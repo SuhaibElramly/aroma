@@ -2,13 +2,23 @@
 <template>
   <div class="space-y-4">
     <!-- Toolbar -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex gap-2 flex-1">
-        <AInput v-model="search" placeholder="Search products…" class="w-56" @input="debouncedFetch" />
+    <div class="space-y-3">
+      <div class="flex items-end justify-between gap-3">
+        <div class="grid grid-cols-3 gap-3 flex-1">
+          <AInput v-model="search" label="Name" placeholder="Search AR / EN…" @input="debouncedFetch" />
+          <ASelect v-model="brandId" label="Brand" :options="[{ value: '', label: 'All brands' }, ...brandOptions]" @update:modelValue="fetch(1)" />
+          <ASelect v-model="categoryId" label="Category" :options="[{ value: '', label: 'All categories' }, ...categoryOptions]" @update:modelValue="fetch(1)" />
+        </div>
+        <AButton @click="openCreate" size="sm" class="shrink-0 self-end">
+          <Plus :size="14" /> Add Product
+        </AButton>
       </div>
-      <AButton @click="openCreate" size="sm">
-        <Plus :size="14" /> Add Product
-      </AButton>
+
+      <div class="grid grid-cols-3 gap-3">
+        <ASelect v-model="filterType" label="Type" :options="typeFilterOptions" @update:modelValue="fetch(1)" />
+        <AInput v-model="priceMin" label="Price Min (LYD)" type="number" placeholder="0" @input="debouncedFetch" />
+        <AInput v-model="priceMax" label="Price Max (LYD)" type="number" placeholder="Any" @input="debouncedFetch" />
+      </div>
     </div>
 
     <ATable :columns="cols" :rows="items" :loading="loading">
@@ -123,7 +133,12 @@ import APagination     from '../components/ui/APagination.vue'
 import AEmptyState     from '../components/ui/AEmptyState.vue'
 import AConfirmDialog  from '../components/ui/AConfirmDialog.vue'
 
-const search  = ref('')
+const search     = ref('')
+const brandId    = ref('')
+const categoryId = ref('')
+const filterType = ref('')
+const priceMin   = ref('')
+const priceMax   = ref('')
 const brands  = ref<AdminBrand[]>([])
 const cats    = ref<AdminCategory[]>([])
 const modalOpen       = ref(false)
@@ -141,6 +156,7 @@ const emptyForm = () => ({
 const form = ref(emptyForm())
 
 const typeOptions     = ['EDP','EDT','Parfum','EDC'].map(v => ({ value: v, label: v }))
+const typeFilterOptions = [{ value: '', label: 'All types' }, ...typeOptions]
 const brandOptions    = computed(() => brands.value.map(b => ({ value: String(b.id), label: b.name })))
 const categoryOptions = computed(() => cats.value.map(c => ({ value: String(c.id), label: c.label })))
 
@@ -155,7 +171,15 @@ const cols = [
 ]
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
-  apiGetProducts({ search: search.value || undefined, page }).then(r => r.data),
+  apiGetProducts({
+    search:      search.value      || undefined,
+    brand_id:    brandId.value     || undefined,
+    category_id: categoryId.value  || undefined,
+    type:        filterType.value  || undefined,
+    price_min:   priceMin.value    ? Number(priceMin.value)  : undefined,
+    price_max:   priceMax.value    ? Number(priceMax.value)  : undefined,
+    page,
+  }).then(r => r.data),
 )
 
 let debounceTimer: ReturnType<typeof setTimeout>
