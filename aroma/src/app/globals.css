@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg:         #F9F8F4;
+    --surface:    #FFFFFF;
+    --border:     #E7E4DF;
+    --text:       #1C1917;
+    --text-2:     #7A7570;
+    --text-3:     #A09890;
+    --accent:     #B8966E;
+    --accent-lt:  #F4EFE8;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #F9F8F4;
+    color: #1C1917;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    min-height: 100vh;
+    /* Ensure RTL body defaults */
+    text-align: right;
+  }
+
+  input, textarea, select {
+    text-align: start; /* Restore browser default regardless of RTL direction */
+  }
+
+  /* Thin scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D0CCC8; border-radius: 2px; }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid #B8966E;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Range input */
+  input[type='range'] {
+    -webkit-appearance: none;
+    height: 2px;
+    background: #D0CCC8;
+    border-radius: 1px;
+    outline: none;
+    width: 100%;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #1C1917;
+    cursor: pointer;
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #1C1917;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* Inputs focus */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #1C1917 !important;
+    outline: none;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .font-display {
+    /* Temporarily aliased to font-sans: Cormorant Garamond removed for Arabic support.
+       Remove this class from components as they are Arabized (Tasks 3–9). */
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
