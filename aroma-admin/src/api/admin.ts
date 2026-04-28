@@ -14,7 +14,14 @@ export const apiGetStats = () =>
   client.get<DashboardStats>('/admin/stats')
 
 // ── Orders ────────────────────────────────────────────────────────────
-export const apiGetOrders = (params: { status?: string; page?: number }) =>
+export const apiGetOrders = (params: {
+  status?:    string
+  order_id?:  string
+  phone?:     string
+  date_from?: string
+  date_to?:   string
+  page?:      number
+}) =>
   client.get<{ data: AdminOrder[]; meta: PageMeta }>('/admin/orders', { params })
 
 export const apiGetOrder = (id: string) =>
@@ -27,7 +34,15 @@ export const apiAddAdminNote = (id: string, admin_note: string) =>
   client.patch<{ admin_note: string }>(`/admin/orders/${id}/note`, { admin_note })
 
 // ── Products ──────────────────────────────────────────────────────────
-export const apiGetProducts = (params: { search?: string; brand_id?: string; page?: number }) =>
+export const apiGetProducts = (params: {
+  search?:      string
+  brand_id?:    string
+  category_id?: string
+  type?:        string
+  price_min?:   number
+  price_max?:   number
+  page?:        number
+}) =>
   client.get<{ data: AdminProduct[]; meta: PageMeta }>('/admin/products', { params })
 
 export const apiCreateProduct = (data: Record<string, unknown>) =>
@@ -100,7 +115,18 @@ export const apiDeleteImage = (productId: number, imageId: number) =>
   client.delete(`/admin/products/${productId}/images/${imageId}`)
 
 // ── Users ─────────────────────────────────────────────────────────────
-export const apiGetUsers = (params: { search?: string; page?: number }) =>
+export const apiGetUser = (userId: number) =>
+  client.get<AdminUserRow>(`/admin/users/${userId}`)
+
+export const apiGetUsers = (params: {
+  search?:       string
+  phone?:        string
+  joined_from?:  string
+  joined_to?:    string
+  min_orders?:   number
+  max_orders?:   number
+  page?:         number
+}) =>
   client.get<{ data: AdminUserRow[]; meta: PageMeta }>('/admin/users', { params })
 
 export const apiGetUserCart = (userId: number) =>
