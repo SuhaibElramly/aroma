@@ -2,7 +2,7 @@ import { client } from './client'
 import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
-  AdminCartItem, AdminWishlistProduct,
+  AdminCartItem, AdminWishlistProduct, ProductType,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ export const apiGetProducts = (params: {
   search?:      string
   brand_id?:    string
   category_id?: string
-  type?:        string
+  type?:        ProductType
   price_min?:   number
   price_max?:   number
   page?:        number

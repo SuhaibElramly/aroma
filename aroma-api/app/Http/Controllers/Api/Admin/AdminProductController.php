@@ -21,7 +21,7 @@ class AdminProductController extends Controller
         }
 
         if ($request->filled('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
+            $query->where('brand_id', (string) $request->brand_id);
         }
 
         if ($request->filled('category_id')) {
@@ -40,6 +40,7 @@ class AdminProductController extends Controller
         }
 
         if ($request->filled('price_max')) {
+            // MIN(price): show products where the cheapest variant is within budget
             $query->whereRaw(
                 '(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) <= ?',
                 [(float) $request->price_max]
