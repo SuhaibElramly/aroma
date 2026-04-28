@@ -13,37 +13,68 @@ class AdminProductController extends Controller
             ->orderBy('name');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
+            $term = "%{$request->search}%";
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', $term)
+                  ->orWhere('name_en', 'like', $term);
+            });
         }
+
         if ($request->filled('brand_id')) {
             $query->where('brand_id', $request->brand_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('price_min')) {
+            $query->whereExists(function ($sub) use ($request) {
+                $sub->selectRaw('1')
+                    ->from('product_variants')
+                    ->whereColumn('product_variants.product_id', 'products.id')
+                    ->havingRaw('MIN(price) >= ?', [(float) $request->price_min]);
+            });
+        }
+
+        if ($request->filled('price_max')) {
+            $query->whereExists(function ($sub) use ($request) {
+                $sub->selectRaw('1')
+                    ->from('product_variants')
+                    ->whereColumn('product_variants.product_id', 'products.id')
+                    ->havingRaw('MIN(price) <= ?', [(float) $request->price_max]);
+            });
         }
 
         $products = $query->paginate(20);
 
         return response()->json([
             'data' => $products->map(fn($p) => [
-                'id' => $p->id,
-                'slug' => $p->slug,
-                'name' => $p->name,
-                'nameEn' => $p->name_en,
-                'brand' => $p->brand?->name,
-                'brandId' => $p->brand_id,
-                'category' => $p->category?->label,
-                'categoryId' => $p->category_id,
-                'type' => $p->type?->value,
-                'isNew' => $p->is_new,
+                'id'           => $p->id,
+                'slug'         => $p->slug,
+                'name'         => $p->name,
+                'nameEn'       => $p->name_en,
+                'brand'        => $p->brand?->name,
+                'brandId'      => $p->brand_id,
+                'category'     => $p->category?->label,
+                'categoryId'   => $p->category_id,
+                'type'         => $p->type?->value,
+                'isNew'        => $p->is_new,
                 'isBestseller' => $p->is_bestseller,
-                'isOffer' => $p->is_offer,
-                'variantCount'  => $p->variants->count(),
-                'price'         => $p->variants->first()?->price,
-                'thumbnailUrl'  => $p->images->firstWhere('is_thumbnail', true)?->url
-                                ?? $p->images->first()?->url,
+                'isOffer'      => $p->is_offer,
+                'variantCount' => $p->variants->count(),
+                'price'        => $p->variants->first()?->price,
+                'thumbnailUrl' => $p->images->firstWhere('is_thumbnail', true)?->url
+                               ?? $p->images->first()?->url,
             ]),
             'meta' => [
-                'total' => $products->total(),
+                'total'       => $products->total(),
                 'currentPage' => $products->currentPage(),
-                'lastPage' => $products->lastPage(),
+                'lastPage'    => $products->lastPage(),
             ],
         ]);
     }
