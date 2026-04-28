@@ -25,10 +25,10 @@ class AdminProductController extends Controller
         }
 
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $query->where('category_id', (int) $request->category_id);
         }
 
-        if ($request->filled('type')) {
+        if ($request->filled('type') && in_array($request->type, ['EDP', 'EDT', 'Parfum', 'EDC'], true)) {
             $query->where('type', $request->type);
         }
 
@@ -63,7 +63,7 @@ class AdminProductController extends Controller
                 'isBestseller' => $p->is_bestseller,
                 'isOffer'      => $p->is_offer,
                 'variantCount' => $p->variants->count(),
-                'price'        => $p->variants->first()?->price,
+                'price'        => $p->variants->min('price'),
                 'thumbnailUrl' => $p->images->firstWhere('is_thumbnail', true)?->url
                                ?? $p->images->first()?->url,
             ]),
