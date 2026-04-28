@@ -33,21 +33,17 @@ class AdminProductController extends Controller
         }
 
         if ($request->filled('price_min')) {
-            $query->whereExists(function ($sub) use ($request) {
-                $sub->selectRaw('1')
-                    ->from('product_variants')
-                    ->whereColumn('product_variants.product_id', 'products.id')
-                    ->havingRaw('MIN(price) >= ?', [(float) $request->price_min]);
-            });
+            $query->whereRaw(
+                '(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) >= ?',
+                [(float) $request->price_min]
+            );
         }
 
         if ($request->filled('price_max')) {
-            $query->whereExists(function ($sub) use ($request) {
-                $sub->selectRaw('1')
-                    ->from('product_variants')
-                    ->whereColumn('product_variants.product_id', 'products.id')
-                    ->havingRaw('MIN(price) <= ?', [(float) $request->price_max]);
-            });
+            $query->whereRaw(
+                '(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) <= ?',
+                [(float) $request->price_max]
+            );
         }
 
         $products = $query->paginate(20);
