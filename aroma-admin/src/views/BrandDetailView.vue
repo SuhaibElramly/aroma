@@ -241,6 +241,10 @@
       @cancel="deletingProduct = null"
     />
 
+    <div v-if="deleteError" class="rounded-lg bg-dash-danger-lt border border-dash-danger/20 px-3 py-2 text-xs text-dash-danger">
+      {{ deleteError }}
+    </div>
+
   </div>
 </template>
 
@@ -329,6 +333,7 @@ const editing         = ref<AdminProduct | null>(null)
 const saving          = ref(false)
 const deletingProduct = ref<AdminProduct | null>(null)
 const deleting        = ref(false)
+const deleteError     = ref<string | null>(null)
 const formErrors      = ref<Record<string, string>>({})
 
 const flags = [
@@ -374,21 +379,20 @@ async function handleSave() {
 
   saving.value = true
   try {
-    if (editing.value) {
-      await apiUpdateProduct(editing.value.id, {
-        name:            form.value.name,
-        name_en:         form.value.name_en     || undefined,
-        brand_id:        form.value.brand_id,
-        category_id:     form.value.category_id,
-        type:            form.value.type,
-        description:     form.value.description || undefined,
-        placeholder_bg:  form.value.placeholder_bg,
-        placeholder_dot: form.value.placeholder_dot,
-        is_new:          form.value.is_new,
-        is_bestseller:   form.value.is_bestseller,
-        is_offer:        form.value.is_offer,
-      })
-    }
+    if (!editing.value) { saving.value = false; return }
+    await apiUpdateProduct(editing.value.id, {
+      name:            form.value.name,
+      name_en:         form.value.name_en     || undefined,
+      brand_id:        form.value.brand_id,
+      category_id:     form.value.category_id,
+      type:            form.value.type,
+      description:     form.value.description || undefined,
+      placeholder_bg:  form.value.placeholder_bg,
+      placeholder_dot: form.value.placeholder_dot,
+      is_new:          form.value.is_new,
+      is_bestseller:   form.value.is_bestseller,
+      is_offer:        form.value.is_offer,
+    })
     modalOpen.value = false
     fetch(1)
     loadBrand() // refresh product count in header
@@ -402,6 +406,7 @@ async function handleSave() {
 function confirmDelete(p: AdminProduct) { deletingProduct.value = p }
 
 async function handleDelete() {
+  deleteError.value = null
   if (!deletingProduct.value) return
   deleting.value = true
   try {
@@ -410,7 +415,7 @@ async function handleDelete() {
     fetch(1)
     loadBrand() // refresh product count in header
   } catch (e: unknown) {
-    formErrors.value.general = e instanceof Error ? e.message : 'Delete failed.'
+    deleteError.value = e instanceof Error ? e.message : 'Delete failed.'
   } finally {
     deleting.value = false
   }
