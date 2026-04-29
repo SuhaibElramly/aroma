@@ -4,16 +4,33 @@
     <div v-if="loadError" class="rounded-lg bg-dash-danger-lt border border-dash-danger/20 px-3 py-2 text-xs text-dash-danger">
       {{ loadError }}
     </div>
+
     <div class="flex justify-end">
       <AButton size="sm" @click="openCreate"><Plus :size="14" /> Add Brand</AButton>
     </div>
 
+    <!-- Filters -->
+    <div class="space-y-3">
+      <div class="grid grid-cols-3 gap-3">
+        <AInput v-model="filterName"    label="Name"    placeholder="Search AR / EN…"  @input="debouncedLoad" />
+        <AInput v-model="filterOrigin"  label="Origin"  placeholder="e.g. France"      @input="debouncedLoad" />
+        <AInput v-model="filterTagline" label="Tagline" placeholder="Keyword…"         @input="debouncedLoad" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <AInput v-model="filterMinProducts" label="Min Products" type="number" placeholder="0"   @input="debouncedLoad" />
+        <AInput v-model="filterMaxProducts" label="Max Products" type="number" placeholder="Any" @input="debouncedLoad" />
+      </div>
+    </div>
+
     <ATable :columns="cols" :rows="brands" :loading="loading">
       <template #cell-name="{ row }">
-        <div>
-          <p class="font-medium text-xs">{{ (row as AdminBrand).name }}</p>
+        <RouterLink
+          :to="`/brands/${(row as AdminBrand).id}`"
+          class="group block"
+        >
+          <p class="font-medium text-xs group-hover:text-dash-primary transition-colors">{{ (row as AdminBrand).name }}</p>
           <p v-if="(row as AdminBrand).nameEn" class="text-[10px] text-dash-faint">{{ (row as AdminBrand).nameEn }}</p>
-        </div>
+        </RouterLink>
       </template>
       <template #cell-id="{ value }">
         <span class="font-mono text-[10px] text-dash-faint">{{ value }}</span>
@@ -25,17 +42,31 @@
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Tag" heading="No brands yet" />
+        <AEmptyState :icon="Tag" heading="No brands found" />
       </template>
     </ATable>
 
     <AModal :open="modalOpen" :title="editing ? 'Edit Brand' : 'Add Brand'" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
-        <AInput v-if="!editing" v-model="form.id"      label="ID (slug, e.g. chanel)" :error="formErrors.id" />
         <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.name"    label="Name (Arabic)" :error="formErrors.name" />
-          <AInput v-model="form.name_en" label="Name (English)" />
+          <AInput v-model="form.name"    label="Name (Arabic)"  :error="formErrors.name"    dir="rtl" />
+          <AInput v-model="form.name_en" label="Name (English)" :error="formErrors.name_en" />
         </div>
+
+        <!-- Slug preview — only shown when creating -->
+        <div
+          v-if="!editing"
+          class="flex items-center gap-2 rounded-btn bg-dash-bg border border-dash-border px-3 py-2"
+        >
+          <Link2 :size="12" class="text-dash-faint shrink-0" />
+          <span class="text-2xs text-dash-muted">Brand ID:</span>
+          <span
+            v-if="generatedSlug"
+            class="text-2xs font-medium text-dash-text font-mono"
+          >{{ generatedSlug }}</span>
+          <span v-else class="text-2xs text-dash-faint italic">type English name above…</span>
+        </div>
+
         <AInput v-model="form.origin"  label="Country of origin" />
         <AInput v-model="form.tagline" label="Tagline" />
         <AInput v-model="form.bg"      label="Background colour" placeholder="#F4EFE8" :error="formErrors.bg" />
@@ -65,8 +96,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Plus, Tag } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { Plus, Tag, Link2 } from 'lucide-vue-next'
 import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand } from '../api/admin'
 import type { AdminBrand } from '../types'
 import ATable         from '../components/ui/ATable.vue'
@@ -76,19 +108,34 @@ import AModal         from '../components/ui/AModal.vue'
 import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 
-const brands       = ref<AdminBrand[]>([])
-const loading      = ref(true)
-const loadError    = ref<string | null>(null)
+// ── Filter state ──────────────────────────────────────────────────────
+const filterName        = ref('')
+const filterOrigin      = ref('')
+const filterTagline     = ref('')
+const filterMinProducts = ref('')
+const filterMaxProducts = ref('')
+
+// ── List state ────────────────────────────────────────────────────────
+const brands      = ref<AdminBrand[]>([])
+const loading     = ref(true)
+const loadError   = ref<string | null>(null)
+
+// ── Modal state ───────────────────────────────────────────────────────
 const modalOpen    = ref(false)
 const editing      = ref<AdminBrand | null>(null)
 const saving       = ref(false)
 const deletingBrand= ref<AdminBrand | null>(null)
 const deleting     = ref(false)
 const deleteError  = ref<string | null>(null)
-const formErrors   = ref<Record<string,string>>({})
+const formErrors   = ref<Record<string, string>>({})
 
-const emptyForm = () => ({ id: '', name: '', name_en: '', origin: '', tagline: '', bg: '' })
+const emptyForm = () => ({ name: '', name_en: '', origin: '', tagline: '', bg: '' })
 const form = ref(emptyForm())
+
+// Derive slug from English name: "Jo Malone" → "jo-malone"
+const generatedSlug = computed(() =>
+  form.value.name_en.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+)
 
 const cols = [
   { key: 'id',           label: 'ID' },
@@ -98,11 +145,18 @@ const cols = [
   { key: 'productCount', label: 'Products' },
 ]
 
+// ── Data fetching ─────────────────────────────────────────────────────
 async function loadBrands() {
-  loading.value = true
+  loading.value  = true
   loadError.value = null
   try {
-    brands.value = (await apiGetBrands()).data
+    brands.value = (await apiGetBrands({
+      name:         filterName.value        || undefined,
+      origin:       filterOrigin.value      || undefined,
+      tagline:      filterTagline.value     || undefined,
+      min_products: filterMinProducts.value ? Number(filterMinProducts.value) : undefined,
+      max_products: filterMaxProducts.value ? Number(filterMaxProducts.value) : undefined,
+    })).data
   } catch (e: unknown) {
     loadError.value = e instanceof Error ? e.message : 'Failed to load brands.'
   } finally {
@@ -110,27 +164,48 @@ async function loadBrands() {
   }
 }
 
-function openCreate() { editing.value = null; form.value = emptyForm(); formErrors.value = {}; modalOpen.value = true }
+let debounceTimer: ReturnType<typeof setTimeout>
+function debouncedLoad() {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => loadBrands(), 350)
+}
+
+// ── Modal helpers ─────────────────────────────────────────────────────
+function openCreate() {
+  editing.value = null
+  form.value = emptyForm()
+  formErrors.value = {}
+  modalOpen.value = true
+}
+
 function openEdit(b: AdminBrand) {
   editing.value = b
-  form.value = { id: b.id, name: b.name, name_en: b.nameEn ?? '', origin: b.origin ?? '', tagline: b.tagline ?? '', bg: b.bg }
-  formErrors.value = {}; modalOpen.value = true
+  form.value = { name: b.name, name_en: b.nameEn ?? '', origin: b.origin ?? '', tagline: b.tagline ?? '', bg: b.bg }
+  formErrors.value = {}
+  modalOpen.value = true
 }
 
 async function handleSave() {
   formErrors.value = {}
-  if (!editing.value && !form.value.id) { formErrors.value.id = 'ID is required'; return }
   if (!form.value.name) { formErrors.value.name = 'Name is required'; return }
   if (!form.value.bg)   { formErrors.value.bg   = 'Colour is required'; return }
+  if (!editing.value && !generatedSlug.value) {
+    formErrors.value.name_en = 'English name required to generate the brand ID'
+    return
+  }
+
   saving.value = true
   try {
     editing.value
       ? await apiUpdateBrand(editing.value.id, form.value)
-      : await apiCreateBrand(form.value)
-    modalOpen.value = false; loadBrands()
+      : await apiCreateBrand({ id: generatedSlug.value, ...form.value })
+    modalOpen.value = false
+    loadBrands()
   } catch (e: unknown) {
     formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
-  } finally { saving.value = false }
+  } finally {
+    saving.value = false
+  }
 }
 
 function confirmDelete(b: AdminBrand) { deletingBrand.value = b }
@@ -152,4 +227,5 @@ async function handleDelete() {
 }
 
 onMounted(loadBrands)
+onUnmounted(() => clearTimeout(debounceTimer))
 </script>
