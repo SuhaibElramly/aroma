@@ -71,8 +71,17 @@ export const apiSetDefaultVariant = (productId: number, variantId: number) =>
   client.patch<ProductVariant>(`/admin/products/${productId}/variants/${variantId}/default`)
 
 // ── Brands ────────────────────────────────────────────────────────────
-export const apiGetBrands = () =>
-  client.get<AdminBrand[]>('/admin/brands')
+export const apiGetBrands = (params?: {
+  name?:         string
+  origin?:       string
+  tagline?:      string
+  min_products?: number
+  max_products?: number
+}) =>
+  client.get<AdminBrand[]>('/admin/brands', { params })
+
+export const apiGetBrand = (id: string) =>
+  client.get<AdminBrand>(`/admin/brands/${id}`)
 
 export const apiCreateBrand = (data: Record<string, unknown>) =>
   client.post<{ id: string }>('/admin/brands', data)
