@@ -8,7 +8,7 @@ class Brand extends Model
 {
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['id', 'name', 'origin', 'tagline', 'bg'];
+    protected $fillable = ['id', 'name', 'name_en', 'origin', 'tagline', 'bg'];
 
     public function products() {
         return $this->hasMany(Product::class, 'brand_id', 'id');
