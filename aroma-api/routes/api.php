@@ -80,6 +80,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
 
     Route::get('/brands', [AdminBrandController::class, 'index']);
     Route::post('/brands', [AdminBrandController::class, 'store']);
+    Route::get('/brands/{id}', [AdminBrandController::class, 'show']);
     Route::put('/brands/{id}', [AdminBrandController::class, 'update']);
     Route::delete('/brands/{id}', [AdminBrandController::class, 'destroy']);
 
@@ -88,7 +89,8 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::put('/categories/{id}', [AdminCategoryController::class, 'update']);
     Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy']);
 
-    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users',              [AdminUserController::class, 'index']);
+    Route::get('/users/{id}',         [AdminUserController::class, 'show']);
     Route::get('/users/{id}/cart',     [AdminUserDetailController::class, 'cart']);
     Route::get('/users/{id}/wishlist', [AdminUserDetailController::class, 'wishlist']);
 });
