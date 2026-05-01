@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminBrandController extends Controller
 {
@@ -50,6 +52,7 @@ class AdminBrandController extends Controller
             'origin'       => $b->origin,
             'tagline'      => $b->tagline,
             'bg'           => $b->bg,
+            'logoUrl'      => $b->logo ? Storage::disk('public')->url($b->logo) : null,
             'productCount' => $b->products_count,
         ]));
     }
@@ -65,6 +68,7 @@ class AdminBrandController extends Controller
             'origin'       => $brand->origin,
             'tagline'      => $brand->tagline,
             'bg'           => $brand->bg,
+            'logoUrl'      => $brand->logo ? Storage::disk('public')->url($brand->logo) : null,
             'productCount' => $brand->products_count,
         ]);
     }
@@ -108,6 +112,42 @@ class AdminBrandController extends Controller
         }
 
         $brand->delete();
+        return response()->json(null, 204);
+    }
+
+    public function uploadLogo(Request $request, string $id)
+    {
+        $brand = Brand::findOrFail($id);
+
+        $request->validate([
+            'logo' => 'required|file|image|max:2048',
+        ]);
+
+        // Delete previous logo file if one exists
+        if ($brand->logo) {
+            Storage::disk('public')->delete($brand->logo);
+        }
+
+        $file     = $request->file('logo');
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path     = $file->storeAs("brands/{$id}", $filename, 'public');
+
+        $brand->update(['logo' => $path]);
+
+        return response()->json([
+            'logoUrl' => Storage::disk('public')->url($path),
+        ]);
+    }
+
+    public function destroyLogo(string $id)
+    {
+        $brand = Brand::findOrFail($id);
+
+        if ($brand->logo) {
+            Storage::disk('public')->delete($brand->logo);
+            $brand->update(['logo' => null]);
+        }
+
         return response()->json(null, 204);
     }
 }
