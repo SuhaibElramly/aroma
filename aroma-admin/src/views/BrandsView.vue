@@ -70,6 +70,23 @@
         <AInput v-model="form.origin"  label="Country of origin" />
         <AInput v-model="form.tagline" label="Tagline" />
         <AInput v-model="form.bg"      label="Background colour" placeholder="#F4EFE8" :error="formErrors.bg" />
+
+        <!-- Logo -->
+        <div>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2">Logo (optional)</p>
+          <div v-if="logoPreview" class="flex items-center gap-3">
+            <img :src="logoPreview" alt="Brand logo" class="h-12 w-12 object-contain rounded border border-dash-border bg-dash-bg p-1" />
+            <AButton size="sm" variant="ghost" type="button" @click="removeLogo">
+              <X :size="12" /> Remove
+            </AButton>
+          </div>
+          <label v-else class="flex items-center gap-2 cursor-pointer rounded-btn border border-dashed border-dash-border px-3 py-2.5 text-xs text-dash-faint hover:border-dash-muted transition-colors">
+            <Image :size="14" />
+            Click to upload logo (PNG, JPG — max 2 MB)
+            <input type="file" accept="image/*" class="sr-only" @change="pickLogoFile" />
+          </label>
+        </div>
+
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
@@ -98,8 +115,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { Plus, Tag, Link2 } from 'lucide-vue-next'
-import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand } from '../api/admin'
+import { Plus, Tag, Link2, Image, X } from 'lucide-vue-next'
+import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand, apiUploadBrandLogo, apiDeleteBrandLogo } from '../api/admin'
 import type { AdminBrand } from '../types'
 import ATable         from '../components/ui/ATable.vue'
 import AButton        from '../components/ui/AButton.vue'
@@ -128,6 +145,10 @@ const deletingBrand= ref<AdminBrand | null>(null)
 const deleting     = ref(false)
 const deleteError  = ref<string | null>(null)
 const formErrors   = ref<Record<string, string>>({})
+
+const logoPreview     = ref<string | null>(null)
+const pendingLogoFile = ref<File | null>(null)
+const logoRemoved     = ref(false)
 
 const emptyForm = () => ({ name: '', name_en: '', origin: '', tagline: '', bg: '' })
 const form = ref(emptyForm())
@@ -175,14 +196,34 @@ function openCreate() {
   editing.value = null
   form.value = emptyForm()
   formErrors.value = {}
+  logoPreview.value     = null
+  pendingLogoFile.value = null
+  logoRemoved.value     = false
   modalOpen.value = true
 }
 
 function openEdit(b: AdminBrand) {
   editing.value = b
   form.value = { name: b.name, name_en: b.nameEn ?? '', origin: b.origin ?? '', tagline: b.tagline ?? '', bg: b.bg }
-  formErrors.value = {}
-  modalOpen.value = true
+  formErrors.value  = {}
+  logoPreview.value  = b.logoUrl ?? null
+  pendingLogoFile.value = null
+  logoRemoved.value  = false
+  modalOpen.value    = true
+}
+
+function pickLogoFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  pendingLogoFile.value = file
+  logoRemoved.value     = false
+  logoPreview.value     = URL.createObjectURL(file)
+}
+
+function removeLogo() {
+  pendingLogoFile.value = null
+  logoPreview.value     = null
+  logoRemoved.value     = true
 }
 
 async function handleSave() {
@@ -196,9 +237,21 @@ async function handleSave() {
 
   saving.value = true
   try {
-    editing.value
-      ? await apiUpdateBrand(editing.value.id, form.value)
-      : await apiCreateBrand({ id: generatedSlug.value, ...form.value })
+    let brandId: string
+    if (editing.value) {
+      await apiUpdateBrand(editing.value.id, form.value)
+      brandId = editing.value.id
+    } else {
+      const res = await apiCreateBrand({ id: generatedSlug.value, ...form.value })
+      brandId = res.data.id
+    }
+
+    if (pendingLogoFile.value) {
+      await apiUploadBrandLogo(brandId, pendingLogoFile.value)
+    } else if (logoRemoved.value && editing.value?.logoUrl) {
+      await apiDeleteBrandLogo(brandId)
+    }
+
     modalOpen.value = false
     loadBrands()
   } catch (e: unknown) {
