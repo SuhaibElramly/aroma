@@ -46,7 +46,7 @@
       </template>
     </ATable>
 
-    <AModal :open="modalOpen" :title="editing ? 'Edit Brand' : 'Add Brand'" @close="modalOpen = false">
+    <AModal :open="modalOpen" :title="editing ? 'Edit Brand' : 'Add Brand'" @close="closeModal">
       <form class="space-y-3" @submit.prevent>
         <div class="grid grid-cols-2 gap-3">
           <AInput v-model="form.name"    label="Name (Arabic)"  :error="formErrors.name"    dir="rtl" />
@@ -90,7 +90,7 @@
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
+        <AButton variant="secondary" size="sm" @click="closeModal">Cancel</AButton>
         <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save' : 'Add' }}</AButton>
       </template>
     </AModal>
@@ -196,6 +196,7 @@ function openCreate() {
   editing.value = null
   form.value = emptyForm()
   formErrors.value = {}
+  if (logoPreview.value?.startsWith('blob:')) URL.revokeObjectURL(logoPreview.value)
   logoPreview.value     = null
   pendingLogoFile.value = null
   logoRemoved.value     = false
@@ -206,6 +207,7 @@ function openEdit(b: AdminBrand) {
   editing.value = b
   form.value = { name: b.name, name_en: b.nameEn ?? '', origin: b.origin ?? '', tagline: b.tagline ?? '', bg: b.bg }
   formErrors.value  = {}
+  if (logoPreview.value?.startsWith('blob:')) URL.revokeObjectURL(logoPreview.value)
   logoPreview.value  = b.logoUrl ?? null
   pendingLogoFile.value = null
   logoRemoved.value  = false
@@ -215,12 +217,14 @@ function openEdit(b: AdminBrand) {
 function pickLogoFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
+  if (logoPreview.value?.startsWith('blob:')) URL.revokeObjectURL(logoPreview.value)
   pendingLogoFile.value = file
   logoRemoved.value     = false
   logoPreview.value     = URL.createObjectURL(file)
 }
 
 function removeLogo() {
+  if (logoPreview.value?.startsWith('blob:')) URL.revokeObjectURL(logoPreview.value)
   pendingLogoFile.value = null
   logoPreview.value     = null
   logoRemoved.value     = true
@@ -256,9 +260,18 @@ async function handleSave() {
     loadBrands()
   } catch (e: unknown) {
     formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
+    loadBrands()
   } finally {
     saving.value = false
   }
+}
+
+function closeModal() {
+  if (logoPreview.value?.startsWith('blob:')) URL.revokeObjectURL(logoPreview.value)
+  logoPreview.value     = null
+  pendingLogoFile.value = null
+  logoRemoved.value     = false
+  modalOpen.value       = false
 }
 
 function confirmDelete(b: AdminBrand) { deletingBrand.value = b }
