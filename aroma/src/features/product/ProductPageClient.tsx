@@ -95,14 +95,17 @@ export function ProductPageClient({ slug }: { slug: string }) {
         {/* Gallery */}
         <div className="md:pl-12 mb-8 md:mb-0">
           {/* Main image */}
-          <div className="rounded-lg overflow-hidden mb-4 relative" style={{ height: 480 }}>
+          <div
+            className="rounded-lg overflow-hidden mb-4 relative"
+            style={{ height: 480, backgroundColor: product.placeholder.bg }}
+          >
             {displayImg ? (
               <Image
                 src={displayImg}
                 alt={product.nameEn || product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 480px"
-                className="object-cover"
+                className="object-contain p-6"
                 priority
               />
             ) : (
@@ -119,6 +122,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
                   className="flex-1 rounded overflow-hidden cursor-pointer relative"
                   style={{
                     height: 90,
+                    backgroundColor: product.placeholder.bg,
                     border: (activeImg ?? product.thumbnailUrl) === img.url
                       ? '2px solid #1C1917'
                       : '2px solid transparent',
@@ -129,7 +133,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
                     alt=""
                     fill
                     sizes="100px"
-                    className="object-cover"
+                    className="object-contain p-1.5"
                   />
                 </div>
               ))}
@@ -153,9 +157,22 @@ export function ProductPageClient({ slug }: { slug: string }) {
 
         {/* Purchase module */}
         <div className="md:sticky md:top-20 md:self-start space-y-0">
-          <p className="font-sans text-[12px] text-aroma-accent tracking-[0.12em] uppercase mb-2">
-            {product.brand}
-          </p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="font-sans text-[12px] text-aroma-accent tracking-[0.12em] uppercase">
+              {product.brand}
+            </p>
+            {product.brandLogoUrl && (
+              <div className="relative h-6 w-6 rounded-full bg-white border border-aroma-border-lt shadow-sm overflow-hidden flex-shrink-0">
+                <Image
+                  src={product.brandLogoUrl}
+                  alt={product.brand}
+                  fill
+                  sizes="24px"
+                  className="object-contain p-0.5"
+                />
+              </div>
+            )}
+          </div>
           <h1 className="font-display text-[36px] font-normal text-aroma-text leading-[1.1]">
             {product.name}
           </h1>
@@ -258,38 +275,10 @@ export function ProductPageClient({ slug }: { slug: string }) {
             </p>
           </div>
 
-          {/* Scent Profile */}
-          <div className="mt-6 bg-aroma-bg rounded-md p-5">
-            <p className="font-sans text-[11px] text-aroma-faint uppercase mb-4">
-              ملف العطر
-            </p>
-            {[
-              ['رائحة افتتاحية', product.notes.top],
-              ['رائحة القلب',   product.notes.heart],
-              ['رائحة القاعدة', product.notes.base],
-            ].map(([layer, notes]) => (
-              <div key={layer as string} className="flex gap-3 mb-3 last:mb-0 items-start">
-                <span className="font-sans text-[11px] text-aroma-faint w-20 shrink-0 pt-0.5">
-                  {layer as string}
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {(notes as string[]).map(n => (
-                    <span
-                      key={n}
-                      className="font-sans text-[12px] text-[#4A4540] bg-white border
-                                 border-aroma-border px-2.5 py-0.5 rounded-full"
-                    >
-                      {n}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
 
           {/* Tags */}
           <div className="mt-4 flex flex-wrap gap-1.5">
-            {product.tags.map(t => (
+            {(product.tags ?? []).map(t => (
               <span
                 key={t}
                 className="font-sans text-[11px] text-aroma-muted border border-aroma-border
