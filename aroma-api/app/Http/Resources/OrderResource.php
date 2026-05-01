@@ -38,6 +38,8 @@ class OrderResource extends JsonResource
                 'bg' => $this->placeholder_bg,
                 'dot' => $this->placeholder_dot,
             ],
+            'couponCode'     => $this->coupon_code,
+            'discountAmount' => $this->discount_amount ? (float) $this->discount_amount : null,
         ];
     }
 }

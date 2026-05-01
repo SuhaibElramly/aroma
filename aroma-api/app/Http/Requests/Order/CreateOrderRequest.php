@@ -21,6 +21,7 @@ class CreateOrderRequest extends FormRequest
             'is_pickup'                  => ['required', 'boolean'],
             'address_id'                 => ['required_if:is_pickup,false', 'nullable', 'integer', 'exists:addresses,id'],
             'total'                      => ['required', 'numeric', 'min:0.01'],
+            'coupon_code'                => ['nullable', 'string'],
         ];
     }
 }

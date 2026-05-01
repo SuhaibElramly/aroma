@@ -10,13 +10,35 @@ class AdminOrderController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['status' => 'sometimes|in:placed,confirmed,preparing,ready,delivered,cancelled']);
+        $request->validate([
+            'status'    => 'sometimes|in:placed,confirmed,preparing,ready,delivered,cancelled',
+            'order_id'  => 'sometimes|string|max:100',
+            'phone'     => 'sometimes|string|max:30',
+            'date_from' => 'sometimes|date_format:Y-m-d',
+            'date_to'   => 'sometimes|date_format:Y-m-d',
+        ]);
 
         $query = Order::with(['user', 'items'])
             ->orderByDesc('created_at');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->filled('order_id')) {
+            $query->where('id', 'like', '%' . $request->order_id . '%');
+        }
+
+        if ($request->filled('phone')) {
+            $query->whereHas('user', fn($q) => $q->where('phone', 'like', '%' . $request->phone . '%'));
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         $orders = $query->paginate(20);
@@ -83,6 +105,8 @@ class AdminOrderController extends Controller
             'adminNote' => $order->admin_note,
             'date' => $order->created_at->format('Y-m-d H:i'),
             'itemCount' => $order->items->count(),
+            'couponCode'     => $order->coupon_code,
+            'discountAmount' => $order->discount_amount ? (float) $order->discount_amount : null,
         ];
         if ($detailed) {
             $base['items'] = $order->items->map(fn($i) => [
