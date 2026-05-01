@@ -23,6 +23,12 @@
           class="h-10 w-10 rounded-btn shrink-0 border border-dash-border"
           :style="{ backgroundColor: brand.bg }"
         />
+        <img
+          v-if="brand.logoUrl"
+          :src="brand.logoUrl"
+          alt="Brand logo"
+          class="h-10 w-10 object-contain rounded-btn border border-dash-border bg-white p-1 shrink-0"
+        />
         <div>
           <RouterLink
             to="/brands"
