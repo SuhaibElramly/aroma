@@ -11,7 +11,7 @@ class Brand extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['id', 'name', 'name_en', 'origin', 'tagline', 'bg'];
+    protected $fillable = ['id', 'name', 'name_en', 'origin', 'tagline', 'bg', 'logo'];
 
     public function products()
     {
