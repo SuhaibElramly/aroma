@@ -42,6 +42,7 @@ export interface Brand {
   tagline: string
   count: number
   bg?: string
+  logoUrl?: string | null
 }
 
 export interface ProductNotes {
@@ -68,6 +69,7 @@ export interface Product {
   nameEn: string
   brand: string
   brandId: string
+  brandLogoUrl?: string | null
   price: number
   originalPrice: number | null
   sizes: string[]
