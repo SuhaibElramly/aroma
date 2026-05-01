@@ -24,14 +24,17 @@ export function ProductCard({ product, compact = false }: Props) {
     >
       <Link href={`/product/${product.slug}`} className="block">
         {/* Image area */}
-        <div className="relative rounded overflow-hidden mb-3.5" style={{ height: imgH }}>
+        <div
+          className="relative rounded overflow-hidden mb-3.5"
+          style={{ height: imgH, backgroundColor: product.placeholder.bg }}
+        >
           {product.thumbnailUrl ? (
             <Image
               src={product.thumbnailUrl}
               alt={product.nameEn || product.name}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover"
+              className="object-contain p-4"
             />
           ) : (
             <ProductPlaceholder product={product} height={imgH} />
@@ -55,6 +58,19 @@ export function ProductCard({ product, compact = false }: Props) {
 
           {/* Wishlist button */}
           <WishlistButton productId={product.id} />
+
+          {/* Brand logo */}
+          {product.brandLogoUrl && (
+            <div className="absolute bottom-2 right-2 h-7 w-7 rounded-full bg-white/90 border border-black/5 shadow-sm flex items-center justify-center overflow-hidden">
+              <Image
+                src={product.brandLogoUrl}
+                alt={product.brand}
+                fill
+                sizes="28px"
+                className="object-contain p-0.5"
+              />
+            </div>
+          )}
 
           {/* Bestseller strip */}
           {product.bestseller && (
