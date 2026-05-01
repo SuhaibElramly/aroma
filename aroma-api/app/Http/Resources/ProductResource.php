@@ -24,6 +24,9 @@ class ProductResource extends JsonResource
             'nameEn' => $this->name_en,
             'brand' => $this->brand?->name_en ?: $this->brand?->name,
             'brandId' => $this->brand_id,
+            'brandLogoUrl' => $this->brand?->logo
+                ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->brand->logo)
+                : null,
             'price' => $defaultVariant?->price,
             'originalPrice' => $defaultVariant?->original_price,
             'sizes' => $this->variants->pluck('size')->toArray(),
