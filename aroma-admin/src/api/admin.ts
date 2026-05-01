@@ -92,6 +92,17 @@ export const apiUpdateBrand = (id: string, data: Record<string, unknown>) =>
 export const apiDeleteBrand = (id: string) =>
   client.delete(`/admin/brands/${id}`)
 
+export const apiUploadBrandLogo = (id: string, file: File) => {
+  const form = new FormData()
+  form.append('logo', file)
+  return client.post<{ logoUrl: string }>(`/admin/brands/${id}/logo`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const apiDeleteBrandLogo = (id: string) =>
+  client.delete(`/admin/brands/${id}/logo`)
+
 // ── Categories ────────────────────────────────────────────────────────
 export const apiGetCategories = (params?: {
   label?: string
@@ -141,6 +152,9 @@ export const apiGetUsers = (params: {
   page?:         number
 }) =>
   client.get<{ data: AdminUserRow[]; meta: PageMeta }>('/admin/users', { params })
+
+export const apiGetUserOrders = (userId: number) =>
+  client.get<AdminUserOrder[]>(`/admin/users/${userId}/orders`)
 
 export const apiGetUserCart = (userId: number) =>
   client.get<AdminCartItem[]>(`/admin/users/${userId}/cart`)

@@ -100,9 +100,11 @@ export interface AdminProduct {
   isNew:        boolean
   isBestseller: boolean
   isOffer:      boolean
-  variantCount: number
-  price:        string | null
-  thumbnailUrl: string | null
+  variantCount:   number
+  price:          string | null
+  thumbnailUrl:   string | null
+  placeholderBg:  string
+  placeholderDot: string
 }
 
 export interface ProductVariant {
@@ -133,6 +135,7 @@ export interface AdminBrand {
   origin: string | null
   tagline: string | null
   bg: string
+  logoUrl: string | null
   productCount: number
 }
 
@@ -146,6 +149,15 @@ export interface AdminCategory {
 }
 
 // ── Users ─────────────────────────────────────────────────────────────
+export interface AdminUserOrder {
+  id: string
+  total: string
+  status: OrderStatus
+  isPickup: boolean
+  itemCount: number
+  date: string
+}
+
 export interface AdminUserRow {
   id: number
   name: string
