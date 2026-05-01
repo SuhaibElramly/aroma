@@ -95,9 +95,7 @@ export const apiDeleteBrand = (id: string) =>
 export const apiUploadBrandLogo = (id: string, file: File) => {
   const form = new FormData()
   form.append('logo', file)
-  return client.post<{ logoUrl: string }>(`/admin/brands/${id}/logo`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  return client.post<{ logoUrl: string }>(`/admin/brands/${id}/logo`, form)
 }
 
 export const apiDeleteBrandLogo = (id: string) =>
@@ -127,9 +125,7 @@ export const apiGetImages = (productId: number) =>
 export const apiUploadImages = (productId: number, files: File[]) => {
   const form = new FormData()
   files.forEach(f => form.append('images[]', f))
-  return client.post<ProductImage[]>(`/admin/products/${productId}/images`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  return client.post<ProductImage[]>(`/admin/products/${productId}/images`, form)
 }
 
 export const apiSetThumbnail = (productId: number, imageId: number) =>
