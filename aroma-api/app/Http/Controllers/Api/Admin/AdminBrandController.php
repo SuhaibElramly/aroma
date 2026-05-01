@@ -132,6 +132,10 @@ class AdminBrandController extends Controller
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         $path     = $file->storeAs("brands/{$id}", $filename, 'public');
 
+        if ($path === false) {
+            return response()->json(['message' => 'File could not be stored.'], 500);
+        }
+
         $brand->update(['logo' => $path]);
 
         return response()->json([

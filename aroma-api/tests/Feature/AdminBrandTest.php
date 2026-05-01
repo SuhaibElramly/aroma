@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Brand;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminBrandTest extends TestCase
@@ -121,5 +123,86 @@ class AdminBrandTest extends TestCase
     {
         $this->asAdmin()->getJson('/api/admin/brands/nonexistent')
             ->assertNotFound();
+    }
+
+    public function test_upload_logo_stores_file_and_returns_logo_url(): void
+    {
+        Storage::fake('public');
+
+        $brand = Brand::factory()->create();
+
+        $file = UploadedFile::fake()->image('logo.png');
+
+        $this->asAdmin()
+            ->postJson("/api/admin/brands/{$brand->id}/logo", ['logo' => $file])
+            ->assertOk()
+            ->assertJsonStructure(['logoUrl']);
+
+        $brand->refresh();
+        $this->assertNotNull($brand->logo);
+        Storage::disk('public')->assertExists($brand->logo);
+    }
+
+    public function test_upload_logo_replaces_existing_file(): void
+    {
+        Storage::fake('public');
+
+        $brand = Brand::factory()->create();
+
+        // Upload a first logo
+        $firstFile = UploadedFile::fake()->image('first.png');
+        Storage::disk('public')->putFileAs("brands/{$brand->id}", $firstFile, 'first.png');
+        $oldPath = "brands/{$brand->id}/first.png";
+        $brand->update(['logo' => $oldPath]);
+
+        // Upload a replacement logo
+        $newFile = UploadedFile::fake()->image('second.png');
+        $response = $this->asAdmin()
+            ->postJson("/api/admin/brands/{$brand->id}/logo", ['logo' => $newFile])
+            ->assertOk()
+            ->assertJsonStructure(['logoUrl']);
+
+        Storage::disk('public')->assertMissing($oldPath);
+
+        $brand->refresh();
+        $this->assertNotNull($brand->logo);
+        $this->assertNotEquals($oldPath, $brand->logo);
+        Storage::disk('public')->assertExists($brand->logo);
+    }
+
+    public function test_destroy_logo_removes_file_and_nulls_column(): void
+    {
+        Storage::fake('public');
+
+        $brand = Brand::factory()->create();
+
+        // Give the brand a logo
+        $file = UploadedFile::fake()->image('logo.png');
+        Storage::disk('public')->putFileAs("brands/{$brand->id}", $file, 'logo.png');
+        $logoPath = "brands/{$brand->id}/logo.png";
+        $brand->update(['logo' => $logoPath]);
+
+        $this->asAdmin()
+            ->deleteJson("/api/admin/brands/{$brand->id}/logo")
+            ->assertNoContent();
+
+        Storage::disk('public')->assertMissing($logoPath);
+
+        $brand->refresh();
+        $this->assertNull($brand->logo);
+    }
+
+    public function test_destroy_logo_is_idempotent_when_no_logo(): void
+    {
+        Storage::fake('public');
+
+        $brand = Brand::factory()->create(['logo' => null]);
+
+        $this->asAdmin()
+            ->deleteJson("/api/admin/brands/{$brand->id}/logo")
+            ->assertNoContent();
+
+        $brand->refresh();
+        $this->assertNull($brand->logo);
     }
 }
