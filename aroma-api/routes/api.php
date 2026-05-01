@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\{
     AuthController, ProductController, BrandController, CategoryController,
-    OrderController, AddressController, CartController, WishlistController, HomeController
+    OrderController, AddressController, CartController, WishlistController, HomeController,
+    CouponController
 };
 
 Route::get('/health', fn() => response()->json(['status' => 'ok']));
@@ -45,6 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::post('/wishlist', [WishlistController::class, 'store']);
     Route::delete('/wishlist/{productId}', [WishlistController::class, 'destroy']);
+
+    Route::post('/coupons/validate', [CouponController::class, 'validate']);
 });
 
 use App\Http\Controllers\Api\Admin\{
