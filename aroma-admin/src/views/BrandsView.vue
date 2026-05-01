@@ -256,7 +256,7 @@ async function handleSave() {
       await apiDeleteBrandLogo(brandId)
     }
 
-    modalOpen.value = false
+    closeModal()
     loadBrands()
   } catch (e: unknown) {
     formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'

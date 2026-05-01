@@ -116,7 +116,7 @@ class AdminBrandTest extends TestCase
             ->assertOk()
             ->assertJsonPath('id', $brand->id)
             ->assertJsonPath('name', $brand->name)
-            ->assertJsonStructure(['id', 'name', 'nameEn', 'origin', 'tagline', 'bg', 'productCount']);
+            ->assertJsonStructure(['id', 'name', 'nameEn', 'origin', 'tagline', 'bg', 'logoUrl', 'productCount']);
     }
 
     public function test_show_returns_404_for_nonexistent_brand(): void

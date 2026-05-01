@@ -111,6 +111,10 @@ class AdminBrandController extends Controller
             ], 422);
         }
 
+        if ($brand->logo) {
+            Storage::disk('public')->delete($brand->logo);
+        }
+
         $brand->delete();
         return response()->json(null, 204);
     }
