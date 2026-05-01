@@ -13,12 +13,14 @@ class Order extends Model
         'id', 'user_id', 'status', 'total', 'note', 'admin_note',
         'is_pickup', 'address_id', 'delivery_city', 'delivery_description',
         'placeholder_bg', 'placeholder_dot',
+        'coupon_code', 'discount_amount',
     ];
 
     protected $casts = [
-        'status' => OrderStatus::class,
-        'total' => 'decimal:2',
-        'is_pickup' => 'boolean',
+        'status'          => OrderStatus::class,
+        'total'           => 'decimal:2',
+        'is_pickup'       => 'boolean',
+        'discount_amount' => 'decimal:2',
     ];
 
     public function user() {
