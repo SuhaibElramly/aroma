@@ -27,6 +27,7 @@ export const router = createRouter({
         { path: 'categories', name: 'categories',        component: () => import('../views/CategoriesView.vue') },
         { path: 'users',      name: 'users',             component: () => import('../views/UsersView.vue') },
         { path: 'users/:id',  name: 'user-detail',       component: () => import('../views/UserDetailView.vue'), props: true },
+        { path: 'coupons', name: 'coupons', component: () => import('../views/CouponsView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

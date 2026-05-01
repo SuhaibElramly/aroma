@@ -70,6 +70,8 @@ export interface AdminOrder {
   itemCount: number
   items?: AdminOrderItem[]
   timeline?: AdminTimelineEntry[]
+  couponCode?: string | null
+  discountAmount?: number | null
 }
 
 export interface AdminOrderItem {
@@ -187,4 +189,18 @@ export interface AdminWishlistProduct {
   selectedSize: string
   stock: string
   thumbnailUrl: string | null
+}
+
+// ── Coupons ───────────────────────────────────────────────────────────
+export interface AdminCoupon {
+  id: number
+  code: string
+  type: 'percentage' | 'fixed'
+  value: number
+  minOrderAmount: number | null
+  maxUses: number | null
+  usesCount: number
+  expiresAt: string | null
+  isActive: boolean
+  createdAt: string
 }

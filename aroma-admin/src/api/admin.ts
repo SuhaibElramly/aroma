@@ -2,7 +2,7 @@ import { client } from './client'
 import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
-  AdminCartItem, AdminWishlistProduct, ProductType,
+  AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -157,3 +157,35 @@ export const apiGetUserCart = (userId: number) =>
 
 export const apiGetUserWishlist = (userId: number) =>
   client.get<AdminWishlistProduct[]>(`/admin/users/${userId}/wishlist`)
+
+// ── Coupons ───────────────────────────────────────────────────────────
+export const apiGetCoupons = (params?: { search?: string }) =>
+  client.get<AdminCoupon[]>('/admin/coupons', { params })
+
+export const apiCreateCoupon = (data: {
+  code: string
+  type: 'percentage' | 'fixed'
+  value: number
+  min_order_amount?: number | null
+  max_uses?: number | null
+  expires_at?: string | null
+  is_active?: boolean
+}) =>
+  client.post<AdminCoupon>('/admin/coupons', data)
+
+export const apiUpdateCoupon = (id: number, data: Partial<{
+  code: string
+  type: 'percentage' | 'fixed'
+  value: number
+  min_order_amount: number | null
+  max_uses: number | null
+  expires_at: string | null
+  is_active: boolean
+}>) =>
+  client.put<AdminCoupon>(`/admin/coupons/${id}`, data)
+
+export const apiDeleteCoupon = (id: number) =>
+  client.delete(`/admin/coupons/${id}`)
+
+export const apiToggleCoupon = (id: number) =>
+  client.patch<AdminCoupon>(`/admin/coupons/${id}/toggle`)

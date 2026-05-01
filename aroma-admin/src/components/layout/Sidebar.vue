@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutDashboard, ShoppingBag, Package, Tag, Grid3X3, Users } from 'lucide-vue-next'
+import { LayoutDashboard, ShoppingBag, Package, Tag, Grid3X3, Users, Ticket } from 'lucide-vue-next'
 
 const mainItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -104,5 +104,6 @@ const catalogItems = [
   { to: '/products',   label: 'Products',   icon: Package },
   { to: '/brands',     label: 'Brands',     icon: Tag },
   { to: '/categories', label: 'Categories', icon: Grid3X3 },
+  { to: '/coupons',    label: 'Coupons',    icon: Ticket },
 ]
 </script>
