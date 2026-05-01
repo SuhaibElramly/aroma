@@ -1,15 +1,38 @@
 <?php
+
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cats = Category::withCount('products')->orderBy('label')->get();
+        $query = Category::withCount('products');
+
+        if ($request->filled('label')) {
+            $query->where('label', 'like', '%' . $request->label . '%');
+        }
+
+        if ($request->filled('min_products')) {
+            $query->whereRaw(
+                '(SELECT COUNT(*) FROM products WHERE products.category_id = categories.id) >= ?',
+                [(int) $request->min_products]
+            );
+        }
+
+        if ($request->filled('max_products')) {
+            $query->whereRaw(
+                '(SELECT COUNT(*) FROM products WHERE products.category_id = categories.id) <= ?',
+                [(int) $request->max_products]
+            );
+        }
+
+        $cats = $query->orderBy('label')->get();
+
         return response()->json($cats->map(fn($c) => [
             'id'           => $c->id,
             'slug'         => $c->slug,
@@ -22,17 +45,25 @@ class AdminCategoryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'slug'  => 'required|string|unique:categories,slug',
             'label' => 'required|string',
             'bg'    => 'required|string',
         ]);
+
+        $base = Str::slug($data['label']);
+        $slug = $base;
+        $i    = 2;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        $data['slug'] = $slug;
+
         $cat = Category::create($data);
         return response()->json(['id' => $cat->id], 201);
     }
 
     public function update(Request $request, int $id)
     {
-        $cat = Category::findOrFail($id);
+        $cat  = Category::findOrFail($id);
         $data = $request->validate([
             'label' => 'sometimes|string',
             'bg'    => 'sometimes|string',
