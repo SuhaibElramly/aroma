@@ -93,8 +93,12 @@ export const apiDeleteBrand = (id: string) =>
   client.delete(`/admin/brands/${id}`)
 
 // ── Categories ────────────────────────────────────────────────────────
-export const apiGetCategories = () =>
-  client.get<AdminCategory[]>('/admin/categories')
+export const apiGetCategories = (params?: {
+  label?: string
+  min_products?: number
+  max_products?: number
+}) =>
+  client.get<AdminCategory[]>('/admin/categories', { params })
 
 export const apiCreateCategory = (data: Record<string, unknown>) =>
   client.post<{ id: string }>('/admin/categories', data)
