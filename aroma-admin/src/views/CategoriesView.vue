@@ -8,6 +8,17 @@
       <AButton size="sm" @click="openCreate"><Plus :size="14" /> Add Category</AButton>
     </div>
 
+    <!-- Filters -->
+    <div class="space-y-3">
+      <div class="grid grid-cols-1 gap-3">
+        <AInput v-model="filterLabel" label="Label" placeholder="Search label…" @input="debouncedLoad" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <AInput v-model="filterMinProducts" label="Min Products" type="number" placeholder="0"   @input="debouncedLoad" />
+        <AInput v-model="filterMaxProducts" label="Max Products" type="number" placeholder="Any" @input="debouncedLoad" />
+      </div>
+    </div>
+
     <ATable :columns="cols" :rows="categories" :loading="loading">
       <template #cell-id="{ value }">
         <span class="font-mono text-[10px] text-dash-faint">{{ value }}</span>
@@ -19,13 +30,12 @@
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Grid3X3" heading="No categories yet" />
+        <AEmptyState :icon="Grid3X3" heading="No categories found" />
       </template>
     </ATable>
 
     <AModal :open="modalOpen" :title="editing ? 'Edit Category' : 'Add Category'" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
-        <AInput v-if="!editing" v-model="form.id"    label="ID (slug, e.g. women)" :error="formErrors.id" />
         <AInput v-model="form.label" label="Label" :error="formErrors.label" />
         <AInput v-model="form.bg"    label="Background colour" placeholder="#F4EFE8" :error="formErrors.bg" />
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
@@ -51,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { Plus, Grid3X3 } from 'lucide-vue-next'
 import { apiGetCategories, apiCreateCategory, apiUpdateCategory, apiDeleteCategory } from '../api/admin'
 import type { AdminCategory } from '../types'
@@ -73,7 +83,11 @@ const deleting   = ref(false)
 const deleteError= ref<string | null>(null)
 const formErrors = ref<Record<string,string>>({})
 
-const emptyForm = () => ({ id: '', label: '', bg: '' })
+const filterLabel       = ref('')
+const filterMinProducts = ref('')
+const filterMaxProducts = ref('')
+
+const emptyForm = () => ({ label: '', bg: '' })
 const form = ref(emptyForm())
 
 const cols = [
@@ -86,7 +100,11 @@ async function loadCats() {
   loading.value = true
   loadError.value = null
   try {
-    categories.value = (await apiGetCategories()).data
+    categories.value = (await apiGetCategories({
+      label:        filterLabel.value       || undefined,
+      min_products: filterMinProducts.value ? Number(filterMinProducts.value) : undefined,
+      max_products: filterMaxProducts.value ? Number(filterMaxProducts.value) : undefined,
+    })).data
   } catch (e: unknown) {
     loadError.value = e instanceof Error ? e.message : 'Failed to load categories.'
   } finally {
@@ -94,22 +112,28 @@ async function loadCats() {
   }
 }
 
+let debounceTimer: ReturnType<typeof setTimeout>
+function debouncedLoad() {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => loadCats(), 350)
+}
+onUnmounted(() => clearTimeout(debounceTimer))
+
 function openCreate() { editing.value = null; form.value = emptyForm(); formErrors.value = {}; modalOpen.value = true }
 function openEdit(c: AdminCategory) {
   editing.value = c
-  form.value = { id: c.id, label: c.label, bg: c.bg }
+  form.value = { label: c.label, bg: c.bg }
   formErrors.value = {}; modalOpen.value = true
 }
 
 async function handleSave() {
   formErrors.value = {}
-  if (!editing.value && !form.value.id)    { formErrors.value.id    = 'ID is required';    return }
   if (!form.value.label) { formErrors.value.label = 'Label is required'; return }
   if (!form.value.bg)    { formErrors.value.bg    = 'Colour is required'; return }
   saving.value = true
   try {
     editing.value
-      ? await apiUpdateCategory(editing.value.id, form.value)
+      ? await apiUpdateCategory(String(editing.value.id), form.value)
       : await apiCreateCategory(form.value)
     modalOpen.value = false; loadCats()
   } catch (e: unknown) {
@@ -124,7 +148,7 @@ async function handleDelete() {
   deleteError.value = null
   deleting.value = true
   try {
-    await apiDeleteCategory(deletingCat.value.id)
+    await apiDeleteCategory(String(deletingCat.value.id))
     deletingCat.value = null
     loadCats()
   } catch (e: unknown) {
