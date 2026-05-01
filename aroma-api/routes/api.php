@@ -54,7 +54,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminDashboardController, AdminOrderController, AdminProductController,
     AdminBrandController, AdminCategoryController, AdminUserController,
     AdminProductVariantController, AdminProductImageController,
-    AdminUserDetailController
+    AdminUserDetailController, AdminCouponController
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -99,4 +99,10 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::get('/users/{id}/orders',   [AdminUserDetailController::class, 'orders']);
     Route::get('/users/{id}/cart',     [AdminUserDetailController::class, 'cart']);
     Route::get('/users/{id}/wishlist', [AdminUserDetailController::class, 'wishlist']);
+
+    Route::get('/coupons',               [AdminCouponController::class, 'index']);
+    Route::post('/coupons',              [AdminCouponController::class, 'store']);
+    Route::put('/coupons/{id}',          [AdminCouponController::class, 'update']);
+    Route::delete('/coupons/{id}',       [AdminCouponController::class, 'destroy']);
+    Route::patch('/coupons/{id}/toggle', [AdminCouponController::class, 'toggle']);
 });
