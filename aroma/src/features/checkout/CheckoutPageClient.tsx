@@ -7,7 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { Check, Store } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
-import { useCreateOrder, useAddresses, useCart, useRemoveFromCart } from '@/lib/api/queries'
+import { useCreateOrder, useAddresses, useCart, useRemoveFromCart, useValidateCoupon } from '@/lib/api/queries'
+import type { CouponValidation } from '@/mocks/services'
 import { CheckoutFormSchema, type CheckoutFormValues } from '@/lib/schemas'
 import { formatPrice } from '@/lib/formatters'
 import { ProfileCompletionModal } from './ProfileCompletionModal'
@@ -25,6 +26,15 @@ export function CheckoutPageClient() {
   const [submitted, setSubmitted]           = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<number | undefined>()
   const [profileDone, setProfileDone]       = useState(false)
+
+  const validateCoupon = useValidateCoupon()
+  const [couponInput,   setCouponInput]   = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<(CouponValidation & { valid: true }) | null>(null)
+  const [couponError,   setCouponError]   = useState('')
+
+  const finalTotal = appliedCoupon
+    ? subtotal - parseFloat(appliedCoupon.discountAmount)
+    : subtotal
 
   const profileIncomplete = !user?.name || !user?.phone
   const showProfileModal  = profileIncomplete && !profileDone
@@ -52,21 +62,68 @@ export function CheckoutPageClient() {
     }
   }, [addresses, selectedAddressId])
 
+  async function handleApplyCoupon() {
+    if (!couponInput.trim()) return
+    setCouponError('')
+    try {
+      const result = await validateCoupon.mutateAsync({
+        code:       couponInput.trim().toUpperCase(),
+        orderTotal: subtotal,
+      })
+      if (result.valid) {
+        setAppliedCoupon(result)
+        setCouponError('')
+      } else {
+        setAppliedCoupon(null)
+        const messages: Record<string, string> = {
+          coupon_not_found:  'الكوبون غير موجود',
+          coupon_inactive:   'هذا الكوبون غير مفعّل',
+          coupon_expired:    'انتهت صلاحية الكوبون',
+          min_order_not_met: 'الطلب أقل من الحد الأدنى لتطبيق الكوبون',
+          max_uses_reached:  'تم استنفاد استخدامات هذا الكوبون',
+          already_used:      'لقد استخدمت هذا الكوبون من قبل',
+        }
+        setCouponError(messages[result.error] ?? 'الكوبون غير صالح')
+      }
+    } catch {
+      setCouponError('حدث خطأ. حاول مرة أخرى.')
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null)
+    setCouponInput('')
+    setCouponError('')
+  }
+
   const onSubmit = async (data: CheckoutFormValues) => {
     if (!isPickup && !selectedAddressId) return
     try {
       await createOrder.mutateAsync({
-        note:      data.note,
-        pickup:    data.pickup,
-        addressId: data.pickup ? undefined : selectedAddressId,
-        items:     cartItems,
-        total:     subtotal,
+        note:       data.note,
+        pickup:     data.pickup,
+        addressId:  data.pickup ? undefined : selectedAddressId,
+        items:      cartItems,
+        total:      finalTotal,
+        couponCode: appliedCoupon ? couponInput.trim().toUpperCase() : undefined,
       })
       // clear cart — remove each item from backend
       await Promise.all(cartItems.map(i => removeFromCart.mutateAsync(i.id)))
       setSubmitted(true)
-    } catch {
-      // error displayed via createOrder.isError
+    } catch (err: any) {
+      const couponErrors = err?.response?.data?.errors?.coupon_code
+      if (couponErrors?.length) {
+        const messages: Record<string, string> = {
+          coupon_inactive:   'هذا الكوبون غير مفعّل',
+          coupon_expired:    'انتهت صلاحية الكوبون',
+          min_order_not_met: 'الطلب أقل من الحد الأدنى لتطبيق الكوبون',
+          max_uses_reached:  'تم استنفاد استخدامات هذا الكوبون',
+          already_used:      'لقد استخدمت هذا الكوبون من قبل',
+        }
+        setCouponError(messages[couponErrors[0]] ?? 'الكوبون غير صالح')
+        handleRemoveCoupon()
+      }
+      // existing error is displayed via createOrder.isError
     }
   }
 
@@ -192,9 +249,59 @@ export function CheckoutPageClient() {
                 ))}
               </div>
 
-              <div className="border-t border-aroma-border pt-4 flex justify-between font-sans text-[15px] font-medium text-aroma-text">
-                <span>الإجمالي</span>
-                <span>{formatPrice(subtotal)}</span>
+              {/* Coupon input */}
+              {!appliedCoupon ? (
+                <div className="flex gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                    placeholder="كوبون الخصم"
+                    dir="rtl"
+                    className="flex-1 border border-aroma-border rounded px-3 py-2 font-sans text-[13px] bg-transparent focus:outline-none focus:border-aroma-text"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={validateCoupon.isPending || !couponInput.trim()}
+                    className="border border-aroma-border rounded px-4 py-2 font-sans text-[13px] hover:border-aroma-text transition-colors disabled:opacity-40"
+                  >
+                    {validateCoupon.isPending ? '…' : 'تطبيق'}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between mt-3 rounded bg-green-50 border border-green-200 px-3 py-2">
+                  <span className="font-sans text-[13px] text-green-700">
+                    كوبون <span className="font-mono font-bold">{couponInput}</span> — خصم {appliedCoupon.discountAmount} LYD
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-[11px] text-green-600 hover:text-red-500 transition-colors ml-2"
+                  >✕</button>
+                </div>
+              )}
+              {couponError && (
+                <p className="mt-1 font-sans text-[12px] text-red-500" dir="rtl">{couponError}</p>
+              )}
+
+              <div className="border-t border-aroma-border pt-4">
+                {appliedCoupon && (
+                  <div className="flex justify-between font-sans text-[13px] text-aroma-muted mb-2">
+                    <span>المجموع الفرعي</span>
+                    <span>{formatPrice(subtotal)}</span>
+                  </div>
+                )}
+                {appliedCoupon && (
+                  <div className="flex justify-between font-sans text-[13px] text-green-600 mb-2">
+                    <span>كوبون {couponInput}</span>
+                    <span>−{appliedCoupon.discountAmount} LYD</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-sans text-[15px] font-medium text-aroma-text">
+                  <span>الإجمالي</span>
+                  <span>{formatPrice(finalTotal)}</span>
+                </div>
               </div>
 
               {createOrder.isError && (
