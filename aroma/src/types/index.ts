@@ -139,6 +139,8 @@ export interface Order {
     city: string
     description?: string
   } | null
+  couponCode?: string | null
+  discountAmount?: number | null
 }
 
 // ── Cart ──────────────────────────────────────────────────────────────
@@ -195,6 +197,7 @@ export interface CheckoutPayload {
   pickup: boolean
   items: CartItem[]
   total: number
+  couponCode?: string
 }
 
 // ── Filters ───────────────────────────────────────────────────────────

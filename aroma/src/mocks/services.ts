@@ -19,6 +19,20 @@ function authHeaders(): HeadersInit {
   }
 }
 
+export type CouponValidation =
+  | { valid: true; type: 'percentage' | 'fixed'; value: string; discountAmount: string; finalTotal: string }
+  | { valid: false; error: string }
+
+export async function validateCoupon(code: string, orderTotal: number): Promise<CouponValidation> {
+  const res = await fetch(`${API_URL}/api/coupons/validate`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body:    JSON.stringify({ code, order_total: orderTotal }),
+  })
+  if (!res.ok) throw new Error('Failed to validate coupon')
+  return res.json()
+}
+
 // ── Home ──────────────────────────────────────────────────────────────
 export async function getHomePageData(): Promise<HomePageData> {
   const res = await fetch(`${API_URL}/api/home`)
@@ -112,14 +126,15 @@ export async function createOrder(payload: CheckoutPayload): Promise<Order> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({
-      items:      payload.items.map(i => ({
+      items:       payload.items.map(i => ({
         product_variant_id: i.variantId,
         quantity:           i.quantity,
       })),
-      note:       payload.note ?? null,
-      is_pickup:  payload.pickup,
-      address_id: payload.pickup ? null : (payload.addressId ?? null),
-      total:      payload.total,
+      note:        payload.note ?? null,
+      is_pickup:   payload.pickup,
+      address_id:  payload.pickup ? null : (payload.addressId ?? null),
+      total:       payload.total,
+      coupon_code: payload.couponCode ?? null,
     }),
   })
   if (!res.ok) throw new Error('Failed to create order')

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { SearchFilters, CheckoutPayload, Address, CartItem } from '@/types'
 import type { AddressValues } from '@/lib/schemas'
+import type { CouponValidation } from '@/mocks/services'
 import * as services from '@/mocks/services'
 import { useAuthStore } from '@/store/auth'
 
@@ -247,5 +248,14 @@ export function useChangePassword() {
       currentPassword: string
       newPassword: string
     }) => services.changePassword(userId, currentPassword, newPassword),
+  })
+}
+
+// ── Coupons ───────────────────────────────────────────────────────────
+
+export function useValidateCoupon() {
+  return useMutation({
+    mutationFn: ({ code, orderTotal }: { code: string; orderTotal: number }) =>
+      services.validateCoupon(code, orderTotal),
   })
 }
