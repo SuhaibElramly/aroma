@@ -141,10 +141,23 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
                 </p>
               </div>
             ))}
-            <div className="flex justify-between pt-4 mt-1 border-t border-aroma-border-lt
-                            font-sans text-[14px] font-semibold text-aroma-text">
-              <span>الإجمالي</span>
-              <span>{formatPrice(order.total)}</span>
+            <div className="pt-4 mt-1 border-t border-aroma-border-lt space-y-2">
+              {order.discountAmount && (
+                <div className="flex justify-between font-sans text-[13px] text-aroma-muted">
+                  <span>المجموع الفرعي</span>
+                  <span>{formatPrice(order.total + order.discountAmount)}</span>
+                </div>
+              )}
+              {order.discountAmount && order.couponCode && (
+                <div className="flex justify-between font-sans text-[13px] text-green-600">
+                  <span>كوبون <span className="font-mono font-semibold">{order.couponCode}</span></span>
+                  <span>−{order.discountAmount.toFixed(2)} LYD</span>
+                </div>
+              )}
+              <div className="flex justify-between font-sans text-[14px] font-semibold text-aroma-text">
+                <span>الإجمالي</span>
+                <span>{formatPrice(order.total)}</span>
+              </div>
             </div>
           </div>
 
