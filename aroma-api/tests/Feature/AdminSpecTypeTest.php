@@ -96,4 +96,28 @@ class AdminSpecTypeTest extends TestCase
         $user = User::factory()->create(['is_admin' => false]);
         $this->actingAs($user, 'sanctum')->getJson('/api/admin/spec-types')->assertForbidden();
     }
+
+    public function test_store_rejects_duplicate_name(): void
+    {
+        SpecType::factory()->create(['name' => 'Size']);
+
+        $this->asAdmin()->postJson('/api/admin/spec-types', ['name' => 'Size', 'unit' => 'ml'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('name');
+    }
+
+    public function test_update_rejects_name_taken_by_another_spec(): void
+    {
+        SpecType::factory()->create(['name' => 'Size']);
+        $color = SpecType::factory()->create(['name' => 'Color']);
+
+        // Trying to rename Color to Size (already taken) — should fail
+        $this->asAdmin()->putJson("/api/admin/spec-types/{$color->id}", ['name' => 'Size'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('name');
+
+        // Updating Color with its own name — should succeed (unique-except-self)
+        $this->asAdmin()->putJson("/api/admin/spec-types/{$color->id}", ['name' => 'Color'])
+            ->assertOk();
+    }
 }

@@ -38,7 +38,13 @@ class AdminSpecTypeController extends Controller
             'unit' => 'nullable|string|max:20',
         ]);
         $spec->update($data);
-        return response()->json($this->fmt($spec->fresh()));
+        $spec->refresh()->loadCount('assignments as product_count');
+        return response()->json([
+            'id'           => $spec->id,
+            'name'         => $spec->name,
+            'unit'         => $spec->unit,
+            'productCount' => (int) $spec->product_count,
+        ]);
     }
 
     public function destroy(int $id)
