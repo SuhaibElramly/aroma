@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('value');
             $table->integer('sort_order')->default(0);
             $table->timestamps();
+            $table->unique(['product_id', 'spec_type_id', 'value']);
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('spec_type_id')->references('id')->on('spec_types')->onDelete('restrict');
         });

@@ -7,7 +7,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('spec_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('unit')->nullable();
             $table->timestamps();
         });
