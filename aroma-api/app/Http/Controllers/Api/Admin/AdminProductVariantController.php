@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductSpecAssignment;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,38 +12,30 @@ class AdminProductVariantController extends Controller
 {
     public function index(int $productId)
     {
-        $product = Product::findOrFail($productId);
-        return response()->json(
-            $product->variants()->orderBy('size')->get()->map(fn($v) => $this->fmt($v))
-        );
-    }
+        $product   = Product::findOrFail($productId);
+        $specOrder = $this->getSpecOrder($productId);
 
-    public function store(Request $request, int $productId)
-    {
-        Product::findOrFail($productId);
-        $data = $request->validate([
-            'size'                => 'required|integer|min:1',
-            'price'               => 'required|numeric|min:0',
-            'original_price'      => 'nullable|numeric|min:0',
-            'quantity'            => 'required|integer|min:0',
-            'low_stock_threshold' => 'required|integer|min:0',
-        ]);
-        $variant = ProductVariant::create(array_merge($data, ['product_id' => $productId]));
-        return response()->json($this->fmt($variant), 201);
+        return response()->json(
+            $product->variants()
+                ->with('specValues.specType')
+                ->orderBy('id')
+                ->get()
+                ->map(fn($v) => $this->fmt($v, $specOrder))
+        );
     }
 
     public function update(Request $request, int $productId, int $variantId)
     {
         $variant = ProductVariant::where('product_id', $productId)->findOrFail($variantId);
         $data = $request->validate([
-            'size'                => 'sometimes|integer|min:1',
             'price'               => 'sometimes|numeric|min:0',
             'original_price'      => 'nullable|numeric|min:0',
             'quantity'            => 'sometimes|integer|min:0',
             'low_stock_threshold' => 'sometimes|integer|min:0',
         ]);
         $variant->update($data);
-        return response()->json($this->fmt($variant->fresh()));
+        $specOrder = $this->getSpecOrder($productId);
+        return response()->json($this->fmt($variant->fresh()->load('specValues.specType'), $specOrder));
     }
 
     public function setDefault(int $productId, int $variantId)
@@ -52,12 +45,13 @@ class AdminProductVariantController extends Controller
             ProductVariant::where('product_id', $productId)->update(['is_default' => false]);
             $variant->updateQuietly(['is_default' => true]);
         });
-        return response()->json($this->fmt($variant->fresh()));
+        $specOrder = $this->getSpecOrder($productId);
+        return response()->json($this->fmt($variant->fresh()->load('specValues.specType'), $specOrder));
     }
 
     public function destroy(int $productId, int $variantId)
     {
-        $variant = ProductVariant::where('product_id', $productId)->findOrFail($variantId);
+        $variant    = ProductVariant::where('product_id', $productId)->findOrFail($variantId);
         $wasDefault = $variant->is_default;
         $variant->delete();
 
@@ -69,18 +63,41 @@ class AdminProductVariantController extends Controller
         return response()->json(null, 204);
     }
 
-    private function fmt(ProductVariant $v): array
+    private function getSpecOrder(int $productId): array
     {
+        return ProductSpecAssignment::where('product_id', $productId)
+            ->orderBy('sort_order')
+            ->pluck('spec_type_id')
+            ->toArray();
+    }
+
+    private function fmt(ProductVariant $v, array $specOrder): array
+    {
+        if (!$v->relationLoaded('specValues')) {
+            $v->load('specValues.specType');
+        }
+
+        $specs = $v->specValues
+            ->sortBy(fn($sv) => array_search($sv->spec_type_id, $specOrder) !== false
+                ? array_search($sv->spec_type_id, $specOrder)
+                : 999
+            )
+            ->map(fn($sv) => [
+                'name'  => $sv->specType->name,
+                'unit'  => $sv->specType->unit,
+                'value' => $sv->value,
+            ])->values()->toArray();
+
         return [
             'id'                => $v->id,
             'productId'         => $v->product_id,
-            'size'              => $v->size,
             'price'             => $v->price,
             'originalPrice'     => $v->original_price,
             'quantity'          => $v->quantity,
             'lowStockThreshold' => $v->low_stock_threshold,
             'stock'             => $v->stock?->value,
             'isDefault'         => (bool) $v->is_default,
+            'specs'             => $specs,
         ];
     }
 }

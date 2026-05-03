@@ -72,7 +72,6 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
 
     Route::get('/products/{productId}/variants',                [AdminProductVariantController::class, 'index']);
-    Route::post('/products/{productId}/variants',               [AdminProductVariantController::class, 'store']);
     Route::put('/products/{productId}/variants/{variantId}',    [AdminProductVariantController::class, 'update']);
     Route::delete('/products/{productId}/variants/{variantId}', [AdminProductVariantController::class, 'destroy']);
     Route::patch('/products/{productId}/variants/{variantId}/default', [AdminProductVariantController::class, 'setDefault']);
