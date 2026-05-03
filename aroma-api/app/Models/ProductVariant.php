@@ -1,14 +1,17 @@
 <?php
-
 namespace App\Models;
 
 use App\Enums\StockStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductVariant extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'product_id', 'size', 'price', 'original_price',
+        'product_id', 'price', 'original_price',
         'quantity', 'low_stock_threshold', 'stock', 'is_default',
     ];
 
@@ -40,13 +43,18 @@ class ProductVariant extends Model
 
     public static function computeStock(int $quantity, int $threshold): string
     {
-        if ($quantity === 0)          return 'out_of_stock';
-        if ($quantity <= $threshold)  return 'low_stock';
+        if ($quantity === 0)         return 'out_of_stock';
+        if ($quantity <= $threshold) return 'low_stock';
         return 'in_stock';
     }
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function specValues(): HasMany
+    {
+        return $this->hasMany(VariantSpecValue::class, 'variant_id');
     }
 }

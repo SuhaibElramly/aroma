@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'slug', 'brand_id', 'category_id', 'name', 'name_en', 'description', 'type',
         'rating', 'reviews_count', 'is_new', 'is_bestseller', 'is_offer',
@@ -49,5 +52,15 @@ class Product extends Model
 
     public function tags(): HasMany {
         return $this->hasMany(ProductTag::class);
+    }
+
+    public function specAssignments(): HasMany
+    {
+        return $this->hasMany(ProductSpecAssignment::class);
+    }
+
+    public function specValues(): HasMany
+    {
+        return $this->hasMany(ProductSpecValue::class);
     }
 }
