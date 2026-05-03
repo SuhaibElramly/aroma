@@ -43,7 +43,7 @@ class AdminProductSpecController extends Controller
 
         $data = $request->validate([
             'specs'                => 'present|array',
-            'specs.*.spec_type_id' => 'required|integer|exists:spec_types,id',
+            'specs.*.spec_type_id' => 'required|integer|exists:spec_types,id|distinct',
             'specs.*.values'       => 'required|array|min:1',
             'specs.*.values.*'     => 'required|string|max:100',
         ]);

@@ -89,4 +89,13 @@ class AdminProductSpecTest extends TestCase
         $this->assertCount(2, $spec['values']);
         $this->assertEquals('30', $spec['values'][0]['value']);
     }
+
+    public function test_non_admin_cannot_access(): void
+    {
+        $product = Product::factory()->create();
+        $user = User::factory()->create(['is_admin' => false]);
+        $this->actingAs($user, 'sanctum')
+            ->getJson("/api/admin/products/{$product->id}/specs")
+            ->assertForbidden();
+    }
 }

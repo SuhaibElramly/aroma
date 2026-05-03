@@ -118,4 +118,13 @@ class AdminVariantGenerateTest extends TestCase
         $this->assertCount(1, $res->json());
         $this->assertEquals(1, ProductVariant::where('product_id', $product->id)->count());
     }
+
+    public function test_non_admin_cannot_access(): void
+    {
+        $product = Product::factory()->create();
+        $user = User::factory()->create(['is_admin' => false]);
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/admin/products/{$product->id}/variants/generate")
+            ->assertForbidden();
+    }
 }
