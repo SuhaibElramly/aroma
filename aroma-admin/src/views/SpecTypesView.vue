@@ -101,7 +101,7 @@ async function load() {
     const res = await apiGetSpecTypes()
     specTypes.value = res.data
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load spec types.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to load spec types.'
   } finally {
     loading.value = false
   }
@@ -141,7 +141,10 @@ async function handleSave() {
     }
     modalOpen.value = false
   } catch (e: unknown) {
-    formErrors.value.name = e instanceof Error ? e.message : 'Save failed.'
+    const msg = (e as any)?.response?.data?.errors?.name?.[0]
+      ?? (e as any)?.response?.data?.message
+      ?? 'Save failed.'
+    formErrors.value.name = msg
   } finally {
     saving.value = false
   }
@@ -157,7 +160,7 @@ async function handleDelete() {
     specTypes.value = specTypes.value.filter(s => s.id !== deleting.value!.id)
     deleting.value = null
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Delete failed.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Delete failed.'
     deleting.value = null
   } finally {
     deleteLoading.value = false

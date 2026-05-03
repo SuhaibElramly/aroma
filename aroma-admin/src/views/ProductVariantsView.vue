@@ -309,7 +309,7 @@ async function handleUpload(e: Event) {
       images.value[0] = { ...images.value[0], isThumbnail: true }
     }
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Upload failed.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Upload failed.'
   } finally {
     uploading.value = false
     ;(e.target as HTMLInputElement).value = ''
@@ -365,7 +365,7 @@ async function loadSpecs() {
     }))
     assignedSpecs.value.forEach(s => { valueInputs.value[s.spec_type_id] = '' })
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load specs.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to load specs.'
   }
 }
 
@@ -411,7 +411,7 @@ async function saveSpecs() {
       assignedSpecs.value.map(s => ({ spec_type_id: s.spec_type_id, values: s.values }))
     )
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to save specs.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to save specs.'
   } finally {
     savingSpecs.value = false
   }
@@ -441,7 +441,7 @@ async function doGenerate(force: boolean) {
     const res = await apiGenerateVariants(productId, force)
     variants.value = res.data
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Generation failed.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Generation failed.'
   } finally {
     generating.value = false
   }
@@ -497,7 +497,7 @@ async function loadVariants() {
     const res = await apiGetVariants(productId)
     variants.value = res.data
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load variants.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to load variants.'
   } finally {
     variantsLoading.value = false
   }
@@ -535,7 +535,7 @@ async function handleSave() {
     }
     modalOpen.value = false
   } catch (e: unknown) {
-    formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
+    formErrors.value.general = (e as any)?.response?.data?.message ?? 'Save failed.'
   } finally {
     saving.value = false
   }
@@ -547,7 +547,7 @@ async function setDefault(v: ProductVariant) {
     await apiSetDefaultVariant(productId, v.id)
     variants.value = variants.value.map(x => ({ ...x, isDefault: x.id === v.id }))
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to set default.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to set default.'
   } finally {
     settingDefault.value = null
   }
@@ -563,7 +563,7 @@ async function handleDelete() {
     variants.value = variants.value.filter(v => v.id !== deletingVariant.value!.id)
     deletingVariant.value = null
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Delete failed.'
+    loadError.value = (e as any)?.response?.data?.message ?? 'Delete failed.'
   } finally {
     deleting.value = false
   }

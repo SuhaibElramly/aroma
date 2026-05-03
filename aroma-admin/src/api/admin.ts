@@ -59,8 +59,6 @@ export const apiDeleteProduct = (id: number) =>
 export const apiGetVariants = (productId: number) =>
   client.get<ProductVariant[]>(`/admin/products/${productId}/variants`)
 
-export const apiCreateVariant = (productId: number, data: Record<string, unknown>) =>
-  client.post<ProductVariant>(`/admin/products/${productId}/variants`, data)
 
 export const apiUpdateVariant = (productId: number, variantId: number, data: Record<string, unknown>) =>
   client.put<ProductVariant>(`/admin/products/${productId}/variants/${variantId}`, data)

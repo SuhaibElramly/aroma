@@ -26,9 +26,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#D8E0E8',
                 'placeholder_dot' => '#5070A0',
                 'variants' => [
-                    ['size' => '60ml',  'price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
-                    ['size' => '200ml', 'price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
+                    ['price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
+                    ['price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
+                    ['price' => 480.00, 'original_price' => null,   'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'فلفل كالابريا'],
@@ -57,9 +57,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#F2E8E5',
                 'placeholder_dot' => '#C9A0A0',
                 'variants' => [
-                    ['size' => '30ml',  'price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
-                    ['size' => '50ml',  'price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
+                    ['price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
+                    ['price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
+                    ['price' => 420.00, 'original_price' => 510.00, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'فلفل وردي'],
@@ -87,9 +87,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#E0E8F0',
                 'placeholder_dot' => '#6080A8',
                 'variants' => [
-                    ['size' => '50ml',  'price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '150ml', 'price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 445.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'ليمون'],
@@ -120,9 +120,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#E8DDD0',
                 'placeholder_dot' => '#9A7050',
                 'variants' => [
-                    ['size' => '50ml',  'price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '250ml', 'price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 650.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'عود نادر'],
@@ -150,9 +150,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#2E2830',
                 'placeholder_dot' => '#B080C0',
                 'variants' => [
-                    ['size' => '30ml',  'price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '50ml',  'price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 590.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'كافيار'],
@@ -181,9 +181,9 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#EDE0C8',
                 'placeholder_dot' => '#B8906A',
                 'variants' => [
-                    ['size' => '50ml',  'price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
-                    ['size' => '100ml', 'price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
-                    ['size' => '250ml', 'price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
+                    ['price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
+                    ['price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
+                    ['price' => 780.00, 'original_price' => null, 'stock' => 'low_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'أناناس'],
@@ -214,8 +214,8 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#EDE8F2',
                 'placeholder_dot' => '#8878B0',
                 'variants' => [
-                    ['size' => '75ml',  'price' => 520.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '125ml', 'price' => 520.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 520.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 520.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'تفاح'],
@@ -246,8 +246,8 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#F2E0EC',
                 'placeholder_dot' => '#C080A0',
                 'variants' => [
-                    ['size' => '75ml',  'price' => 560.00, 'original_price' => 650.00, 'stock' => 'in_stock'],
-                    ['size' => '125ml', 'price' => 560.00, 'original_price' => 650.00, 'stock' => 'in_stock'],
+                    ['price' => 560.00, 'original_price' => 650.00, 'stock' => 'in_stock'],
+                    ['price' => 560.00, 'original_price' => 650.00, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'راوند'],
@@ -277,8 +277,8 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#DDE8EC',
                 'placeholder_dot' => '#507090',
                 'variants' => [
-                    ['size' => '50ml',  'price' => 620.00, 'original_price' => null, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 620.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 620.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 620.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'بخور'],
@@ -309,8 +309,8 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#E8ECF0',
                 'placeholder_dot' => '#809090',
                 'variants' => [
-                    ['size' => '50ml',  'price' => 580.00, 'original_price' => 690.00, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 580.00, 'original_price' => 690.00, 'stock' => 'in_stock'],
+                    ['price' => 580.00, 'original_price' => 690.00, 'stock' => 'in_stock'],
+                    ['price' => 580.00, 'original_price' => 690.00, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'ليمون'],
@@ -338,7 +338,7 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#EAE0D0',
                 'placeholder_dot' => '#A07850',
                 'variants' => [
-                    ['size' => '100ml', 'price' => 145.00, 'original_price' => null, 'stock' => 'in_stock'],
+                    ['price' => 145.00, 'original_price' => null, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'زعفران'],
@@ -367,8 +367,8 @@ class ProductSeeder extends Seeder
                 'placeholder_bg'  => '#F0E8D0',
                 'placeholder_dot' => '#C0A050',
                 'variants' => [
-                    ['size' => '60ml',  'price' => 195.00, 'original_price' => 230.00, 'stock' => 'in_stock'],
-                    ['size' => '100ml', 'price' => 195.00, 'original_price' => 230.00, 'stock' => 'in_stock'],
+                    ['price' => 195.00, 'original_price' => 230.00, 'stock' => 'in_stock'],
+                    ['price' => 195.00, 'original_price' => 230.00, 'stock' => 'in_stock'],
                 ],
                 'notes' => [
                     ['type' => 'top',   'note' => 'زعفران'],
