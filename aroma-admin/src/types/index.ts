@@ -109,16 +109,22 @@ export interface AdminProduct {
   placeholderDot: string
 }
 
+export interface VariantSpec {
+  name: string
+  unit: string | null
+  value: string
+}
+
 export interface ProductVariant {
   id:                 number
   productId:          number
-  size:               string
   price:              string
   originalPrice:      string | null
   quantity:           number
   lowStockThreshold:  number
   stock:              StockStatus
   isDefault:          boolean
+  specs:              VariantSpec[]
 }
 
 export interface ProductImage {
@@ -127,6 +133,27 @@ export interface ProductImage {
   originalName: string | null
   isThumbnail:  boolean
   sortOrder:    number
+}
+
+export interface SpecType {
+  id:           number
+  name:         string
+  unit:         string | null
+  productCount: number
+}
+
+export interface ProductSpecValue {
+  id:         number
+  value:      string
+  sort_order: number
+}
+
+export interface ProductSpec {
+  spec_type_id: number
+  name:         string
+  unit:         string | null
+  sort_order:   number
+  values:       ProductSpecValue[]
 }
 
 // ── Brands ────────────────────────────────────────────────────────────
@@ -203,4 +230,14 @@ export interface AdminCoupon {
   expiresAt: string | null
   isActive: boolean
   createdAt: string
+}
+
+export interface CouponOrder {
+  id: string
+  user: string
+  userEmail: string
+  date: string
+  total: number
+  discountAmount: number | null
+  status: string
 }

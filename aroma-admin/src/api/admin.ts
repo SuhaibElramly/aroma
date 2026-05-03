@@ -2,7 +2,8 @@ import { client } from './client'
 import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
-  AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon,
+  AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
+  SpecType, ProductSpec,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -189,3 +190,34 @@ export const apiDeleteCoupon = (id: number) =>
 
 export const apiToggleCoupon = (id: number) =>
   client.patch<AdminCoupon>(`/admin/coupons/${id}/toggle`)
+
+export const apiGetCouponOrders = (id: number) =>
+  client.get<CouponOrder[]>(`/admin/coupons/${id}/orders`)
+
+// ── Spec Types ────────────────────────────────────────────────────────
+export const apiGetSpecTypes = () =>
+  client.get<SpecType[]>('/admin/spec-types')
+
+export const apiCreateSpecType = (data: { name: string; unit?: string | null }) =>
+  client.post<SpecType>('/admin/spec-types', data)
+
+export const apiUpdateSpecType = (id: number, data: { name?: string; unit?: string | null }) =>
+  client.put<SpecType>(`/admin/spec-types/${id}`, data)
+
+export const apiDeleteSpecType = (id: number) =>
+  client.delete(`/admin/spec-types/${id}`)
+
+// ── Product Specs ─────────────────────────────────────────────────────
+export const apiGetProductSpecs = (productId: number) =>
+  client.get<{ specs: ProductSpec[] }>(`/admin/products/${productId}/specs`)
+
+export const apiSaveProductSpecs = (productId: number, specs: Array<{
+  spec_type_id: number
+  values: string[]
+}>) =>
+  client.put(`/admin/products/${productId}/specs`, { specs })
+
+export const apiGenerateVariants = (productId: number, force = false) =>
+  client.post<ProductVariant[]>(
+    `/admin/products/${productId}/variants/generate${force ? '?force=true' : ''}`
+  )
