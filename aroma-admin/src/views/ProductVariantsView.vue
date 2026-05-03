@@ -166,7 +166,7 @@
         </AButton>
         <AButton size="sm" :loading="generating" @click="clickGenerate">
           <Zap :size="13" /> Generate Variants
-          <span v-if="combinationCount > 0" class="ml-1 text-2xs opacity-80">({{ combinationCount }})</span>
+          <span v-if="assignedSpecs.length && combinationCount > 0" class="ml-1 text-2xs opacity-80">({{ combinationCount }})</span>
         </AButton>
       </div>
     </div>
@@ -379,6 +379,8 @@ function addSpec() {
 }
 
 function removeSpec(idx: number) {
+  const removed = assignedSpecs.value[idx]
+  delete valueInputs.value[removed.spec_type_id]
   assignedSpecs.value.splice(idx, 1)
 }
 
@@ -403,6 +405,7 @@ function removeValue(spec: { values: string[] }, idx: number) {
 async function saveSpecs() {
   savingSpecs.value = true
   try {
+    loadError.value = null
     await apiSaveProductSpecs(
       productId,
       assignedSpecs.value.map(s => ({ spec_type_id: s.spec_type_id, values: s.values }))
@@ -430,6 +433,7 @@ async function doGenerate(force: boolean) {
   generating.value = true
   showGenerateConfirm.value = false
   try {
+    loadError.value = null
     await apiSaveProductSpecs(
       productId,
       assignedSpecs.value.map(s => ({ spec_type_id: s.spec_type_id, values: s.values }))
