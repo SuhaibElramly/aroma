@@ -40,8 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'store']);
-    Route::patch('/cart/{id}', [CartController::class, 'update']);
-    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+    Route::patch('/cart/{cartItem}', [CartController::class, 'update']);
+    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy']);
 
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::post('/wishlist', [WishlistController::class, 'store']);
@@ -54,7 +54,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminDashboardController, AdminOrderController, AdminProductController,
     AdminBrandController, AdminCategoryController, AdminUserController,
     AdminProductVariantController, AdminProductImageController,
-    AdminUserDetailController, AdminCouponController
+    AdminUserDetailController, AdminCouponController, AdminSpecTypeController
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -100,9 +100,15 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::get('/users/{id}/cart',     [AdminUserDetailController::class, 'cart']);
     Route::get('/users/{id}/wishlist', [AdminUserDetailController::class, 'wishlist']);
 
-    Route::get('/coupons',               [AdminCouponController::class, 'index']);
-    Route::post('/coupons',              [AdminCouponController::class, 'store']);
-    Route::put('/coupons/{id}',          [AdminCouponController::class, 'update']);
-    Route::delete('/coupons/{id}',       [AdminCouponController::class, 'destroy']);
-    Route::patch('/coupons/{id}/toggle', [AdminCouponController::class, 'toggle']);
+    Route::get('/coupons',                       [AdminCouponController::class, 'index']);
+    Route::post('/coupons',                      [AdminCouponController::class, 'store']);
+    Route::put('/coupons/{id}',                  [AdminCouponController::class, 'update']);
+    Route::delete('/coupons/{id}',               [AdminCouponController::class, 'destroy']);
+    Route::patch('/coupons/{id}/toggle',         [AdminCouponController::class, 'toggle']);
+    Route::get('/coupons/{id}/orders',           [AdminCouponController::class, 'orders']);
+
+    Route::get('/spec-types',         [AdminSpecTypeController::class, 'index']);
+    Route::post('/spec-types',        [AdminSpecTypeController::class, 'store']);
+    Route::put('/spec-types/{id}',    [AdminSpecTypeController::class, 'update']);
+    Route::delete('/spec-types/{id}', [AdminSpecTypeController::class, 'destroy']);
 });
