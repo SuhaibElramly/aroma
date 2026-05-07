@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductSpecAssignment;
 use App\Models\ProductVariant;
+use App\Models\VariantSpecValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,18 +25,104 @@ class AdminProductVariantController extends Controller
         );
     }
 
+    public function store(Request $request, int $productId)
+    {
+        Product::findOrFail($productId);
+        $data = $request->validate([
+            'price'                => 'required|numeric|min:0',
+            'original_price'       => 'nullable|numeric|min:0',
+            'quantity'             => 'required|integer|min:0',
+            'low_stock_threshold'  => 'sometimes|integer|min:0',
+            'specs'                => 'present|array',
+            'specs.*.spec_type_id' => 'required|integer|exists:spec_types,id',
+            'specs.*.value'        => 'required|string|max:100',
+        ]);
+
+        $variant = DB::transaction(function () use ($data, $productId) {
+            $variant = ProductVariant::create([
+                'product_id'          => $productId,
+                'price'               => $data['price'],
+                'original_price'      => $data['original_price'] ?? null,
+                'quantity'            => $data['quantity'],
+                'low_stock_threshold' => $data['low_stock_threshold'] ?? 5,
+            ]);
+            foreach ($data['specs'] as $spec) {
+                VariantSpecValue::create([
+                    'variant_id'   => $variant->id,
+                    'spec_type_id' => $spec['spec_type_id'],
+                    'value'        => $spec['value'],
+                ]);
+            }
+            return $variant;
+        });
+
+        $specOrder = $this->getSpecOrder($productId);
+        return response()->json(
+            $this->fmt($variant->fresh()->load('specValues.specType'), $specOrder),
+            201
+        );
+    }
+
     public function update(Request $request, int $productId, int $variantId)
     {
         $variant = ProductVariant::where('product_id', $productId)->findOrFail($variantId);
         $data = $request->validate([
-            'price'               => 'sometimes|numeric|min:0',
-            'original_price'      => 'nullable|numeric|min:0',
-            'quantity'            => 'sometimes|integer|min:0',
-            'low_stock_threshold' => 'sometimes|integer|min:0',
+            'price'                => 'sometimes|numeric|min:0',
+            'original_price'       => 'nullable|numeric|min:0',
+            'quantity'             => 'sometimes|integer|min:0',
+            'low_stock_threshold'  => 'sometimes|integer|min:0',
+            'specs'                => 'sometimes|array',
+            'specs.*.spec_type_id' => 'required_with:specs|integer|exists:spec_types,id',
+            'specs.*.value'        => 'required_with:specs|string|max:100',
         ]);
-        $variant->update($data);
+
+        DB::transaction(function () use ($data, $variant) {
+            $variant->update(collect($data)->except('specs')->toArray());
+            if (array_key_exists('specs', $data)) {
+                $variant->specValues()->delete();
+                foreach ($data['specs'] as $spec) {
+                    VariantSpecValue::create([
+                        'variant_id'   => $variant->id,
+                        'spec_type_id' => $spec['spec_type_id'],
+                        'value'        => $spec['value'],
+                    ]);
+                }
+            }
+        });
+
         $specOrder = $this->getSpecOrder($productId);
         return response()->json($this->fmt($variant->fresh()->load('specValues.specType'), $specOrder));
+    }
+
+    public function bulkUpdate(Request $request, int $productId)
+    {
+        Product::findOrFail($productId);
+
+        $data = $request->validate([
+            'variants'                       => 'required|array|min:1',
+            'variants.*.id'                  => 'required|integer',
+            'variants.*.price'               => 'required|numeric|min:0',
+            'variants.*.original_price'      => 'nullable|numeric|min:0',
+            'variants.*.quantity'            => 'required|integer|min:0',
+            'variants.*.low_stock_threshold' => 'sometimes|integer|min:0',
+        ]);
+
+        $specOrder = $this->getSpecOrder($productId);
+
+        $updated = DB::transaction(function () use ($data, $productId, $specOrder) {
+            return collect($data['variants'])->map(function (array $item) use ($productId, $specOrder) {
+                $variant = ProductVariant::where('product_id', $productId)->findOrFail($item['id']);
+                $variant->update([
+                    'price'               => $item['price'],
+                    'original_price'      => $item['original_price'] ?? null,
+                    'quantity'            => $item['quantity'],
+                    'low_stock_threshold' => $item['low_stock_threshold'] ?? $variant->low_stock_threshold,
+                ]);
+                return $this->fmt($variant->fresh()->load('specValues.specType'), $specOrder);
+            })->values()->toArray();
+        });
+
+        return response()->json($updated);
     }
 
     public function setDefault(int $productId, int $variantId)
