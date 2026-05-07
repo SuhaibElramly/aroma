@@ -100,27 +100,44 @@ class AdminProductVariantController extends Controller
 
         $data = $request->validate([
             'variants'                       => 'required|array|min:1',
-            'variants.*.id'                  => 'required|integer',
+            'variants.*.id'                  => [
+                'required', 'integer',
+                \Illuminate\Validation\Rule::exists('product_variants', 'id')
+                    ->where('product_id', $productId),
+            ],
             'variants.*.price'               => 'required|numeric|min:0',
             'variants.*.original_price'      => 'nullable|numeric|min:0',
             'variants.*.quantity'            => 'required|integer|min:0',
             'variants.*.low_stock_threshold' => 'sometimes|integer|min:0',
         ]);
 
-        $specOrder = $this->getSpecOrder($productId);
+        $ids = collect($data['variants'])->pluck('id')->all();
 
-        $updated = DB::transaction(function () use ($data, $productId, $specOrder) {
-            return collect($data['variants'])->map(function (array $item) use ($productId, $specOrder) {
-                $variant = ProductVariant::where('product_id', $productId)->findOrFail($item['id']);
-                $variant->update([
+        $variantMap = ProductVariant::where('product_id', $productId)
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        DB::transaction(function () use ($data, $variantMap) {
+            foreach ($data['variants'] as $item) {
+                $variantMap[$item['id']]->update([
                     'price'               => $item['price'],
                     'original_price'      => $item['original_price'] ?? null,
                     'quantity'            => $item['quantity'],
-                    'low_stock_threshold' => $item['low_stock_threshold'] ?? $variant->low_stock_threshold,
+                    'low_stock_threshold' => $item['low_stock_threshold'] ?? $variantMap[$item['id']]->low_stock_threshold,
                 ]);
-                return $this->fmt($variant->fresh()->load('specValues.specType'), $specOrder);
-            })->values()->toArray();
+            }
         });
+
+        $specOrder = $this->getSpecOrder($productId);
+
+        $updated = ProductVariant::where('product_id', $productId)
+            ->whereIn('id', $ids)
+            ->with('specValues.specType')
+            ->get()
+            ->map(fn($v) => $this->fmt($v, $specOrder))
+            ->values()
+            ->toArray();
 
         return response()->json($updated);
     }

@@ -3,7 +3,6 @@ namespace Tests\Feature;
 
 use App\Models\Product;
 use App\Models\ProductSpecAssignment;
-use App\Models\ProductSpecValue;
 use App\Models\ProductVariant;
 use App\Models\SpecType;
 use App\Models\User;
@@ -81,7 +80,7 @@ class AdminProductVariantBulkTest extends TestCase
             'variants' => [
                 ['id' => $otherVariant->id, 'price' => 50, 'original_price' => null, 'quantity' => 5, 'low_stock_threshold' => 1],
             ],
-        ])->assertNotFound();
+        ])->assertUnprocessable();
     }
 
     public function test_bulk_update_requires_price_and_quantity(): void
@@ -106,5 +105,28 @@ class AdminProductVariantBulkTest extends TestCase
             ->putJson("/api/admin/products/{$product->id}/variants/bulk", [
                 'variants' => [['id' => $variant->id, 'price' => 50, 'original_price' => null, 'quantity' => 5, 'low_stock_threshold' => 1]],
             ])->assertForbidden();
+    }
+
+    public function test_bulk_update_preserves_low_stock_threshold_when_omitted(): void
+    {
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create([
+            'product_id'          => $product->id,
+            'low_stock_threshold' => 12,
+        ]);
+
+        $this->asAdmin()->putJson("/api/admin/products/{$product->id}/variants/bulk", [
+            'variants' => [[
+                'id'       => $variant->id,
+                'price'    => 99.00,
+                'quantity' => 10,
+                // low_stock_threshold intentionally omitted
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('product_variants', [
+            'id'                  => $variant->id,
+            'low_stock_threshold' => 12,
+        ]);
     }
 }
