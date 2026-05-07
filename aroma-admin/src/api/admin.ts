@@ -59,6 +59,8 @@ export const apiDeleteProduct = (id: number) =>
 export const apiGetVariants = (productId: number) =>
   client.get<ProductVariant[]>(`/admin/products/${productId}/variants`)
 
+export const apiCreateVariant = (productId: number, data: Record<string, unknown>) =>
+  client.post<ProductVariant>(`/admin/products/${productId}/variants`, data)
 
 export const apiUpdateVariant = (productId: number, variantId: number, data: Record<string, unknown>) =>
   client.put<ProductVariant>(`/admin/products/${productId}/variants/${variantId}`, data)
@@ -68,6 +70,18 @@ export const apiDeleteVariant = (productId: number, variantId: number) =>
 
 export const apiSetDefaultVariant = (productId: number, variantId: number) =>
   client.patch<ProductVariant>(`/admin/products/${productId}/variants/${variantId}/default`)
+
+export const apiBulkUpdateVariants = (
+  productId: number,
+  variants: Array<{
+    id:                  number
+    price:               number
+    original_price:      number | null
+    quantity:            number
+    low_stock_threshold: number
+  }>
+) =>
+  client.put<ProductVariant[]>(`/admin/products/${productId}/variants/bulk`, { variants })
 
 // ── Brands ────────────────────────────────────────────────────────────
 export const apiGetBrands = (params?: {
