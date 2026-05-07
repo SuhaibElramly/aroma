@@ -59,6 +59,8 @@ Two radio options:
 
 A "Continue →" button advances to the appropriate next step. The choice is local state only — not persisted to the backend.
 
+For the **single-variant path**, clicking "Continue →" immediately calls `POST /admin/products/{id}/variants/generate` (with no spec assignments, which the existing backend supports — it creates one default variant). On success, Step 3 is shown with one pre-populated row. If the generate call fails, an error banner is shown and the admin stays on Step 1.
+
 ### Step 2 — Define variants (multi-variant path only)
 
 - Dropdown to assign spec types from the global spec types list.
@@ -99,7 +101,7 @@ No wizard. The page opens directly in the completed state:
 
 **Top — collapsed summary cards:**
 - Images card: thumbnail count + "Manage" button (expands to full image grid).
-- Specs card: one-line summary of the spec configuration + "Edit Specs" button.
+- Specs card (multi-variant products only): one-line summary of the spec configuration + "Edit Specs" button. For single-variant products (no specs), this card is not shown — instead, a subtle "Switch to multiple variants" link appears below the price table.
 
 **Main — price/stock table:**
 Same inline-editable table as Step 3 above. Shown immediately. No step indicators.
