@@ -1,5 +1,6 @@
 <template>
-  <div class="space-y-6 max-w-4xl">
+  <div class="space-y-4 max-w-4xl">
+
     <!-- Breadcrumb -->
     <div class="flex items-center gap-2 text-xs">
       <RouterLink to="/products" class="text-dash-faint hover:text-dash-text transition-colors">Products</RouterLink>
@@ -7,293 +8,516 @@
       <span class="text-dash-text font-medium">Variants &amp; Images</span>
     </div>
 
-    <!-- Error -->
-    <div v-if="loadError" class="rounded-card bg-dash-danger-lt border border-dash-danger/20 px-4 py-3 text-xs text-dash-danger">
-      {{ loadError }}
+    <!-- Page-level error banner -->
+    <div v-if="pageError" class="rounded-card bg-dash-danger-lt border border-dash-danger/20 px-4 py-3 text-xs text-dash-danger">
+      {{ pageError }}
     </div>
 
-    <!-- ── Images ──────────────────────────────────── -->
-    <div class="bg-dash-surface rounded-card shadow-card p-5">
-      <div class="flex items-center justify-between mb-4">
+    <!-- ── Images card (always shown, collapsible) ── -->
+    <div class="bg-dash-surface rounded-card shadow-card">
+      <!-- Collapsed header -->
+      <div class="flex items-center justify-between px-5 py-3">
         <div>
           <h2 class="text-sm font-semibold text-dash-text">Images</h2>
-          <p class="text-2xs text-dash-muted mt-0.5">Click any image to set it as the thumbnail</p>
+          <p class="text-2xs text-dash-muted mt-0.5">
+            {{ imagesExpanded ? 'Click any image to set as thumbnail' : `${images.length} image${images.length !== 1 ? 's' : ''} uploaded` }}
+          </p>
         </div>
-        <label class="cursor-pointer">
-          <input type="file" accept="image/*" multiple class="sr-only" @change="handleUpload" :disabled="uploading" />
-          <span
-            :class="[
-              'inline-flex items-center gap-1.5 rounded-btn px-3 py-1.5 text-xs font-medium transition-all duration-200',
-              uploading
-                ? 'bg-dash-border text-dash-faint cursor-not-allowed'
-                : 'bg-dash-secondary text-white hover:bg-dash-secondary-dk shadow-sm cursor-pointer',
-            ]"
-          >
-            <span v-if="uploading" class="inline-block h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
-            <ImagePlus v-else :size="14" />
-            Upload images
-          </span>
-        </label>
-      </div>
-
-      <div v-if="imagesLoading" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-        <div v-for="i in 4" :key="i" class="aspect-square rounded-xl bg-dash-border animate-pulse" />
-      </div>
-
-      <div v-else-if="images.length" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-        <div
-          v-for="img in images"
-          :key="img.id"
-          class="group relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer"
-          :class="img.isThumbnail ? 'border-dash-primary shadow-card' : 'border-dash-border hover:border-dash-primary/40'"
-          @click="setThumbnail(img)"
-        >
-          <img :src="img.url" :alt="img.originalName ?? 'Product image'" class="h-full w-full object-cover" />
-          <div v-if="img.isThumbnail" class="absolute top-1.5 left-1.5 bg-dash-primary text-white text-2xs font-semibold rounded-md px-1.5 py-0.5 flex items-center gap-1">
-            <Star :size="9" /> Thumbnail
-          </div>
-          <button
-            class="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-lg bg-dash-text/70 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-dash-danger"
-            @click.stop="deleteImage(img)"
-          >
-            <X :size="11" />
-          </button>
-        </div>
-      </div>
-
-      <div v-else class="flex flex-col items-center justify-center py-10 text-center">
-        <div class="h-12 w-12 rounded-2xl bg-dash-border flex items-center justify-center text-dash-faint mb-3">
-          <ImageOff :size="22" />
-        </div>
-        <p class="text-sm font-medium text-dash-text">No images yet</p>
-        <p class="text-2xs text-dash-faint mt-1">Upload images using the button above</p>
-      </div>
-    </div>
-
-    <!-- ── Specs ───────────────────────────────────── -->
-    <div class="bg-dash-surface rounded-card shadow-card p-5 space-y-5">
-      <div>
-        <h2 class="text-sm font-semibold text-dash-text">Specs</h2>
-        <p class="text-2xs text-dash-muted mt-0.5">Define what varies between variants (e.g. Size, Color). Leave empty for a single-variant product.</p>
-      </div>
-
-      <!-- Step 1: Assign specs -->
-      <div>
-        <p class="text-xs font-medium text-dash-text mb-2">Assign Specs</p>
-        <div class="flex gap-2">
-          <select
-            v-model="specToAdd"
-            class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary"
-          >
-            <option value="">Add a spec type…</option>
-            <option
-              v-for="s in availableSpecTypes"
-              :key="s.id"
-              :value="s.id"
-            >{{ s.name }}{{ s.unit ? ` (${s.unit})` : '' }}</option>
-          </select>
-          <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">Add</AButton>
-        </div>
-
-        <!-- Assigned spec chips -->
-        <div v-if="assignedSpecs.length" class="mt-3 space-y-2">
-          <div
-            v-for="(spec, idx) in assignedSpecs"
-            :key="spec.spec_type_id"
-            class="flex items-center gap-2 px-3 py-2 rounded-btn border border-dash-border bg-dash-bg"
-          >
-            <span class="text-xs font-medium text-dash-text flex-1">
-              {{ spec.name }}{{ spec.unit ? ` (${spec.unit})` : '' }}
+        <div class="flex items-center gap-2">
+          <label v-if="imagesExpanded" class="cursor-pointer">
+            <input type="file" accept="image/*" multiple class="sr-only" @change="handleUpload" :disabled="uploading" />
+            <span :class="['inline-flex items-center gap-1.5 rounded-btn px-3 py-1.5 text-xs font-medium transition-all duration-200',
+              uploading ? 'bg-dash-border text-dash-faint cursor-not-allowed' : 'bg-dash-secondary text-white hover:bg-dash-secondary-dk shadow-sm cursor-pointer']">
+              <span v-if="uploading" class="inline-block h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
+              <ImagePlus v-else :size="14" />
+              Upload
             </span>
-            <button
-              :disabled="idx === 0"
-              class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30"
-              @click="moveSpec(idx, -1)"
-            ><ChevronUp :size="12" /></button>
-            <button
-              :disabled="idx === assignedSpecs.length - 1"
-              class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30"
-              @click="moveSpec(idx, 1)"
-            ><ChevronDown :size="12" /></button>
-            <button
-              class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-danger"
-              @click="removeSpec(idx)"
-            ><X :size="12" /></button>
-          </div>
+          </label>
+          <AButton size="sm" variant="ghost" @click="imagesExpanded = !imagesExpanded">
+            {{ imagesExpanded ? 'Collapse' : 'Manage' }}
+          </AButton>
         </div>
       </div>
 
-      <!-- Step 2: Define values -->
-      <div v-if="assignedSpecs.length">
-        <p class="text-xs font-medium text-dash-text mb-3">Define Values</p>
-        <div class="space-y-4">
-          <div v-for="spec in assignedSpecs" :key="spec.spec_type_id">
-            <p class="text-2xs font-semibold text-dash-muted mb-1.5 uppercase tracking-wide">
-              {{ spec.name }}{{ spec.unit ? ` (${spec.unit})` : '' }}
-            </p>
-            <!-- Tag chips -->
-            <div class="flex flex-wrap gap-1.5 mb-2">
-              <span
-                v-for="(val, vi) in spec.values"
-                :key="vi"
-                class="inline-flex items-center gap-1 rounded-full border border-dash-border bg-dash-bg px-2.5 py-1 text-xs font-medium text-dash-text"
-              >
-                {{ val }}{{ spec.unit ? spec.unit : '' }}
-                <button @click="removeValue(spec, vi)" class="text-dash-faint hover:text-dash-danger ml-0.5">
-                  <X :size="10" />
-                </button>
-              </span>
+      <!-- Expanded image grid -->
+      <div v-if="imagesExpanded" class="px-5 pb-5">
+        <div v-if="imagesLoading" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div v-for="i in 4" :key="i" class="aspect-square rounded-xl bg-dash-border animate-pulse" />
+        </div>
+        <div v-else-if="images.length" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div v-for="img in images" :key="img.id"
+            class="group relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer"
+            :class="img.isThumbnail ? 'border-dash-primary shadow-card' : 'border-dash-border hover:border-dash-primary/40'"
+            @click="setThumbnail(img)">
+            <img :src="img.url" :alt="img.originalName ?? 'Product image'" class="h-full w-full object-cover" />
+            <div v-if="img.isThumbnail" class="absolute top-1.5 left-1.5 bg-dash-primary text-white text-2xs font-semibold rounded-md px-1.5 py-0.5 flex items-center gap-1">
+              <Star :size="9" /> Thumbnail
             </div>
-            <!-- Add value input -->
-            <div class="flex gap-2">
-              <input
-                v-model="valueInputs[spec.spec_type_id]"
-                type="text"
-                :placeholder="`Add ${spec.name} value…`"
-                class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary"
-                @keydown.enter.prevent="addValue(spec)"
-              />
-              <AButton size="sm" variant="secondary" @click="addValue(spec)">Add</AButton>
-            </div>
+            <button class="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-lg bg-dash-text/70 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-dash-danger"
+              @click.stop="deleteImage(img)">
+              <X :size="11" />
+            </button>
           </div>
         </div>
-      </div>
-
-      <!-- Save + Generate row -->
-      <div class="flex items-center gap-3 pt-1">
-        <AButton size="sm" variant="secondary" :loading="savingSpecs" @click="saveSpecs">
-          <Save :size="13" /> Save Specs &amp; Values
-        </AButton>
-        <AButton size="sm" :loading="generating" @click="clickGenerate">
-          <Zap :size="13" /> Generate Variants
-          <span v-if="assignedSpecs.length && combinationCount > 0" class="ml-1 text-2xs opacity-80">({{ combinationCount }})</span>
-        </AButton>
+        <div v-else class="flex flex-col items-center justify-center py-8 text-center">
+          <div class="h-10 w-10 rounded-2xl bg-dash-border flex items-center justify-center text-dash-faint mb-3">
+            <ImageOff :size="20" />
+          </div>
+          <p class="text-sm font-medium text-dash-text">No images yet</p>
+          <p class="text-2xs text-dash-faint mt-1">Upload images using the button above</p>
+        </div>
       </div>
     </div>
 
-    <!-- ── Variants ────────────────────────────────── -->
-    <div class="bg-dash-surface rounded-card shadow-card p-5">
-      <div class="flex items-center justify-between mb-4">
+    <!-- ══════════════════════════════════════════════
+         WIZARD MODE — no variants exist yet
+    ══════════════════════════════════════════════ -->
+    <template v-if="!hasVariants">
+
+      <!-- Step indicators -->
+      <div class="flex items-stretch gap-2">
+        <!-- Step 1 -->
+        <div :class="['flex items-center gap-2 px-4 py-2.5 rounded-card border flex-1 transition-all', stepClass(1)]">
+          <div :class="['w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0', stepNumClass(1)]">
+            <Check v-if="currentStep > 1" :size="10" />
+            <span v-else>1</span>
+          </div>
+          <div class="text-xs font-medium leading-tight">
+            <span v-if="currentStep > 1 && productType === 'single'" class="text-emerald-400">Single price</span>
+            <span v-else-if="currentStep > 1 && productType === 'multi'" class="text-emerald-400">Multiple variants</span>
+            <span v-else>Product type</span>
+          </div>
+        </div>
+        <!-- Step 2 (multi only) -->
+        <div :class="['flex items-center gap-2 px-4 py-2.5 rounded-card border flex-1 transition-all', stepClass(2)]">
+          <div :class="['w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0', stepNumClass(2)]">
+            <Check v-if="currentStep > 2" :size="10" />
+            <span v-else>2</span>
+          </div>
+          <div class="text-xs font-medium leading-tight">
+            <span v-if="currentStep > 2">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }} generated</span>
+            <span v-else>Define variants</span>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div :class="['flex items-center gap-2 px-4 py-2.5 rounded-card border flex-1 transition-all', stepClass(3)]">
+          <div :class="['w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0', stepNumClass(3)]">
+            <span>3</span>
+          </div>
+          <div class="text-xs font-medium leading-tight">Set prices</div>
+        </div>
+      </div>
+
+      <!-- ── Step 1: Product type ── -->
+      <div v-if="currentStep === 1" class="bg-dash-surface rounded-card shadow-card p-5">
+        <h2 class="text-sm font-semibold text-dash-text mb-1">Step 1 — Product type</h2>
+        <p class="text-2xs text-dash-muted mb-4">How does this product work in your store?</p>
+
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 p-3 rounded-card border cursor-pointer transition-all"
+            :class="productType === 'single' ? 'border-dash-primary bg-dash-primary-lt/30' : 'border-dash-border hover:border-dash-muted'">
+            <div class="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+              :class="productType === 'single' ? 'border-dash-primary bg-dash-primary' : 'border-dash-border'">
+              <div v-if="productType === 'single'" class="w-1.5 h-1.5 rounded-full bg-white" />
+            </div>
+            <input type="radio" v-model="productType" value="single" class="sr-only" />
+            <div>
+              <p class="text-xs font-semibold text-dash-text">Single price &amp; stock</p>
+              <p class="text-2xs text-dash-muted mt-0.5">One price, one quantity — good for a product sold in one size only.</p>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 rounded-card border cursor-pointer transition-all"
+            :class="productType === 'multi' ? 'border-dash-primary bg-dash-primary-lt/30' : 'border-dash-border hover:border-dash-muted'">
+            <div class="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+              :class="productType === 'multi' ? 'border-dash-primary bg-dash-primary' : 'border-dash-border'">
+              <div v-if="productType === 'multi'" class="w-1.5 h-1.5 rounded-full bg-white" />
+            </div>
+            <input type="radio" v-model="productType" value="multi" class="sr-only" />
+            <div>
+              <p class="text-xs font-semibold text-dash-text">Multiple variants</p>
+              <p class="text-2xs text-dash-muted mt-0.5">Different sizes, colors, or combinations — each with its own price and stock.</p>
+            </div>
+          </label>
+        </div>
+
+        <div class="flex justify-end mt-5">
+          <AButton size="sm" :disabled="!productType" :loading="generatingSingle" @click="handleStep1Continue">
+            Continue →
+          </AButton>
+        </div>
+      </div>
+
+      <!-- ── Step 2: Define variants (multi only) ── -->
+      <div v-if="currentStep === 2" class="bg-dash-surface rounded-card shadow-card p-5 space-y-5">
         <div>
-          <h2 class="text-sm font-semibold text-dash-text">Variants</h2>
-          <p class="text-2xs text-dash-muted mt-0.5">Price and stock per variant</p>
+          <h2 class="text-sm font-semibold text-dash-text">Step 2 — Define variants</h2>
+          <p class="text-2xs text-dash-muted mt-0.5">Assign spec types and add all values for each one.</p>
+        </div>
+
+        <!-- Spec type selector -->
+        <div>
+          <p class="text-xs font-medium text-dash-text mb-2">Spec types</p>
+          <div class="flex gap-2">
+            <select v-model="specToAdd"
+              class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary">
+              <option value="">Add a spec type…</option>
+              <option v-for="s in availableSpecTypes" :key="s.id" :value="s.id">
+                {{ s.name }}{{ s.unit ? ` (${s.unit})` : '' }}
+              </option>
+            </select>
+            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">Add</AButton>
+          </div>
+
+          <div v-if="assignedSpecs.length" class="mt-3 space-y-2">
+            <div v-for="(spec, idx) in assignedSpecs" :key="spec.spec_type_id"
+              class="px-3 py-2.5 rounded-btn border border-dash-border bg-dash-bg">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold text-dash-text flex-1">
+                  {{ spec.name }}{{ spec.unit ? ` (${spec.unit})` : '' }}
+                </span>
+                <button :disabled="idx === 0" class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30" @click="moveSpec(idx, -1)">
+                  <ChevronUp :size="12" />
+                </button>
+                <button :disabled="idx === assignedSpecs.length - 1" class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30" @click="moveSpec(idx, 1)">
+                  <ChevronDown :size="12" />
+                </button>
+                <button class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-danger" @click="removeSpec(idx)">
+                  <X :size="12" />
+                </button>
+              </div>
+              <!-- Value chips -->
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                <span v-for="(val, vi) in spec.values" :key="vi"
+                  class="inline-flex items-center gap-1 rounded-full border border-dash-border bg-dash-surface px-2.5 py-1 text-xs font-medium text-dash-text">
+                  {{ val }}{{ spec.unit ?? '' }}
+                  <button @click="removeValue(spec, vi)" class="text-dash-faint hover:text-dash-danger ml-0.5">
+                    <X :size="10" />
+                  </button>
+                </span>
+              </div>
+              <!-- Value input -->
+              <div class="flex gap-2">
+                <input v-model="valueInputs[spec.spec_type_id]" type="text"
+                  :placeholder="`Add ${spec.name} value…`"
+                  :class="['flex-1 rounded-btn border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none transition-colors',
+                    spec.values.length === 0 ? 'border-dash-danger/60 focus:border-dash-danger' : 'border-dash-border focus:border-dash-primary']"
+                  @keydown.enter.prevent="addValue(spec)" />
+                <AButton size="sm" variant="secondary" @click="addValue(spec)">Add</AButton>
+              </div>
+              <p v-if="spec.values.length === 0" class="mt-1 text-2xs text-dash-danger">At least one value is required.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate bar -->
+        <div class="flex items-center justify-between pt-1 border-t border-dash-border">
+          <p v-if="assignedSpecs.length && specsValid" class="text-xs text-dash-muted">
+            Will generate <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
+            <span v-if="assignedSpecs.length > 1"> ({{ assignedSpecs.map(s => s.values.length).join(' × ') }})</span>
+          </p>
+          <p v-else-if="assignedSpecs.length" class="text-xs text-dash-danger">Add at least one value per spec to generate.</p>
+          <p v-else class="text-xs text-dash-muted">Add at least one spec type above.</p>
+          <AButton size="sm" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
+            :title="!specsValid ? 'Add at least one value for each spec' : undefined"
+            @click="handleGenerate(false)">
+            <Zap :size="13" /> Generate Variants
+          </AButton>
         </div>
       </div>
 
-      <ATable :columns="cols" :rows="variants" :loading="variantsLoading">
-        <template #cell-label="{ row }">
-          <span class="text-xs font-medium text-dash-text">{{ variantLabel(row as ProductVariant) }}</span>
-        </template>
-        <template #cell-stock="{ value }">
-          <ABadge :status="typeof value === 'string' ? value : ''" />
-        </template>
-        <template #cell-price="{ value }">{{ Number(value).toFixed(2) }} LYD</template>
-        <template #cell-originalPrice="{ value }">
-          <span v-if="value">{{ Number(value).toFixed(2) }} LYD</span>
-          <span v-else class="text-dash-faint">—</span>
-        </template>
-        <template #cell-quantity="{ value, row }">
-          <span :class="getQtyClass(row as ProductVariant)">{{ value }}</span>
-        </template>
-        <template #cell-isDefault="{ value }">
-          <span v-if="value" class="inline-flex items-center gap-1 text-2xs font-semibold text-dash-primary bg-dash-primary/10 rounded px-1.5 py-0.5">
-            <Star :size="10" /> Default
-          </span>
-        </template>
-        <template #actions="{ row }">
-          <div class="flex gap-1.5 justify-end">
-            <AButton v-if="!(row as ProductVariant).isDefault" size="sm" variant="ghost" @click.stop="setDefault(row as ProductVariant)" :loading="settingDefault === (row as ProductVariant).id">Default</AButton>
-            <AButton size="sm" variant="ghost" @click.stop="openEdit(row as ProductVariant)">Edit</AButton>
-            <AButton size="sm" variant="danger" @click.stop="confirmDeleteVariant(row as ProductVariant)">Delete</AButton>
+      <!-- ── Step 3: Set prices ── -->
+      <div v-if="currentStep === 3" class="bg-dash-surface rounded-card shadow-card p-5">
+        <h2 class="text-sm font-semibold text-dash-text mb-1">
+          {{ productType === 'single' ? 'Price &amp; Stock' : 'Step 3 — Set prices &amp; stock' }}
+        </h2>
+        <p class="text-2xs text-dash-muted mb-4">
+          {{ productType === 'single' ? 'This product has one price.' : 'Fill in every variant. You can update these anytime.' }}
+        </p>
+
+        <!-- Single: simple 2×2 grid -->
+        <div v-if="productType === 'single'" class="grid grid-cols-2 gap-3 mb-4">
+          <AInput v-model="priceRows[0].price"             label="Price (LYD)" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
+          <AInput v-model="priceRows[0].originalPrice"     label="Original price (LYD)" type="number" step="0.01" />
+          <AInput v-model="priceRows[0].quantity"          label="Quantity in stock" type="number" min="0" />
+          <AInput v-model="priceRows[0].lowStockThreshold" label="Low stock alert at" type="number" min="0" />
+        </div>
+
+        <!-- Multi: inline table -->
+        <div v-else class="overflow-x-auto mb-4">
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-dash-border">
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Variant</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Price (LYD)</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Original</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Qty</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Low at</th>
+                <th class="py-2 px-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, ri) in priceRows" :key="row.id" class="border-b border-dash-border/50 last:border-0">
+                <td class="py-2 px-2 font-semibold text-dash-text whitespace-nowrap">{{ variantLabel(row.id) }}</td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.price" type="number" step="0.01" min="0"
+                    :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
+                      priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
+                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">Required</p>
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
+                    class="w-24 px-2 py-1 rounded-btn border border-dash-border/50 text-xs bg-dash-bg text-dash-faint focus:outline-none focus:border-dash-border" />
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.quantity" type="number" min="0"
+                    class="w-16 px-2 py-1 rounded-btn border border-dash-border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary" />
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.lowStockThreshold" type="number" min="0"
+                    class="w-16 px-2 py-1 rounded-btn border border-dash-border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary" />
+                </td>
+                <td class="py-1.5 px-2">
+                  <button v-if="!variants.find(v => v.id === row.id)?.isDefault"
+                    class="text-2xs text-dash-muted hover:text-dash-primary transition-colors whitespace-nowrap"
+                    @click="setDefault(row.id)">Set default</button>
+                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">★ Default</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Save row -->
+        <div class="flex items-center justify-between pt-2 border-t border-dash-border">
+          <div class="flex items-center gap-2 text-2xs text-dash-muted">
+            <span>Overall stock:</span>
+            <ABadge :status="overallStockPreview" />
           </div>
-        </template>
-        <template #empty>
-          <AEmptyState :icon="Package" heading="No variants" sub="Save your specs and click Generate Variants" />
-        </template>
-      </ATable>
-    </div>
+          <AButton size="sm" :loading="savingPrices" @click="savePrices">
+            Save{{ productType === 'multi' ? ' Prices &amp; Stock' : '' }}
+          </AButton>
+        </div>
+        <p v-if="saveError" class="mt-2 text-xs text-dash-danger">{{ saveError }}</p>
+      </div>
 
-    <!-- Edit variant modal -->
-    <AModal :open="modalOpen" title="Edit Variant" @close="modalOpen = false">
-      <form class="space-y-3" @submit.prevent>
-        <!-- Spec label read-only -->
-        <div v-if="editing && variantLabel(editing)" class="rounded-btn bg-dash-bg border border-dash-border px-3 py-2 text-xs font-medium text-dash-text">
-          {{ variantLabel(editing) }}
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.price"          label="Price (LYD)" type="number" step="0.01" :error="formErrors.price" />
-          <AInput v-model="form.original_price" label="Original price (LYD)" type="number" step="0.01" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.quantity"            label="Quantity in stock" type="number" min="0" :error="formErrors.quantity" />
-          <AInput v-model="form.low_stock_threshold" label="Low stock threshold" type="number" min="0" />
-        </div>
-        <div class="flex items-center gap-2 text-2xs text-dash-muted pt-0.5">
-          <span>Stock status will be:</span>
-          <ABadge :status="previewStock" />
-        </div>
-        <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
-      </form>
-      <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">Save</AButton>
-      </template>
-    </AModal>
+    </template>
 
-    <!-- Confirm generate when variants exist -->
-    <AConfirmDialog
-      :open="showGenerateConfirm"
-      title="Regenerate variants?"
-      :message="`This will permanently delete ${variants.length} existing variant${variants.length !== 1 ? 's' : ''} and regenerate from your current spec values. Continue?`"
-      :loading="generating"
-      @confirm="doGenerate(true)"
-      @cancel="showGenerateConfirm = false"
-    />
+    <!-- ══════════════════════════════════════════════
+         EDITING MODE — variants already exist
+    ══════════════════════════════════════════════ -->
+    <template v-else>
 
-    <!-- Confirm delete variant -->
-    <AConfirmDialog
-      :open="!!deletingVariant"
-      title="Delete variant?"
-      message="This variant will be permanently removed."
-      :loading="deleting"
-      @confirm="handleDelete"
-      @cancel="deletingVariant = null"
-    />
+      <!-- Specs summary card (multi-variant products only) -->
+      <div v-if="hasSpecs" class="bg-dash-surface rounded-card shadow-card">
+        <div class="flex items-center justify-between px-5 py-3">
+          <div>
+            <h2 class="text-sm font-semibold text-dash-text">
+              Variants — {{ assignedSpecs.map(s => s.name + (s.unit ? ` (${s.unit})` : '')).join(' × ') }}
+              <span class="font-normal text-dash-muted text-xs">· {{ variants.length }} combinations</span>
+            </h2>
+            <p class="text-2xs text-dash-muted mt-0.5">
+              {{ assignedSpecs.map(s => s.name + ': ' + s.values.join(', ')).join(' · ') }}
+            </p>
+          </div>
+          <AButton size="sm" variant="secondary" @click="editSpecsExpanded = !editSpecsExpanded">
+            {{ editSpecsExpanded ? 'Cancel' : 'Edit Specs' }}
+          </AButton>
+        </div>
+
+        <!-- Edit specs expanded -->
+        <div v-if="editSpecsExpanded" class="px-5 pb-5 border-t border-dash-border space-y-4 pt-4">
+          <div class="flex gap-2">
+            <select v-model="specToAdd"
+              class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary">
+              <option value="">Add a spec type…</option>
+              <option v-for="s in availableSpecTypes" :key="s.id" :value="s.id">
+                {{ s.name }}{{ s.unit ? ` (${s.unit})` : '' }}
+              </option>
+            </select>
+            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">Add</AButton>
+          </div>
+
+          <div v-if="assignedSpecs.length" class="space-y-2">
+            <div v-for="(spec, idx) in assignedSpecs" :key="spec.spec_type_id"
+              class="px-3 py-2.5 rounded-btn border border-dash-border bg-dash-bg">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold text-dash-text flex-1">
+                  {{ spec.name }}{{ spec.unit ? ` (${spec.unit})` : '' }}
+                </span>
+                <button :disabled="idx === 0" class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30" @click="moveSpec(idx, -1)">
+                  <ChevronUp :size="12" />
+                </button>
+                <button :disabled="idx === assignedSpecs.length - 1" class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-text disabled:opacity-30" @click="moveSpec(idx, 1)">
+                  <ChevronDown :size="12" />
+                </button>
+                <button class="w-5 h-5 flex items-center justify-center text-dash-muted hover:text-dash-danger" @click="removeSpec(idx)">
+                  <X :size="12" />
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                <span v-for="(val, vi) in spec.values" :key="vi"
+                  class="inline-flex items-center gap-1 rounded-full border border-dash-border bg-dash-surface px-2.5 py-1 text-xs font-medium text-dash-text">
+                  {{ val }}{{ spec.unit ?? '' }}
+                  <button @click="removeValue(spec, vi)" class="text-dash-faint hover:text-dash-danger ml-0.5">
+                    <X :size="10" />
+                  </button>
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <input v-model="valueInputs[spec.spec_type_id]" type="text"
+                  :placeholder="`Add ${spec.name} value…`"
+                  :class="['flex-1 rounded-btn border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none transition-colors',
+                    spec.values.length === 0 ? 'border-dash-danger/60 focus:border-dash-danger' : 'border-dash-border focus:border-dash-primary']"
+                  @keydown.enter.prevent="addValue(spec)" />
+                <AButton size="sm" variant="secondary" @click="addValue(spec)">Add</AButton>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1 border-t border-dash-border">
+            <p v-if="assignedSpecs.length && specsValid" class="text-xs text-dash-muted">
+              Will generate <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
+            </p>
+            <p v-else class="text-xs text-dash-danger">Add at least one value per spec.</p>
+            <AButton size="sm" variant="danger" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
+              @click="handleGenerate(true)">
+              <Zap :size="13" /> Regenerate Variants
+            </AButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Switch to multiple variants (single-variant product only) -->
+      <div v-if="!hasSpecs" class="text-center py-2">
+        <button class="text-2xs text-dash-muted hover:text-dash-text underline underline-offset-2 transition-colors"
+          @click="switchToMultiple">
+          Switch to multiple variants
+        </button>
+      </div>
+
+      <!-- Price grid (always shown in editing mode) -->
+      <div class="bg-dash-surface rounded-card shadow-card p-5">
+        <h2 class="text-sm font-semibold text-dash-text mb-1">Prices &amp; Stock</h2>
+        <p class="text-2xs text-dash-muted mb-4">Changes are saved when you click Save.</p>
+
+        <!-- Single variant: 2×2 grid -->
+        <div v-if="!hasSpecs && priceRows.length === 1" class="grid grid-cols-2 gap-3 mb-4">
+          <AInput v-model="priceRows[0].price"             label="Price (LYD)" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
+          <AInput v-model="priceRows[0].originalPrice"     label="Original price (LYD)" type="number" step="0.01" />
+          <AInput v-model="priceRows[0].quantity"          label="Quantity in stock" type="number" min="0" />
+          <AInput v-model="priceRows[0].lowStockThreshold" label="Low stock alert at" type="number" min="0" />
+        </div>
+
+        <!-- Multi-variant: table -->
+        <div v-else class="overflow-x-auto mb-4">
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-dash-border">
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Variant</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Price (LYD)</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Original</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Qty</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Low at</th>
+                <th class="py-2 px-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, ri) in priceRows" :key="row.id" class="border-b border-dash-border/50 last:border-0">
+                <td class="py-2 px-2 font-semibold text-dash-text whitespace-nowrap">{{ variantLabel(row.id) }}</td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.price" type="number" step="0.01" min="0"
+                    :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
+                      priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
+                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">Required</p>
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
+                    class="w-24 px-2 py-1 rounded-btn border border-dash-border/50 text-xs bg-dash-bg text-dash-faint focus:outline-none focus:border-dash-border" />
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.quantity" type="number" min="0"
+                    class="w-16 px-2 py-1 rounded-btn border border-dash-border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary" />
+                </td>
+                <td class="py-1.5 px-1">
+                  <input v-model="row.lowStockThreshold" type="number" min="0"
+                    class="w-16 px-2 py-1 rounded-btn border border-dash-border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary" />
+                </td>
+                <td class="py-1.5 px-2">
+                  <button v-if="!variants.find(v => v.id === row.id)?.isDefault"
+                    class="text-2xs text-dash-muted hover:text-dash-primary transition-colors whitespace-nowrap"
+                    @click="setDefault(row.id)">Set default</button>
+                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">★ Default</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-dash-border">
+          <div class="flex items-center gap-2 text-2xs text-dash-muted">
+            <span>Overall stock:</span>
+            <ABadge :status="overallStockPreview" />
+          </div>
+          <AButton size="sm" :loading="savingPrices" @click="savePrices">Save Prices &amp; Stock</AButton>
+        </div>
+        <p v-if="saveError" class="mt-2 text-xs text-dash-danger">{{ saveError }}</p>
+      </div>
+
+    </template>
+
+    <!-- Confirm regenerate modal -->
+    <Teleport to="body">
+      <div v-if="showRegenerateConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-dash-surface rounded-card shadow-card p-6 max-w-sm w-full mx-4">
+          <h3 class="text-sm font-semibold text-dash-text mb-2">Regenerate variants?</h3>
+          <p class="text-xs text-dash-muted mb-5">
+            This will permanently delete {{ variants.length }} existing variant{{ variants.length !== 1 ? 's' : '' }} and regenerate from your current spec values. Continue?
+          </p>
+          <div class="flex gap-2 justify-end">
+            <AButton size="sm" variant="ghost" @click="showRegenerateConfirm = false">Cancel</AButton>
+            <AButton size="sm" variant="danger" :loading="generating" @click="doGenerate(true)">Regenerate</AButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { Package, ImagePlus, ImageOff, Star, X, ChevronUp, ChevronDown, Save, Zap } from 'lucide-vue-next'
+import { RouterLink } from 'vue-router'
+import { ImagePlus, ImageOff, Star, X, ChevronUp, ChevronDown, Zap, Check } from 'lucide-vue-next'
 import {
   apiGetVariants, apiUpdateVariant, apiDeleteVariant, apiSetDefaultVariant,
+  apiBulkUpdateVariants,
   apiGetImages, apiUploadImages, apiSetThumbnail, apiDeleteImage,
   apiGetSpecTypes, apiGetProductSpecs, apiSaveProductSpecs, apiGenerateVariants,
 } from '../api/admin'
 import type { ProductVariant, ProductImage, SpecType, ProductSpec } from '../types'
-import ATable         from '../components/ui/ATable.vue'
-import ABadge         from '../components/ui/ABadge.vue'
-import AButton        from '../components/ui/AButton.vue'
-import AInput         from '../components/ui/AInput.vue'
-import AModal         from '../components/ui/AModal.vue'
-import AEmptyState    from '../components/ui/AEmptyState.vue'
-import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
+import ABadge  from '../components/ui/ABadge.vue'
+import AButton from '../components/ui/AButton.vue'
+import AInput  from '../components/ui/AInput.vue'
 
 const props     = defineProps<{ id: string }>()
 const productId = Number(props.id)
 
-// ── Images ────────────────────────────────────────────────
+// ── Page-level error ──────────────────────────────────────────────────
+const pageError = ref<string | null>(null)
+
+// ── Images ────────────────────────────────────────────────────────────
 const images        = ref<ProductImage[]>([])
 const imagesLoading = ref(true)
 const uploading     = ref(false)
-const loadError     = ref<string | null>(null)
+const imagesExpanded = ref(true)
 
 async function loadImages() {
   imagesLoading.value = true
   try {
     const res = await apiGetImages(productId)
     images.value = res.data
-  } catch { /* show empty state */ } finally {
+  } catch { /* empty state */ } finally {
     imagesLoading.value = false
   }
 }
@@ -309,7 +533,7 @@ async function handleUpload(e: Event) {
       images.value[0] = { ...images.value[0], isThumbnail: true }
     }
   } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Upload failed.'
+    pageError.value = (e as any)?.response?.data?.message ?? 'Upload failed.'
   } finally {
     uploading.value = false
     ;(e.target as HTMLInputElement).value = ''
@@ -334,12 +558,38 @@ async function deleteImage(img: ProductImage) {
   } catch { /* ignore */ }
 }
 
-// ── Specs ─────────────────────────────────────────────────
+// ── Variants ──────────────────────────────────────────────────────────
+const variants = ref<ProductVariant[]>([])
+
+const hasVariants = computed(() => variants.value.length > 0)
+const hasSpecs    = computed(() =>
+  hasVariants.value && variants.value[0]?.specs != null && variants.value[0].specs.length > 0
+)
+
+async function loadVariants() {
+  try {
+    const res = await apiGetVariants(productId)
+    variants.value = res.data
+    if (res.data.length > 0) {
+      buildPriceRows(res.data)
+      imagesExpanded.value = false
+    }
+  } catch (e: unknown) {
+    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to load variants.'
+  }
+}
+
+function variantLabel(variantId: number): string {
+  const v = variants.value.find(x => x.id === variantId)
+  if (!v || !v.specs || v.specs.length === 0) return 'Default'
+  return v.specs.map(s => s.unit ? `${s.value}${s.unit}` : s.value).join(' / ')
+}
+
+// ── Specs ─────────────────────────────────────────────────────────────
 const allSpecTypes  = ref<SpecType[]>([])
 const assignedSpecs = ref<Array<{ spec_type_id: number; name: string; unit: string | null; values: string[] }>>([])
 const specToAdd     = ref<number | ''>('')
 const valueInputs   = ref<Record<number, string>>({})
-const savingSpecs   = ref(false)
 
 const availableSpecTypes = computed(() =>
   allSpecTypes.value.filter(s => !assignedSpecs.value.some(a => a.spec_type_id === s.id))
@@ -347,8 +597,12 @@ const availableSpecTypes = computed(() =>
 
 const combinationCount = computed(() => {
   if (!assignedSpecs.value.length) return 1
-  return assignedSpecs.value.reduce((acc, s) => acc * (s.values.length || 1), 1)
+  return assignedSpecs.value.reduce((acc, s) => acc * Math.max(s.values.length, 1), 1)
 })
+
+const specsValid = computed(() =>
+  assignedSpecs.value.length > 0 && assignedSpecs.value.every(s => s.values.length > 0)
+)
 
 async function loadSpecs() {
   try {
@@ -361,11 +615,11 @@ async function loadSpecs() {
       spec_type_id: s.spec_type_id,
       name:         s.name,
       unit:         s.unit,
-      values:       s.values.map(v => v.value),
+      values:       s.values.map((v: { value: string }) => v.value),
     }))
     assignedSpecs.value.forEach(s => { valueInputs.value[s.spec_type_id] = '' })
   } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to load specs.'
+    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to load specs.'
   }
 }
 
@@ -402,173 +656,159 @@ function removeValue(spec: { values: string[] }, idx: number) {
   spec.values.splice(idx, 1)
 }
 
-async function saveSpecs() {
-  savingSpecs.value = true
-  try {
-    loadError.value = null
-    await apiSaveProductSpecs(
-      productId,
-      assignedSpecs.value.map(s => ({ spec_type_id: s.spec_type_id, values: s.values }))
-    )
-  } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to save specs.'
-  } finally {
-    savingSpecs.value = false
+// ── Wizard state ──────────────────────────────────────────────────────
+const currentStep           = ref<1 | 2 | 3>(1)
+const productType           = ref<'single' | 'multi' | null>(null)
+const generatingSingle      = ref(false)
+const generating            = ref(false)
+const showRegenerateConfirm = ref(false)
+const editSpecsExpanded     = ref(false)
+
+function stepClass(n: number): string {
+  if (currentStep.value > n) return 'border-emerald-500/30 bg-emerald-900/20'
+  if (currentStep.value === n) return 'border-dash-primary/40 bg-dash-primary-lt/20'
+  return 'border-dash-border opacity-40'
+}
+
+function stepNumClass(n: number): string {
+  if (currentStep.value > n) return 'bg-emerald-500 text-white'
+  if (currentStep.value === n) return 'bg-dash-primary text-white'
+  return 'bg-dash-border text-dash-muted'
+}
+
+async function handleStep1Continue() {
+  if (!productType.value) return
+  imagesExpanded.value = false
+
+  if (productType.value === 'single') {
+    generatingSingle.value = true
+    pageError.value = null
+    try {
+      const res = await apiGenerateVariants(productId, false)
+      variants.value = res.data
+      buildPriceRows(res.data)
+      currentStep.value = 3
+    } catch (e: unknown) {
+      pageError.value = (e as any)?.response?.data?.message ?? 'Failed to create variant.'
+    } finally {
+      generatingSingle.value = false
+    }
+  } else {
+    currentStep.value = 2
   }
 }
 
-// ── Generate ──────────────────────────────────────────────
-const showGenerateConfirm = ref(false)
-const generating          = ref(false)
-
-function clickGenerate() {
+function handleGenerate(isRegenerate: boolean) {
   if (variants.value.length > 0) {
-    showGenerateConfirm.value = true
-  } else {
-    doGenerate(false)
+    showRegenerateConfirm.value = true
+    return
   }
+  doGenerate(false)
 }
 
 async function doGenerate(force: boolean) {
   generating.value = true
-  showGenerateConfirm.value = false
+  showRegenerateConfirm.value = false
+  pageError.value = null
   try {
-    loadError.value = null
     await apiSaveProductSpecs(
       productId,
       assignedSpecs.value.map(s => ({ spec_type_id: s.spec_type_id, values: s.values }))
     )
     const res = await apiGenerateVariants(productId, force)
     variants.value = res.data
+    buildPriceRows(res.data)
+    editSpecsExpanded.value = false
+    if (currentStep.value === 2) currentStep.value = 3
   } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Generation failed.'
+    pageError.value = (e as any)?.response?.data?.message ?? 'Generation failed.'
   } finally {
     generating.value = false
   }
 }
 
-// ── Variants ──────────────────────────────────────────────
-const variants        = ref<ProductVariant[]>([])
-const variantsLoading = ref(true)
-const modalOpen       = ref(false)
-const editing         = ref<ProductVariant | null>(null)
-const saving          = ref(false)
-const deletingVariant = ref<ProductVariant | null>(null)
-const deleting        = ref(false)
-const formErrors      = ref<Record<string, string>>({})
-const settingDefault  = ref<number | null>(null)
+function switchToMultiple() {
+  variants.value    = []
+  priceRows.value   = []
+  productType.value = 'multi'
+  currentStep.value = 1
+  imagesExpanded.value = false
+}
 
-const emptyForm = () => ({ price: '', original_price: '', quantity: '0', low_stock_threshold: '5' })
-const form = ref(emptyForm())
+// ── Price rows ────────────────────────────────────────────────────────
+interface PriceRow {
+  id:                number
+  price:             string
+  originalPrice:     string
+  quantity:          string
+  lowStockThreshold: string
+}
+const priceRows      = ref<PriceRow[]>([])
+const priceRowErrors = ref<Array<{ price?: string }>>([])
+const savingPrices   = ref(false)
+const saveError      = ref<string | null>(null)
 
-const cols = [
-  { key: 'label',         label: 'Variant' },
-  { key: 'price',         label: 'Price' },
-  { key: 'originalPrice', label: 'Original' },
-  { key: 'quantity',      label: 'Qty' },
-  { key: 'stock',         label: 'Status' },
-  { key: 'isDefault',     label: '' },
-]
+function buildPriceRows(vs: ProductVariant[]) {
+  priceRows.value = vs.map(v => ({
+    id:                v.id,
+    price:             String(v.price),
+    originalPrice:     v.originalPrice != null ? String(v.originalPrice) : '',
+    quantity:          String(v.quantity),
+    lowStockThreshold: String(v.lowStockThreshold),
+  }))
+  priceRowErrors.value = vs.map(() => ({}))
+}
 
-const previewStock = computed(() => {
-  const qty       = Number(form.value.quantity) || 0
-  const threshold = Number(form.value.low_stock_threshold) || 5
-  if (qty === 0)        return 'out_of_stock'
-  if (qty <= threshold) return 'low_stock'
-  return 'in_stock'
+const overallStockPreview = computed(() => {
+  if (!priceRows.value.length) return 'out_of_stock'
+  const statuses = priceRows.value.map(r => {
+    const qty       = Number(r.quantity) || 0
+    const threshold = Number(r.lowStockThreshold) || 5
+    if (qty === 0)        return 'out_of_stock'
+    if (qty <= threshold) return 'low_stock'
+    return 'in_stock'
+  })
+  if (statuses.every(s => s === 'out_of_stock')) return 'out_of_stock'
+  if (statuses.some(s => s === 'in_stock'))      return 'in_stock'
+  return 'low_stock'
 })
 
-function variantLabel(v: ProductVariant): string {
-  if (!v.specs || v.specs.length === 0) return 'Default'
-  return v.specs.map(s => s.unit ? `${s.value}${s.unit}` : s.value).join(' / ')
-}
+async function savePrices() {
+  priceRowErrors.value = priceRows.value.map(r => ({
+    price: !r.price ? 'Required' : undefined,
+  }))
+  if (priceRowErrors.value.some(e => e.price)) return
 
-function getQtyClass(v: ProductVariant) {
-  if (v.stock === 'out_of_stock') return 'text-dash-danger font-medium'
-  if (v.stock === 'low_stock')    return 'text-dash-orange font-medium'
-  return 'text-dash-text'
-}
-
-async function loadVariants() {
-  if (!productId || isNaN(productId)) return
-  variantsLoading.value = true
-  loadError.value = null
+  savingPrices.value = true
+  saveError.value    = null
   try {
-    const res = await apiGetVariants(productId)
+    const res = await apiBulkUpdateVariants(productId, priceRows.value.map(r => ({
+      id:                  r.id,
+      price:               Number(r.price),
+      original_price:      r.originalPrice ? Number(r.originalPrice) : null,
+      quantity:            Number(r.quantity),
+      low_stock_threshold: Number(r.lowStockThreshold),
+    })))
     variants.value = res.data
+    buildPriceRows(res.data)
   } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to load variants.'
+    saveError.value = (e as any)?.response?.data?.message ?? 'Save failed.'
   } finally {
-    variantsLoading.value = false
+    savingPrices.value = false
   }
 }
 
-function openEdit(v: ProductVariant) {
-  editing.value = v
-  form.value = {
-    price:               String(v.price),
-    original_price:      v.originalPrice != null ? String(v.originalPrice) : '',
-    quantity:            String(v.quantity),
-    low_stock_threshold: String(v.lowStockThreshold),
-  }
-  formErrors.value = {}
-  modalOpen.value  = true
-}
-
-async function handleSave() {
-  formErrors.value = {}
-  if (!form.value.price)    { formErrors.value.price    = 'Price is required'; return }
-  if (form.value.quantity === '') { formErrors.value.quantity = 'Quantity is required'; return }
-
-  const payload = {
-    price:               Number(form.value.price),
-    original_price:      form.value.original_price ? Number(form.value.original_price) : null,
-    quantity:            Number(form.value.quantity),
-    low_stock_threshold: Number(form.value.low_stock_threshold),
-  }
-
-  saving.value = true
+// ── Default variant ───────────────────────────────────────────────────
+async function setDefault(variantId: number) {
   try {
-    if (editing.value) {
-      const res = await apiUpdateVariant(productId, editing.value.id, payload)
-      variants.value = variants.value.map(v => v.id === editing.value!.id ? res.data : v)
-    }
-    modalOpen.value = false
+    await apiSetDefaultVariant(productId, variantId)
+    variants.value = variants.value.map(v => ({ ...v, isDefault: v.id === variantId }))
   } catch (e: unknown) {
-    formErrors.value.general = (e as any)?.response?.data?.message ?? 'Save failed.'
-  } finally {
-    saving.value = false
+    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to set default.'
   }
 }
 
-async function setDefault(v: ProductVariant) {
-  settingDefault.value = v.id
-  try {
-    await apiSetDefaultVariant(productId, v.id)
-    variants.value = variants.value.map(x => ({ ...x, isDefault: x.id === v.id }))
-  } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Failed to set default.'
-  } finally {
-    settingDefault.value = null
-  }
-}
-
-function confirmDeleteVariant(v: ProductVariant) { deletingVariant.value = v }
-
-async function handleDelete() {
-  if (!deletingVariant.value) return
-  deleting.value = true
-  try {
-    await apiDeleteVariant(productId, deletingVariant.value.id)
-    variants.value = variants.value.filter(v => v.id !== deletingVariant.value!.id)
-    deletingVariant.value = null
-  } catch (e: unknown) {
-    loadError.value = (e as any)?.response?.data?.message ?? 'Delete failed.'
-  } finally {
-    deleting.value = false
-  }
-}
-
+// ── Lifecycle ─────────────────────────────────────────────────────────
 onMounted(() => { loadImages(); loadSpecs(); loadVariants() })
 watch(() => props.id, () => { loadImages(); loadSpecs(); loadVariants() })
 </script>
