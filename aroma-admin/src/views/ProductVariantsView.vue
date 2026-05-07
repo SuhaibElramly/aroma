@@ -220,7 +220,7 @@
           <p v-else class="text-xs text-dash-muted">Add at least one spec type above.</p>
           <AButton size="sm" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
             :title="!specsValid ? 'Add at least one value for each spec' : undefined"
-            @click="handleGenerate(false)">
+            @click="handleGenerate()">
             <Zap :size="13" /> Generate Variants
           </AButton>
         </div>
@@ -382,7 +382,7 @@
             </p>
             <p v-else class="text-xs text-dash-danger">Add at least one value per spec.</p>
             <AButton size="sm" variant="danger" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
-              @click="handleGenerate(true)">
+              @click="handleGenerate()">
               <Zap :size="13" /> Regenerate Variants
             </AButton>
           </div>
@@ -703,7 +703,7 @@ async function handleStep1Continue() {
   }
 }
 
-function handleGenerate(isRegenerate: boolean) {
+function handleGenerate() {
   if (variants.value.length > 0) {
     showRegenerateConfirm.value = true
     return

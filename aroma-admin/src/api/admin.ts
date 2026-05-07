@@ -59,11 +59,6 @@ export const apiDeleteProduct = (id: number) =>
 export const apiGetVariants = (productId: number) =>
   client.get<ProductVariant[]>(`/admin/products/${productId}/variants`)
 
-export const apiUpdateVariant = (productId: number, variantId: number, data: Record<string, unknown>) =>
-  client.put<ProductVariant>(`/admin/products/${productId}/variants/${variantId}`, data)
-
-export const apiDeleteVariant = (productId: number, variantId: number) =>
-  client.delete(`/admin/products/${productId}/variants/${variantId}`)
 
 export const apiSetDefaultVariant = (productId: number, variantId: number) =>
   client.patch<ProductVariant>(`/admin/products/${productId}/variants/${variantId}/default`)
