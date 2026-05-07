@@ -378,6 +378,7 @@
           <div class="flex items-center justify-between pt-1 border-t border-dash-border">
             <p v-if="assignedSpecs.length && specsValid" class="text-xs text-dash-muted">
               Will generate <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
+              <span v-if="assignedSpecs.length > 1"> ({{ assignedSpecs.map(s => s.values.length).join(' × ') }})</span>
             </p>
             <p v-else class="text-xs text-dash-danger">Add at least one value per spec.</p>
             <AButton size="sm" variant="danger" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
@@ -490,7 +491,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ImagePlus, ImageOff, Star, X, ChevronUp, ChevronDown, Zap, Check } from 'lucide-vue-next'
 import {
-  apiGetVariants, apiUpdateVariant, apiDeleteVariant, apiSetDefaultVariant,
+  apiGetVariants, apiSetDefaultVariant,
   apiBulkUpdateVariants,
   apiGetImages, apiUploadImages, apiSetThumbnail, apiDeleteImage,
   apiGetSpecTypes, apiGetProductSpecs, apiSaveProductSpecs, apiGenerateVariants,
@@ -545,7 +546,9 @@ async function setThumbnail(img: ProductImage) {
   try {
     await apiSetThumbnail(productId, img.id)
     images.value = images.value.map(i => ({ ...i, isThumbnail: i.id === img.id }))
-  } catch { /* ignore */ }
+  } catch (e: unknown) {
+    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to set thumbnail.'
+  }
 }
 
 async function deleteImage(img: ProductImage) {
@@ -555,7 +558,9 @@ async function deleteImage(img: ProductImage) {
     if (img.isThumbnail && images.value.length) {
       images.value[0] = { ...images.value[0], isThumbnail: true }
     }
-  } catch { /* ignore */ }
+  } catch (e: unknown) {
+    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to delete image.'
+  }
 }
 
 // ── Variants ──────────────────────────────────────────────────────────
@@ -810,5 +815,18 @@ async function setDefault(variantId: number) {
 
 // ── Lifecycle ─────────────────────────────────────────────────────────
 onMounted(() => { loadImages(); loadSpecs(); loadVariants() })
-watch(() => props.id, () => { loadImages(); loadSpecs(); loadVariants() })
+watch(() => props.id, () => {
+  currentStep.value           = 1
+  productType.value           = null
+  assignedSpecs.value         = []
+  valueInputs.value           = {}
+  priceRows.value             = []
+  priceRowErrors.value        = []
+  editSpecsExpanded.value     = false
+  showRegenerateConfirm.value = false
+  imagesExpanded.value        = true
+  pageError.value             = null
+  saveError.value             = null
+  loadImages(); loadSpecs(); loadVariants()
+})
 </script>
