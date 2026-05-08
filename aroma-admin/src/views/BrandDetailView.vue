@@ -35,7 +35,7 @@
             class="inline-flex items-center gap-1 text-xs text-dash-faint hover:text-dash-muted transition-colors mb-1"
           >
             <ArrowLeft :size="12" />
-            Brands
+            {{ t('brandDetail.back') }}
           </RouterLink>
           <h2 class="text-xl font-semibold text-dash-text tracking-tight leading-none">{{ brand.name }}</h2>
           <p v-if="brand.nameEn" class="text-sm text-dash-muted mt-0.5">{{ brand.nameEn }}</p>
@@ -43,15 +43,15 @@
       </div>
       <div class="flex items-center gap-6 text-xs">
         <div v-if="brand.origin">
-          <p class="text-dash-faint mb-0.5">Origin</p>
+          <p class="text-dash-faint mb-0.5">{{ t('brandDetail.originLabel') }}</p>
           <p class="font-medium text-dash-text">{{ brand.origin }}</p>
         </div>
         <div>
-          <p class="text-dash-faint mb-0.5">Products</p>
+          <p class="text-dash-faint mb-0.5">{{ t('brandDetail.productsCount') }}</p>
           <p class="font-medium text-dash-text">{{ brand.productCount }}</p>
         </div>
         <div>
-          <p class="text-dash-faint mb-0.5">Colour</p>
+          <p class="text-dash-faint mb-0.5">{{ t('brandDetail.colourLabel') }}</p>
           <div class="flex items-center gap-1.5">
             <div
               class="w-4 h-4 rounded border border-dash-border shrink-0"
@@ -66,23 +66,23 @@
     <!-- Product filters -->
     <div class="space-y-3">
       <div class="grid grid-cols-3 gap-3">
-        <AInput v-model="search"     label="Name"     placeholder="Search AR / EN…" @input="debouncedFetch" />
+        <AInput v-model="search"     :label="t('brandDetail.filterName')"     placeholder="Search AR / EN…" @input="debouncedFetch" />
         <ASelect
           v-model="categoryId"
-          label="Category"
-          :options="[{ value: '', label: 'All categories' }, ...categoryOptions]"
+          :label="t('brandDetail.filterCategory')"
+          :options="[{ value: '', label: t('brandDetail.allCategories') }, ...categoryOptions]"
           @update:modelValue="fetch(1)"
         />
         <ASelect
           v-model="filterType"
-          label="Type"
+          :label="t('brandDetail.filterType')"
           :options="typeFilterOptions"
           @update:modelValue="fetch(1)"
         />
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <AInput v-model="priceMin" label="Price Min (LYD)" type="number" placeholder="0"   @input="debouncedFetch" />
-        <AInput v-model="priceMax" label="Price Max (LYD)" type="number" placeholder="Any" @input="debouncedFetch" />
+        <AInput v-model="priceMin" :label="t('brandDetail.priceMin')" type="number" placeholder="0"   @input="debouncedFetch" />
+        <AInput v-model="priceMax" :label="t('brandDetail.priceMax')" type="number" placeholder="Any" @input="debouncedFetch" />
       </div>
     </div>
 
@@ -110,37 +110,37 @@
       </template>
       <template #cell-price="{ value }">
         <span v-if="value">{{ Number(value).toFixed(2) }} LYD</span>
-        <span v-else class="text-dash-faint">No variants</span>
+        <span v-else class="text-dash-faint">{{ t('products.noVariants') }}</span>
       </template>
       <template #cell-isNew="{ value }">
-        <span v-if="value" class="text-[10px] text-dash-secondary bg-dash-secondary-lt rounded-full px-2 py-0.5">New</span>
+        <span v-if="value" class="text-[10px] text-dash-secondary bg-dash-secondary-lt rounded-full px-2 py-0.5">{{ t('products.newArrival') }}</span>
       </template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
           <RouterLink :to="`/products/${(row as AdminProduct).id}/variants`">
-            <AButton size="sm" variant="ghost">Variants ({{ (row as AdminProduct).variantCount }})</AButton>
+            <AButton size="sm" variant="ghost">{{ t('products.variantsBtn', { count: (row as AdminProduct).variantCount }) }}</AButton>
           </RouterLink>
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminProduct)">Edit</AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminProduct)">Delete</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminProduct)">{{ t('common.edit') }}</AButton>
+          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminProduct)">{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Package" heading="No products for this brand" />
+        <AEmptyState :icon="Package" :heading="t('brandDetail.noProducts')" />
       </template>
     </ATable>
 
     <APagination :meta="meta" @change="changePage" />
 
     <!-- Edit modal -->
-    <AModal :open="modalOpen" title="Edit Product" wide @close="modalOpen = false">
+    <AModal :open="modalOpen" :title="t('brandDetail.editProduct')" wide @close="modalOpen = false">
       <form class="space-y-4" @submit.prevent>
 
         <!-- Names -->
         <div>
-          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">Product Name</p>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">{{ t('brandDetail.sectionProductName') }}</p>
           <div class="grid grid-cols-2 gap-3">
-            <AInput v-model="form.name"    label="Arabic Name"  :error="formErrors.name"  dir="rtl" />
-            <AInput v-model="form.name_en" label="English Name" />
+            <AInput v-model="form.name"    :label="t('products.nameArabic')"   :error="formErrors.name"  dir="rtl" />
+            <AInput v-model="form.name_en" :label="t('products.nameEnglish')" />
           </div>
         </div>
 
@@ -149,25 +149,25 @@
           <Link2 :size="12" class="text-dash-faint shrink-0" />
           <span class="text-2xs text-dash-muted">aromashop.ly/products/</span>
           <span class="text-2xs font-medium text-dash-text font-mono">{{ form.slug }}</span>
-          <span class="ml-auto text-2xs text-dash-faint">URL slug (fixed)</span>
+          <span class="ml-auto text-2xs text-dash-faint">{{ t('brandDetail.slugFixed') }}</span>
         </div>
 
         <!-- Classification -->
         <div>
-          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">Classification</p>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">{{ t('brandDetail.sectionClassification') }}</p>
           <div class="grid grid-cols-3 gap-3">
-            <ASelect v-model="form.brand_id"    label="Brand"    :options="brandOptions"    placeholder="Choose brand…"    :error="formErrors.brand_id" />
-            <ASelect v-model="form.category_id" label="Category" :options="categoryOptions" placeholder="Choose category…" :error="formErrors.category_id" />
-            <ASelect v-model="form.type"        label="Type"     :options="typeOptions"     placeholder="Choose type…"     :error="formErrors.type" />
+            <ASelect v-model="form.brand_id"    :label="t('productCreate.brandLabel')"    :options="brandOptions"    :placeholder="t('productCreate.chooseBrand')"    :error="formErrors.brand_id" />
+            <ASelect v-model="form.category_id" :label="t('productCreate.categoryLabel')" :options="categoryOptions" :placeholder="t('productCreate.chooseCategory')" :error="formErrors.category_id" />
+            <ASelect v-model="form.type"        :label="t('products.typeLabel')"           :options="typeOptions"     :placeholder="t('productCreate.chooseType')"     :error="formErrors.type" />
           </div>
         </div>
 
         <!-- Description -->
-        <ATextarea v-model="form.description" label="Description" placeholder="Optional product description…" rows="3" />
+        <ATextarea v-model="form.description" :label="t('products.descriptionLabel')" :placeholder="t('brandDetail.descriptionPlaceholder')" rows="3" />
 
         <!-- Status flags -->
         <div>
-          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">Status</p>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">{{ t('productCreate.status') }}</p>
           <div class="flex gap-1.5">
             <label
               v-for="flag in flags"
@@ -186,10 +186,10 @@
 
         <!-- Card color -->
         <div>
-          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">Card Color</p>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2.5">{{ t('productCreate.cardColor') }}</p>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <p class="text-2xs text-dash-muted mb-1.5">Background</p>
+              <p class="text-2xs text-dash-muted mb-1.5">{{ t('productCreate.colorBackground') }}</p>
               <div class="flex items-center gap-2">
                 <div class="relative w-8 h-8 rounded-btn overflow-hidden border border-dash-border shrink-0">
                   <input type="color" v-model="form.placeholder_bg" class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
@@ -204,7 +204,7 @@
               </div>
             </div>
             <div>
-              <p class="text-2xs text-dash-muted mb-1.5">Accent</p>
+              <p class="text-2xs text-dash-muted mb-1.5">{{ t('productCreate.colorAccent') }}</p>
               <div class="flex items-center gap-2">
                 <div class="relative w-8 h-8 rounded-btn overflow-hidden border border-dash-border shrink-0">
                   <input type="color" v-model="form.placeholder_dot" class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
@@ -225,23 +225,23 @@
             :style="{ backgroundColor: form.placeholder_bg }"
           >
             <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: form.placeholder_dot }" />
-            <span class="text-2xs font-medium" :style="{ color: form.placeholder_dot }">Preview</span>
+            <span class="text-2xs font-medium" :style="{ color: form.placeholder_dot }">{{ t('productCreate.colorPreview') }}</span>
           </div>
         </div>
 
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">Save Changes</AButton>
+        <AButton variant="secondary" size="sm" @click="modalOpen = false">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ t('products.saveChanges') }}</AButton>
       </template>
     </AModal>
 
     <!-- Delete confirmation -->
     <AConfirmDialog
       :open="!!deletingProduct"
-      title="Delete product?"
-      :message="`Delete &quot;${deletingProduct?.name}&quot;? This cannot be undone.`"
+      :title="t('brandDetail.deleteProduct')"
+      :message="t('brandDetail.deleteProductMessage', { name: deletingProduct?.name ?? '' })"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deletingProduct = null"
@@ -257,6 +257,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Package, ImageOff, Link2, Check } from 'lucide-vue-next'
 import { usePagination } from '../composables/usePagination'
 import {
@@ -275,6 +276,7 @@ import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 
 const props = defineProps<{ id: string }>()
+const { t } = useI18n()
 
 // ── Brand header ──────────────────────────────────────────────────────
 const brand        = ref<AdminBrand | null>(null)
@@ -301,18 +303,18 @@ const cats       = ref<AdminCategory[]>([])
 const allBrands  = ref<AdminBrand[]>([])
 
 const typeOptions       = ['EDP', 'EDT', 'Parfum', 'EDC'].map(v => ({ value: v, label: v }))
-const typeFilterOptions = [{ value: '', label: 'All types' }, ...typeOptions]
+const typeFilterOptions = computed(() => [{ value: '', label: t('brandDetail.allTypes') }, ...typeOptions])
 const categoryOptions   = computed(() => cats.value.map(c => ({ value: String(c.id), label: c.label })))
 const brandOptions      = computed(() => allBrands.value.map(b => ({ value: String(b.id), label: b.name })))
 
-const cols = [
-  { key: 'name',         label: 'Name' },
-  { key: 'category',     label: 'Category' },
-  { key: 'type',         label: 'Type' },
-  { key: 'price',        label: 'Price' },
-  { key: 'isNew',        label: 'Flags' },
-  { key: 'variantCount', label: 'Variants' },
-]
+const cols = computed(() => [
+  { key: 'name',         label: t('brandDetail.columns.name') },
+  { key: 'category',     label: t('brandDetail.columns.category') },
+  { key: 'type',         label: t('brandDetail.columns.type') },
+  { key: 'price',        label: t('brandDetail.columns.price') },
+  { key: 'isNew',        label: t('brandDetail.columns.flags') },
+  { key: 'variantCount', label: t('brandDetail.columns.variants') },
+])
 
 // ── Product table (paginated, locked to this brand) ───────────────────
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
@@ -342,11 +344,11 @@ const deleting        = ref(false)
 const deleteError     = ref<string | null>(null)
 const formErrors      = ref<Record<string, string>>({})
 
-const flags = [
-  { key: 'is_new'        as const, label: 'New arrival' },
-  { key: 'is_bestseller' as const, label: 'Bestseller'  },
-  { key: 'is_offer'      as const, label: 'On offer'    },
-]
+const flags = computed(() => [
+  { key: 'is_new'        as const, label: t('products.newArrival') },
+  { key: 'is_bestseller' as const, label: t('products.bestseller')  },
+  { key: 'is_offer'      as const, label: t('products.onOffer')    },
+])
 
 const emptyForm = () => ({
   slug: '', name: '', name_en: '', brand_id: '', category_id: '',

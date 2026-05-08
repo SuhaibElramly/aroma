@@ -7,11 +7,11 @@
 
     <div class="flex items-center gap-3">
       <div>
-        <h1 class="text-sm font-semibold text-dash-text">Spec Types</h1>
-        <p class="text-2xs text-dash-muted mt-0.5">Global list of product specification types (Size, Color, Weight…)</p>
+        <h1 class="text-sm font-semibold text-dash-text">{{ t('specTypes.title') }}</h1>
+        <p class="text-2xs text-dash-muted mt-0.5">{{ t('specTypes.subtitle') }}</p>
       </div>
       <div class="ml-auto">
-        <AButton size="sm" @click="openCreate"><Plus :size="14" /> New Spec Type</AButton>
+        <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('specTypes.add') }}</AButton>
       </div>
     </div>
 
@@ -20,42 +20,42 @@
         <span class="text-dash-muted text-xs">{{ value ?? '—' }}</span>
       </template>
       <template #cell-productCount="{ value }">
-        <span class="text-xs">{{ value }} product{{ value !== 1 ? 's' : '' }}</span>
+        <span class="text-xs">{{ value }}</span>
       </template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as SpecType)">Edit</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as SpecType)">{{ t('common.edit') }}</AButton>
           <AButton
             size="sm"
             variant="danger"
             :disabled="(row as SpecType).productCount > 0"
-            :title="(row as SpecType).productCount > 0 ? 'In use — cannot delete' : ''"
+            :title="(row as SpecType).productCount > 0 ? t('specTypes.inUseTooltip') : ''"
             @click.stop="confirmDelete(row as SpecType)"
-          >Delete</AButton>
+          >{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="SlidersHorizontal" heading="No spec types yet" sub="Create spec types to use as product variant options" />
+        <AEmptyState :icon="SlidersHorizontal" :heading="t('specTypes.noData')" :sub="t('specTypes.noDataSub')" />
       </template>
     </ATable>
 
     <!-- Create / Edit modal -->
-    <AModal :open="modalOpen" :title="editing ? 'Edit Spec Type' : 'New Spec Type'" @close="modalOpen = false">
+    <AModal :open="modalOpen" :title="editing ? t('specTypes.modal.editTitle') : t('specTypes.modal.createTitle')" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
-        <AInput v-model="form.name" label="Name" placeholder="e.g. Size, Color, Weight" :error="formErrors.name" />
-        <AInput v-model="form.unit" label="Unit (optional)" placeholder="e.g. ml, g, oz" />
-        <p class="text-2xs text-dash-muted">Unit is appended to variant values when displayed (e.g. "30ml").</p>
+        <AInput v-model="form.name" :label="t('specTypes.form.nameLabel')" :placeholder="t('specTypes.form.namePlaceholder')" :error="formErrors.name" />
+        <AInput v-model="form.unit" :label="t('specTypes.form.unitLabel')" :placeholder="t('specTypes.form.unitPlaceholder')" />
+        <p class="text-2xs text-dash-muted">{{ t('specTypes.form.unitHint') }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save' : 'Create' }}</AButton>
+        <AButton variant="secondary" size="sm" @click="modalOpen = false">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? t('common.save') : t('specTypes.create') }}</AButton>
       </template>
     </AModal>
 
     <AConfirmDialog
       :open="!!deleting"
-      title="Delete spec type?"
-      message="This spec type will be permanently removed."
+      :title="t('specTypes.confirm.deleteTitle')"
+      :message="t('specTypes.confirm.deleteMessage')"
       :loading="deleteLoading"
       @confirm="handleDelete"
       @cancel="deleting = null"
@@ -64,7 +64,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Plus, SlidersHorizontal } from 'lucide-vue-next'
 import { apiGetSpecTypes, apiCreateSpecType, apiUpdateSpecType, apiDeleteSpecType } from '../api/admin'
 import type { SpecType } from '../types'
@@ -74,6 +75,8 @@ import AInput         from '../components/ui/AInput.vue'
 import AModal         from '../components/ui/AModal.vue'
 import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
+
+const { t } = useI18n()
 
 const specTypes     = ref<SpecType[]>([])
 const loading       = ref(true)
@@ -88,11 +91,11 @@ const formErrors    = ref<Record<string, string>>({})
 const emptyForm = () => ({ name: '', unit: '' })
 const form = ref(emptyForm())
 
-const cols = [
-  { key: 'name',         label: 'Name' },
-  { key: 'unit',         label: 'Unit' },
-  { key: 'productCount', label: 'In Use' },
-]
+const cols = computed(() => [
+  { key: 'name',         label: t('specTypes.columns.name') },
+  { key: 'unit',         label: t('specTypes.columns.unit') },
+  { key: 'productCount', label: t('specTypes.columns.inUse') },
+])
 
 async function load() {
   loading.value = true

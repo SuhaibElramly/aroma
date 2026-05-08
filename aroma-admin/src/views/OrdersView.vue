@@ -38,11 +38,11 @@
           'text-[11px] rounded-full px-2 py-0.5',
           value ? 'bg-dash-secondary-lt text-dash-secondary' : 'bg-dash-border-lt text-dash-muted'
         ]">
-          {{ value ? 'Pickup' : 'Delivery' }}
+          {{ value ? t('orderDetail.pickup') : t('orderDetail.homeDelivery') }}
         </span>
       </template>
       <template #empty>
-        <AEmptyState :icon="ShoppingBag" heading="No orders found" sub="Try a different status filter" />
+        <AEmptyState :icon="ShoppingBag" :heading="t('orders.noOrders')" sub="" />
       </template>
     </ATable>
 
@@ -51,8 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ShoppingBag } from 'lucide-vue-next'
 import { apiGetOrders } from '../api/admin'
 import type { AdminOrder } from '../types'
@@ -62,28 +63,29 @@ import ABadge      from '../components/ui/ABadge.vue'
 import APagination from '../components/ui/APagination.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
 
+const { t } = useI18n()
 const router       = useRouter()
 const activeStatus = ref('')
 
-const statusOptions = [
-  { value: '',          label: 'All' },
-  { value: 'placed',    label: 'Placed' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'preparing', label: 'Preparing' },
-  { value: 'ready',     label: 'Ready' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
-]
+const statusOptions = computed(() => [
+  { value: '',          label: t('orders.filterAll') },
+  { value: 'placed',    label: t('orders.filterPlaced') },
+  { value: 'confirmed', label: t('orders.filterConfirmed') },
+  { value: 'preparing', label: t('orders.filterPreparing') },
+  { value: 'ready',     label: t('orders.filterReady') },
+  { value: 'delivered', label: t('orders.filterDelivered') },
+  { value: 'cancelled', label: t('orders.filterCancelled') },
+])
 
-const cols = [
-  { key: 'id',        label: 'Order ID' },
-  { key: 'user',      label: 'Customer' },
-  { key: 'itemCount', label: 'Items' },
-  { key: 'total',     label: 'Total' },
-  { key: 'status',    label: 'Status' },
-  { key: 'isPickup',  label: 'Type' },
-  { key: 'date',      label: 'Date' },
-]
+const cols = computed(() => [
+  { key: 'id',        label: t('orders.columns.id') },
+  { key: 'user',      label: t('orders.columns.customer') },
+  { key: 'itemCount', label: t('orders.columns.items') },
+  { key: 'total',     label: t('orders.columns.total') },
+  { key: 'status',    label: t('orders.columns.status') },
+  { key: 'isPickup',  label: t('orders.columns.type') },
+  { key: 'date',      label: t('orders.columns.date') },
+])
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
   apiGetOrders({ status: activeStatus.value || undefined, page }).then((r) => r.data),

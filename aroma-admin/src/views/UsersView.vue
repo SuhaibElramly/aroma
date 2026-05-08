@@ -1,23 +1,23 @@
 <!-- aroma-admin/src/views/UsersView.vue -->
 <template>
   <div class="space-y-4">
-    <AInput v-model="search" placeholder="Search by name or email…" class="w-64" @input="debouncedFetch" />
+    <AInput v-model="search" :placeholder="t('users.searchPlaceholder')" class="w-64" @input="debouncedFetch" />
 
     <ATable :columns="cols" :rows="items" :loading="loading">
       <template #cell-orderCount="{ value }">
         <span class="font-medium">{{ value }}</span>
-        <span class="text-dash-faint text-[10px] ml-1">orders</span>
+        <span class="text-dash-faint text-[10px] ml-1">{{ t('users.columns.orders').toLowerCase() }}</span>
       </template>
       <template #actions="{ row }">
         <RouterLink
           :to="`/users/${(row as AdminUserRow).id}`"
           class="text-xs text-dash-primary hover:underline"
         >
-          View
+          {{ t('common.view') }}
         </RouterLink>
       </template>
       <template #empty>
-        <AEmptyState :icon="Users" heading="No customers found" sub="Try a different search term" />
+        <AEmptyState :icon="Users" :heading="t('users.noUsers')" :sub="t('users.noUsersSub')" />
       </template>
     </ATable>
 
@@ -26,7 +26,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Users } from 'lucide-vue-next'
 import { apiGetUsers } from '../api/admin'
 import type { AdminUserRow } from '../types'
@@ -36,15 +37,16 @@ import AInput      from '../components/ui/AInput.vue'
 import APagination from '../components/ui/APagination.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
 
+const { t } = useI18n()
 const search = ref('')
 
-const cols = [
-  { key: 'name',       label: 'Name' },
-  { key: 'email',      label: 'Email' },
-  { key: 'phone',      label: 'Phone' },
-  { key: 'orderCount', label: 'Orders' },
-  { key: 'joinedAt',   label: 'Joined' },
-]
+const cols = computed(() => [
+  { key: 'name',       label: t('users.columns.name') },
+  { key: 'email',      label: t('users.columns.email') },
+  { key: 'phone',      label: t('users.columns.phone') },
+  { key: 'orderCount', label: t('users.columns.orders') },
+  { key: 'joinedAt',   label: t('users.columns.joined') },
+])
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
   apiGetUsers({ search: search.value || undefined, page }).then(r => r.data),
