@@ -78,6 +78,21 @@ const en = {
     ordersChart: 'Orders Overview',
     recentOrders: 'Recent Orders',
     topProducts: 'Top Products',
+    latestActivity: 'Latest activity',
+    viewAll: 'View all →',
+    noOrdersYet: 'No orders yet',
+    columns: {
+      order: 'Order',
+      customer: 'Customer',
+      total: 'Total',
+      status: 'Status',
+      date: 'Date',
+    },
+    timeOfDay: {
+      morning: 'morning',
+      afternoon: 'afternoon',
+      evening: 'evening',
+    },
   },
   orders: {
     title: 'Orders',

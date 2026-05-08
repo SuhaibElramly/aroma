@@ -80,6 +80,21 @@ const ar = {
     ordersChart: 'نظرة عامة على الطلبات',
     recentOrders: 'أحدث الطلبات',
     topProducts: 'أبرز المنتجات',
+    latestActivity: 'آخر النشاطات',
+    viewAll: 'عرض الكل ←',
+    noOrdersYet: 'لا توجد طلبات بعد',
+    columns: {
+      order: 'الطلب',
+      customer: 'العميل',
+      total: 'الإجمالي',
+      status: 'الحالة',
+      date: 'التاريخ',
+    },
+    timeOfDay: {
+      morning: 'الصباح',
+      afternoon: 'الظهر',
+      evening: 'المساء',
+    },
   },
   orders: {
     title: 'الطلبات',

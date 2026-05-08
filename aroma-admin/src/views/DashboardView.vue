@@ -2,8 +2,8 @@
   <div class="space-y-6 max-w-[1400px]">
     <!-- Welcome -->
     <div>
-      <h2 class="text-lg font-semibold text-dash-text">Good {{ greeting }}, {{ auth.user?.name ?? 'Admin' }} 👋</h2>
-      <p class="text-sm text-dash-muted mt-0.5">Here's what's happening at Aroma Shop today.</p>
+      <h2 class="text-lg font-semibold text-dash-text">{{ t('dashboard.greeting', { timeOfDay: t(`dashboard.timeOfDay.${greeting}`), name: auth.user?.name ?? 'Admin' }) }} 👋</h2>
+      <p class="text-sm text-dash-muted mt-0.5">{{ t('dashboard.subtitle') }}</p>
     </div>
 
     <!-- Error -->
@@ -17,29 +17,29 @@
     <!-- Stat cards -->
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
       <AStatCard
-        label="Total Revenue"
+        :label="t('dashboard.totalRevenue')"
         :value="stats ? `${Number(stats.totalRevenue).toFixed(0)} LYD` : '—'"
         :change="stats?.revenueChange ?? null"
-        sub="vs. last month"
+        :sub="t('dashboard.vsLastMonth')"
         :icon="TrendingUp"
         icon-bg="oklch(67% 0.063 195)"
         :featured="true"
       />
       <AStatCard
-        label="Total Orders"
+        :label="t('dashboard.totalOrders')"
         :value="stats?.totalOrders ?? '—'"
         :change="stats?.ordersChange ?? null"
         :icon="ShoppingBag"
         icon-bg="oklch(72% 0.16 55)"
       />
       <AStatCard
-        label="Products"
+        :label="t('dashboard.products')"
         :value="stats?.totalProducts ?? '—'"
         :icon="Package"
         icon-bg="oklch(52% 0.14 300)"
       />
       <AStatCard
-        label="Customers"
+        :label="t('dashboard.customers')"
         :value="stats?.totalUsers ?? '—'"
         :change="stats?.usersChange ?? null"
         :icon="Users"
@@ -65,14 +65,14 @@
       <div class="xl:col-span-2 bg-dash-surface rounded-card shadow-card p-5">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-sm font-semibold text-dash-text">Recent Orders</h3>
-            <p class="text-2xs text-dash-muted mt-0.5">Latest activity</p>
+            <h3 class="text-sm font-semibold text-dash-text">{{ t('dashboard.recentOrders') }}</h3>
+            <p class="text-2xs text-dash-muted mt-0.5">{{ t('dashboard.latestActivity') }}</p>
           </div>
           <RouterLink
             to="/orders"
             class="text-xs font-medium text-dash-primary hover:text-dash-primary-dk transition-colors"
           >
-            View all →
+            {{ t('dashboard.viewAll') }}
           </RouterLink>
         </div>
 
@@ -88,11 +88,11 @@
         <table v-else class="w-full text-xs">
           <thead>
             <tr class="border-b border-dash-border">
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">Order</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">Customer</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">Total</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">Status</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">Date</th>
+              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.order') }}</th>
+              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.customer') }}</th>
+              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.total') }}</th>
+              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.status') }}</th>
+              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.date') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +110,7 @@
             </tr>
             <tr v-if="!stats?.recentOrders?.length && !loading">
               <td colspan="5" class="py-14 text-center">
-                <AEmptyState :icon="ShoppingBag" heading="No orders yet" />
+                <AEmptyState :icon="ShoppingBag" :heading="t('dashboard.noOrdersYet')" />
               </td>
             </tr>
           </tbody>
@@ -129,6 +129,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { TrendingUp, ShoppingBag, Package, Users } from 'lucide-vue-next'
 import { apiGetStats } from '../api/admin'
 import type { DashboardStats, RecentOrderRow } from '../types'
@@ -140,6 +141,7 @@ import AreaChart       from '../components/charts/AreaChart.vue'
 import BarChart        from '../components/charts/BarChart.vue'
 import ComparisonChart from '../components/charts/ComparisonChart.vue'
 
+const { t }   = useI18n()
 const router  = useRouter()
 const auth    = useAuthStore()
 const stats   = ref<DashboardStats | null>(null)
