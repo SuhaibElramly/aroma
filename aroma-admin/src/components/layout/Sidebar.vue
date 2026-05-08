@@ -7,7 +7,7 @@
       </div>
       <div>
         <p class="text-sm font-semibold text-dash-text leading-none">Aroma</p>
-        <p class="text-2xs text-dash-muted mt-0.5">Admin Console</p>
+        <p class="text-2xs text-dash-muted mt-0.5">{{ t('topbar.adminConsole') }}</p>
       </div>
     </div>
 
@@ -16,7 +16,7 @@
 
     <!-- Nav -->
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-      <p class="px-3 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">Main</p>
+      <p class="px-3 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">{{ t('nav.main') }}</p>
       <RouterLink
         v-for="item in mainItems"
         :key="item.to"
@@ -49,7 +49,7 @@
         </button>
       </RouterLink>
 
-      <p class="px-3 mt-4 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">Catalog</p>
+      <p class="px-3 mt-4 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">{{ t('nav.catalog') }}</p>
       <RouterLink
         v-for="item in catalogItems"
         :key="item.to"
@@ -92,19 +92,23 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { LayoutDashboard, ShoppingBag, Package, Tag, Grid3X3, Users, Ticket, SlidersHorizontal } from 'lucide-vue-next'
 
-const mainItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/orders',    label: 'Orders',    icon: ShoppingBag },
-  { to: '/users',     label: 'Customers', icon: Users },
-]
+const { t } = useI18n()
 
-const catalogItems = [
-  { to: '/products',   label: 'Products',   icon: Package },
-  { to: '/spec-types', label: 'Spec Types', icon: SlidersHorizontal },
-  { to: '/brands',     label: 'Brands',     icon: Tag },
-  { to: '/categories', label: 'Categories', icon: Grid3X3 },
-  { to: '/coupons',    label: 'Coupons',    icon: Ticket },
-]
+const mainItems = computed(() => [
+  { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
+  { to: '/orders',    label: t('nav.orders'),    icon: ShoppingBag },
+  { to: '/users',     label: t('nav.customers'), icon: Users },
+])
+
+const catalogItems = computed(() => [
+  { to: '/products',   label: t('nav.products'),   icon: Package },
+  { to: '/spec-types', label: t('nav.specTypes'),  icon: SlidersHorizontal },
+  { to: '/brands',     label: t('nav.brands'),     icon: Tag },
+  { to: '/categories', label: t('nav.categories'), icon: Grid3X3 },
+  { to: '/coupons',    label: t('nav.coupons'),    icon: Ticket },
+])
 </script>

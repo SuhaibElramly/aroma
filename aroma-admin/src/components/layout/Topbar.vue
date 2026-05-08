@@ -29,7 +29,7 @@
       </div>
       <div class="text-left hidden sm:block">
         <p class="text-xs font-medium text-dash-text leading-none">{{ auth.user?.name ?? 'Admin' }}</p>
-        <p class="text-2xs text-dash-muted mt-0.5 group-hover:text-dash-danger transition-colors">Sign out</p>
+        <p class="text-2xs text-dash-muted mt-0.5 group-hover:text-dash-danger transition-colors">{{ t('topbar.signOut') }}</p>
       </div>
       <LogOut :size="13" class="text-dash-faint group-hover:text-dash-danger transition-colors rtl:scale-x-[-1]" />
     </button>
@@ -42,25 +42,32 @@ import { useRoute, useRouter } from 'vue-router'
 import { LogOut } from 'lucide-vue-next'
 import dayjs from 'dayjs'
 import { useAuthStore } from '../../stores/auth'
+import { useI18n } from 'vue-i18n'
 import { useLocale } from '../../composables/useLocale'
 
 const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
+const { t }  = useI18n()
 const { locale, toggleLocale } = useLocale()
 
-const titles: Record<string, string> = {
-  dashboard:          'Dashboard',
-  orders:             'Orders',
-  'order-detail':     'Order Detail',
-  products:           'Products',
-  'product-variants': 'Variants',
-  brands:             'Brands',
-  categories:         'Categories',
-  users:              'Customers',
-}
+const titles = computed<Record<string, string>>(() => ({
+  dashboard:          t('pageTitles.dashboard'),
+  orders:             t('pageTitles.orders'),
+  'order-detail':     t('pageTitles.orderDetail'),
+  products:           t('pageTitles.products'),
+  'product-variants': t('pageTitles.productVariants'),
+  'product-create':   t('pageTitles.productCreate'),
+  brands:             t('pageTitles.brands'),
+  'brand-detail':     t('pageTitles.brandDetail'),
+  categories:         t('pageTitles.categories'),
+  users:              t('pageTitles.users'),
+  'user-detail':      t('pageTitles.userDetail'),
+  coupons:            t('pageTitles.coupons'),
+  'spec-types':       t('pageTitles.specTypes'),
+}))
 
-const pageTitle      = computed(() => titles[route.name as string] ?? 'Admin')
+const pageTitle      = computed(() => titles.value[route.name as string] ?? t('topbar.adminConsole'))
 const todayFormatted = computed(() => dayjs().format('dddd, MMMM D'))
 const initial        = computed(() => (auth.user?.name ?? 'A')[0].toUpperCase())
 
