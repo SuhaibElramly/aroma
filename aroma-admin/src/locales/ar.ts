@@ -1,5 +1,6 @@
-// Populated in Task 2
-export default {
+import type { MessageSchema } from './en'
+
+const ar = {
   common: {
     save: 'حفظ',
     cancel: 'إلغاء',
@@ -261,4 +262,6 @@ export default {
     page: 'صفحة',
     perPage: 'في الصفحة',
   },
-}
+} satisfies MessageSchema
+
+export default ar

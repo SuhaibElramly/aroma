@@ -1,5 +1,4 @@
-// Populated in Task 2
-export default {
+const en = {
   common: {
     save: 'Save',
     cancel: 'Cancel',
@@ -261,4 +260,10 @@ export default {
     page: 'Page',
     perPage: 'Per page',
   },
-}
+} as const
+
+export type Messages = typeof en
+// DeepStringify maps all leaf string literals to string, allowing translated values in other locale files
+type DeepStringify<T> = { [K in keyof T]: T[K] extends string ? string : DeepStringify<T[K]> }
+export type MessageSchema = DeepStringify<Messages>
+export default en
