@@ -3,9 +3,9 @@
 
     <!-- Breadcrumb -->
     <div class="flex items-center gap-2 text-xs">
-      <RouterLink to="/products" class="text-dash-faint hover:text-dash-text transition-colors">Products</RouterLink>
+      <RouterLink to="/products" class="text-dash-faint hover:text-dash-text transition-colors">{{ t('nav.products') }}</RouterLink>
       <span class="text-dash-border">/</span>
-      <span class="text-dash-text font-medium">Variants &amp; Images</span>
+      <span class="text-dash-text font-medium">{{ t('productVariants.variantsAndImages') }}</span>
     </div>
 
     <!-- Page-level error banner -->
@@ -18,9 +18,9 @@
       <!-- Collapsed header -->
       <div class="flex items-center justify-between px-5 py-3">
         <div>
-          <h2 class="text-sm font-semibold text-dash-text">Images</h2>
+          <h2 class="text-sm font-semibold text-dash-text">{{ t('productVariants.imagesSection') }}</h2>
           <p class="text-2xs text-dash-muted mt-0.5">
-            {{ imagesExpanded ? 'Click any image to set as thumbnail' : `${images.length} image${images.length !== 1 ? 's' : ''} uploaded` }}
+            {{ imagesExpanded ? t('productVariants.clickToSetThumbnail') : `${images.length} image${images.length !== 1 ? 's' : ''} uploaded` }}
           </p>
         </div>
         <div class="flex items-center gap-2">
@@ -30,11 +30,11 @@
               uploading ? 'bg-dash-border text-dash-faint cursor-not-allowed' : 'bg-dash-secondary text-white hover:bg-dash-secondary-dk shadow-sm cursor-pointer']">
               <span v-if="uploading" class="inline-block h-3 w-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
               <ImagePlus v-else :size="14" />
-              Upload
+              {{ t('productVariants.upload') }}
             </span>
           </label>
           <AButton size="sm" variant="ghost" @click="imagesExpanded = !imagesExpanded">
-            {{ imagesExpanded ? 'Collapse' : 'Manage' }}
+            {{ imagesExpanded ? t('productVariants.collapse') : t('productVariants.manage') }}
           </AButton>
         </div>
       </div>
@@ -51,7 +51,7 @@
             @click="setThumbnail(img)">
             <img :src="img.url" :alt="img.originalName ?? 'Product image'" class="h-full w-full object-cover" />
             <div v-if="img.isThumbnail" class="absolute top-1.5 left-1.5 bg-dash-primary text-white text-2xs font-semibold rounded-md px-1.5 py-0.5 flex items-center gap-1">
-              <Star :size="9" /> Thumbnail
+              <Star :size="9" /> {{ t('productVariants.thumbnail') }}
             </div>
             <button class="absolute top-1.5 right-1.5 h-6 w-6 flex items-center justify-center rounded-lg bg-dash-text/70 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-dash-danger"
               @click.stop="deleteImage(img)">
@@ -63,8 +63,8 @@
           <div class="h-10 w-10 rounded-2xl bg-dash-border flex items-center justify-center text-dash-faint mb-3">
             <ImageOff :size="20" />
           </div>
-          <p class="text-sm font-medium text-dash-text">No images yet</p>
-          <p class="text-2xs text-dash-faint mt-1">Upload images using the button above</p>
+          <p class="text-sm font-medium text-dash-text">{{ t('productVariants.noImagesYet') }}</p>
+          <p class="text-2xs text-dash-faint mt-1">{{ t('productVariants.noImagesHint') }}</p>
         </div>
       </div>
     </div>
@@ -83,9 +83,9 @@
             <span v-else>1</span>
           </div>
           <div class="text-xs font-medium leading-tight">
-            <span v-if="currentStep > 1 && productType === 'single'" class="text-emerald-400">Single price</span>
-            <span v-else-if="currentStep > 1 && productType === 'multi'" class="text-emerald-400">Multiple variants</span>
-            <span v-else>Product type</span>
+            <span v-if="currentStep > 1 && productType === 'single'" class="text-emerald-400">{{ t('productVariants.singlePriceDone') }}</span>
+            <span v-else-if="currentStep > 1 && productType === 'multi'" class="text-emerald-400">{{ t('productVariants.multiVariantsDone') }}</span>
+            <span v-else>{{ t('productVariants.productType') }}</span>
           </div>
         </div>
         <!-- Step 2 (multi only) -->
@@ -96,7 +96,7 @@
           </div>
           <div class="text-xs font-medium leading-tight">
             <span v-if="currentStep > 2">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }} generated</span>
-            <span v-else>Define variants</span>
+            <span v-else>{{ t('productVariants.step2') }}</span>
           </div>
         </div>
         <!-- Step 3 -->
@@ -104,14 +104,14 @@
           <div :class="['w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0', stepNumClass(3)]">
             <span>3</span>
           </div>
-          <div class="text-xs font-medium leading-tight">Set prices</div>
+          <div class="text-xs font-medium leading-tight">{{ t('productVariants.setPrices') }}</div>
         </div>
       </div>
 
       <!-- ── Step 1: Product type ── -->
       <div v-if="currentStep === 1" class="bg-dash-surface rounded-card shadow-card p-5">
-        <h2 class="text-sm font-semibold text-dash-text mb-1">Step 1 — Product type</h2>
-        <p class="text-2xs text-dash-muted mb-4">How does this product work in your store?</p>
+        <h2 class="text-sm font-semibold text-dash-text mb-1">{{ t('productVariants.step1Title') }}</h2>
+        <p class="text-2xs text-dash-muted mb-4">{{ t('productVariants.howDoesItWork') }}</p>
 
         <div class="space-y-3">
           <label class="flex items-start gap-3 p-3 rounded-card border cursor-pointer transition-all"
@@ -122,8 +122,8 @@
             </div>
             <input type="radio" v-model="productType" value="single" class="sr-only" />
             <div>
-              <p class="text-xs font-semibold text-dash-text">Single price &amp; stock</p>
-              <p class="text-2xs text-dash-muted mt-0.5">One price, one quantity — good for a product sold in one size only.</p>
+              <p class="text-xs font-semibold text-dash-text">{{ t('productVariants.singlePrice') }}</p>
+              <p class="text-2xs text-dash-muted mt-0.5">{{ t('productVariants.singlePriceDesc') }}</p>
             </div>
           </label>
 
@@ -135,15 +135,15 @@
             </div>
             <input type="radio" v-model="productType" value="multi" class="sr-only" />
             <div>
-              <p class="text-xs font-semibold text-dash-text">Multiple variants</p>
-              <p class="text-2xs text-dash-muted mt-0.5">Different sizes, colors, or combinations — each with its own price and stock.</p>
+              <p class="text-xs font-semibold text-dash-text">{{ t('productVariants.multipleVariants') }}</p>
+              <p class="text-2xs text-dash-muted mt-0.5">{{ t('productVariants.multipleVariantsDesc') }}</p>
             </div>
           </label>
         </div>
 
         <div class="flex justify-end mt-5">
           <AButton size="sm" :disabled="!productType" :loading="generatingSingle" @click="handleStep1Continue">
-            Continue →
+            {{ t('productVariants.continueBtn') }}
           </AButton>
         </div>
       </div>
@@ -151,22 +151,22 @@
       <!-- ── Step 2: Define variants (multi only) ── -->
       <div v-if="currentStep === 2" class="bg-dash-surface rounded-card shadow-card p-5 space-y-5">
         <div>
-          <h2 class="text-sm font-semibold text-dash-text">Step 2 — Define variants</h2>
-          <p class="text-2xs text-dash-muted mt-0.5">Assign spec types and add all values for each one.</p>
+          <h2 class="text-sm font-semibold text-dash-text">{{ t('productVariants.step2Title') }}</h2>
+          <p class="text-2xs text-dash-muted mt-0.5">{{ t('productVariants.step2Desc') }}</p>
         </div>
 
         <!-- Spec type selector -->
         <div>
-          <p class="text-xs font-medium text-dash-text mb-2">Spec types</p>
+          <p class="text-xs font-medium text-dash-text mb-2">{{ t('productVariants.specTypes') }}</p>
           <div class="flex gap-2">
             <select v-model="specToAdd"
               class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary">
-              <option value="">Add a spec type…</option>
+              <option value="">{{ t('productVariants.addSpecType') }}</option>
               <option v-for="s in availableSpecTypes" :key="s.id" :value="s.id">
                 {{ s.name }}{{ s.unit ? ` (${s.unit})` : '' }}
               </option>
             </select>
-            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">Add</AButton>
+            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">{{ t('common.add') }}</AButton>
           </div>
 
           <div v-if="assignedSpecs.length" class="mt-3 space-y-2">
@@ -203,9 +203,9 @@
                   :class="['flex-1 rounded-btn border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none transition-colors',
                     spec.values.length === 0 ? 'border-dash-danger/60 focus:border-dash-danger' : 'border-dash-border focus:border-dash-primary']"
                   @keydown.enter.prevent="addValue(spec)" />
-                <AButton size="sm" variant="secondary" @click="addValue(spec)">Add</AButton>
+                <AButton size="sm" variant="secondary" @click="addValue(spec)">{{ t('common.add') }}</AButton>
               </div>
-              <p v-if="spec.values.length === 0" class="mt-1 text-2xs text-dash-danger">At least one value is required.</p>
+              <p v-if="spec.values.length === 0" class="mt-1 text-2xs text-dash-danger">{{ t('productVariants.atLeastOneValue') }}</p>
             </div>
           </div>
         </div>
@@ -213,15 +213,15 @@
         <!-- Generate bar -->
         <div class="flex items-center justify-between pt-1 border-t border-dash-border">
           <p v-if="assignedSpecs.length && specsValid" class="text-xs text-dash-muted">
-            Will generate <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
+            {{ t('productVariants.willGenerate') }} <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
             <span v-if="assignedSpecs.length > 1"> ({{ assignedSpecs.map(s => s.values.length).join(' × ') }})</span>
           </p>
-          <p v-else-if="assignedSpecs.length" class="text-xs text-dash-danger">Add at least one value per spec to generate.</p>
-          <p v-else class="text-xs text-dash-muted">Add at least one spec type above.</p>
+          <p v-else-if="assignedSpecs.length" class="text-xs text-dash-danger">{{ t('productVariants.addAtLeastOneValuePerSpec') }}</p>
+          <p v-else class="text-xs text-dash-muted">{{ t('productVariants.addAtLeastOneSpec') }}</p>
           <AButton size="sm" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
-            :title="!specsValid ? 'Add at least one value for each spec' : undefined"
+            :title="!specsValid ? t('productVariants.addAtLeastOneValuePerSpec') : undefined"
             @click="handleGenerate()">
-            <Zap :size="13" /> Generate Variants
+            <Zap :size="13" /> {{ t('productVariants.generateVariants') }}
           </AButton>
         </div>
       </div>
@@ -229,18 +229,18 @@
       <!-- ── Step 3: Set prices ── -->
       <div v-if="currentStep === 3" class="bg-dash-surface rounded-card shadow-card p-5">
         <h2 class="text-sm font-semibold text-dash-text mb-1">
-          {{ productType === 'single' ? 'Price &amp; Stock' : 'Step 3 — Set prices &amp; stock' }}
+          {{ productType === 'single' ? t('productVariants.step3TitleSingle') : t('productVariants.step3TitleMulti') }}
         </h2>
         <p class="text-2xs text-dash-muted mb-4">
-          {{ productType === 'single' ? 'This product has one price.' : 'Fill in every variant. You can update these anytime.' }}
+          {{ productType === 'single' ? t('productVariants.step3DescSingle') : t('productVariants.step3DescMulti') }}
         </p>
 
         <!-- Single: simple 2×2 grid -->
         <div v-if="productType === 'single'" class="grid grid-cols-2 gap-3 mb-4">
-          <AInput v-model="priceRows[0].price"             label="Price (LYD)" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
-          <AInput v-model="priceRows[0].originalPrice"     label="Original price (LYD)" type="number" step="0.01" />
-          <AInput v-model="priceRows[0].quantity"          label="Quantity in stock" type="number" min="0" />
-          <AInput v-model="priceRows[0].lowStockThreshold" label="Low stock alert at" type="number" min="0" />
+          <AInput v-model="priceRows[0].price"             :label="t('productVariants.priceLyd')" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
+          <AInput v-model="priceRows[0].originalPrice"     :label="t('productVariants.originalPrice') + ' (LYD)'" type="number" step="0.01" />
+          <AInput v-model="priceRows[0].quantity"          :label="t('productVariants.qty')" type="number" min="0" />
+          <AInput v-model="priceRows[0].lowStockThreshold" :label="t('productVariants.lowAt')" type="number" min="0" />
         </div>
 
         <!-- Multi: inline table -->
@@ -248,11 +248,11 @@
           <table class="w-full text-xs border-collapse">
             <thead>
               <tr class="border-b border-dash-border">
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Variant</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Price (LYD)</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Original</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Qty</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Low at</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
                 <th class="py-2 px-2"></th>
               </tr>
             </thead>
@@ -280,8 +280,8 @@
                 <td class="py-1.5 px-2">
                   <button v-if="!variants.find(v => v.id === row.id)?.isDefault"
                     class="text-2xs text-dash-muted hover:text-dash-primary transition-colors whitespace-nowrap"
-                    @click="setDefault(row.id)">Set default</button>
-                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">★ Default</span>
+                    @click="setDefault(row.id)">{{ t('productVariants.setDefault') }}</button>
+                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">{{ t('productVariants.defaultMark') }}</span>
                 </td>
               </tr>
             </tbody>
@@ -291,11 +291,11 @@
         <!-- Save row -->
         <div class="flex items-center justify-between pt-2 border-t border-dash-border">
           <div class="flex items-center gap-2 text-2xs text-dash-muted">
-            <span>Overall stock:</span>
+            <span>{{ t('productVariants.overallStock') }}</span>
             <ABadge :status="overallStockPreview" />
           </div>
           <AButton size="sm" :loading="savingPrices" @click="savePrices">
-            Save{{ productType === 'multi' ? ' Prices &amp; Stock' : '' }}
+            {{ productType === 'multi' ? t('productVariants.savePricesBtn') : t('productVariants.saveSingleBtn') }}
           </AButton>
         </div>
         <p v-if="saveError" class="mt-2 text-xs text-dash-danger">{{ saveError }}</p>
@@ -321,7 +321,7 @@
             </p>
           </div>
           <AButton size="sm" variant="secondary" @click="editSpecsExpanded = !editSpecsExpanded">
-            {{ editSpecsExpanded ? 'Cancel' : 'Edit Specs' }}
+            {{ editSpecsExpanded ? t('productVariants.cancelEdit') : t('productVariants.editSpecs') }}
           </AButton>
         </div>
 
@@ -330,12 +330,12 @@
           <div class="flex gap-2">
             <select v-model="specToAdd"
               class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary">
-              <option value="">Add a spec type…</option>
+              <option value="">{{ t('productVariants.addSpecType') }}</option>
               <option v-for="s in availableSpecTypes" :key="s.id" :value="s.id">
                 {{ s.name }}{{ s.unit ? ` (${s.unit})` : '' }}
               </option>
             </select>
-            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">Add</AButton>
+            <AButton size="sm" variant="secondary" :disabled="!specToAdd" @click="addSpec">{{ t('common.add') }}</AButton>
           </div>
 
           <div v-if="assignedSpecs.length" class="space-y-2">
@@ -370,20 +370,20 @@
                   :class="['flex-1 rounded-btn border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none transition-colors',
                     spec.values.length === 0 ? 'border-dash-danger/60 focus:border-dash-danger' : 'border-dash-border focus:border-dash-primary']"
                   @keydown.enter.prevent="addValue(spec)" />
-                <AButton size="sm" variant="secondary" @click="addValue(spec)">Add</AButton>
+                <AButton size="sm" variant="secondary" @click="addValue(spec)">{{ t('common.add') }}</AButton>
               </div>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-1 border-t border-dash-border">
             <p v-if="assignedSpecs.length && specsValid" class="text-xs text-dash-muted">
-              Will generate <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
+              {{ t('productVariants.willGenerate') }} <span class="font-semibold text-dash-text">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }}</span>
               <span v-if="assignedSpecs.length > 1"> ({{ assignedSpecs.map(s => s.values.length).join(' × ') }})</span>
             </p>
-            <p v-else class="text-xs text-dash-danger">Add at least one value per spec.</p>
+            <p v-else class="text-xs text-dash-danger">{{ t('productVariants.addAtLeastOneValuePerSpec') }}</p>
             <AButton size="sm" variant="danger" :loading="generating" :disabled="!specsValid || !assignedSpecs.length"
               @click="handleGenerate()">
-              <Zap :size="13" /> Regenerate Variants
+              <Zap :size="13" /> {{ t('productVariants.regenerateVariants') }}
             </AButton>
           </div>
         </div>
@@ -393,21 +393,21 @@
       <div v-if="!hasSpecs" class="text-center py-2">
         <button class="text-2xs text-dash-muted hover:text-dash-text underline underline-offset-2 transition-colors"
           @click="switchToMultiple">
-          Switch to multiple variants
+          {{ t('productVariants.switchToMultiple') }}
         </button>
       </div>
 
       <!-- Price grid (always shown in editing mode) -->
       <div class="bg-dash-surface rounded-card shadow-card p-5">
-        <h2 class="text-sm font-semibold text-dash-text mb-1">Prices &amp; Stock</h2>
-        <p class="text-2xs text-dash-muted mb-4">Changes are saved when you click Save.</p>
+        <h2 class="text-sm font-semibold text-dash-text mb-1">{{ t('productVariants.pricesAndStock') }}</h2>
+        <p class="text-2xs text-dash-muted mb-4">{{ t('productVariants.changesAutoSave') }}</p>
 
         <!-- Single variant: 2×2 grid -->
         <div v-if="!hasSpecs && priceRows.length === 1" class="grid grid-cols-2 gap-3 mb-4">
-          <AInput v-model="priceRows[0].price"             label="Price (LYD)" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
-          <AInput v-model="priceRows[0].originalPrice"     label="Original price (LYD)" type="number" step="0.01" />
-          <AInput v-model="priceRows[0].quantity"          label="Quantity in stock" type="number" min="0" />
-          <AInput v-model="priceRows[0].lowStockThreshold" label="Low stock alert at" type="number" min="0" />
+          <AInput v-model="priceRows[0].price"             :label="t('productVariants.priceLyd')" type="number" step="0.01" :error="priceRowErrors[0]?.price" />
+          <AInput v-model="priceRows[0].originalPrice"     :label="t('productVariants.originalPrice') + ' (LYD)'" type="number" step="0.01" />
+          <AInput v-model="priceRows[0].quantity"          :label="t('productVariants.qty')" type="number" min="0" />
+          <AInput v-model="priceRows[0].lowStockThreshold" :label="t('productVariants.lowAt')" type="number" min="0" />
         </div>
 
         <!-- Multi-variant: table -->
@@ -415,11 +415,11 @@
           <table class="w-full text-xs border-collapse">
             <thead>
               <tr class="border-b border-dash-border">
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Variant</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Price (LYD)</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Original</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Qty</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Low at</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
+                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
                 <th class="py-2 px-2"></th>
               </tr>
             </thead>
@@ -447,8 +447,8 @@
                 <td class="py-1.5 px-2">
                   <button v-if="!variants.find(v => v.id === row.id)?.isDefault"
                     class="text-2xs text-dash-muted hover:text-dash-primary transition-colors whitespace-nowrap"
-                    @click="setDefault(row.id)">Set default</button>
-                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">★ Default</span>
+                    @click="setDefault(row.id)">{{ t('productVariants.setDefault') }}</button>
+                  <span v-else class="text-2xs font-semibold text-dash-primary whitespace-nowrap">{{ t('productVariants.defaultMark') }}</span>
                 </td>
               </tr>
             </tbody>
@@ -457,10 +457,10 @@
 
         <div class="flex items-center justify-between pt-2 border-t border-dash-border">
           <div class="flex items-center gap-2 text-2xs text-dash-muted">
-            <span>Overall stock:</span>
+            <span>{{ t('productVariants.overallStock') }}</span>
             <ABadge :status="overallStockPreview" />
           </div>
-          <AButton size="sm" :loading="savingPrices" @click="savePrices">Save Prices &amp; Stock</AButton>
+          <AButton size="sm" :loading="savingPrices" @click="savePrices">{{ t('productVariants.savePricesBtn') }}</AButton>
         </div>
         <p v-if="saveError" class="mt-2 text-xs text-dash-danger">{{ saveError }}</p>
       </div>
@@ -471,13 +471,13 @@
     <Teleport to="body">
       <div v-if="showRegenerateConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div class="bg-dash-surface rounded-card shadow-card p-6 max-w-sm w-full mx-4">
-          <h3 class="text-sm font-semibold text-dash-text mb-2">Regenerate variants?</h3>
+          <h3 class="text-sm font-semibold text-dash-text mb-2">{{ t('productVariants.regenerateConfirmTitle') }}</h3>
           <p class="text-xs text-dash-muted mb-5">
             This will permanently delete {{ variants.length }} existing variant{{ variants.length !== 1 ? 's' : '' }} and regenerate from your current spec values. Continue?
           </p>
           <div class="flex gap-2 justify-end">
-            <AButton size="sm" variant="ghost" @click="showRegenerateConfirm = false">Cancel</AButton>
-            <AButton size="sm" variant="danger" :loading="generating" @click="doGenerate(true)">Regenerate</AButton>
+            <AButton size="sm" variant="ghost" @click="showRegenerateConfirm = false">{{ t('common.cancel') }}</AButton>
+            <AButton size="sm" variant="danger" :loading="generating" @click="doGenerate(true)">{{ t('productVariants.regenerateBtn') }}</AButton>
           </div>
         </div>
       </div>
@@ -489,6 +489,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ImagePlus, ImageOff, Star, X, ChevronUp, ChevronDown, Zap, Check } from 'lucide-vue-next'
 import {
   apiGetVariants, apiSetDefaultVariant,
@@ -503,8 +504,9 @@ import AInput  from '../components/ui/AInput.vue'
 
 const props     = defineProps<{ id: string }>()
 const productId = Number(props.id)
+const { t } = useI18n()
 
-// ── Page-level error ──────────────────────────────────────────────────
+// ── Page-level error ──────────────────────────────────────────────
 const pageError = ref<string | null>(null)
 
 // ── Images ────────────────────────────────────────────────────────────

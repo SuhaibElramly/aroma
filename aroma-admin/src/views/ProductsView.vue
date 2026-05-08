@@ -5,17 +5,17 @@
     <div class="space-y-3">
       <div class="flex items-end justify-between gap-3">
         <div class="grid grid-cols-3 gap-3 flex-1">
-          <AInput v-model="search" label="Name" placeholder="Search AR / EN…" @input="debouncedFetch" />
-          <ASelect v-model="brandId" label="Brand" :options="[{ value: '', label: 'All brands' }, ...brandOptions]" @update:modelValue="fetch(1)" />
-          <ASelect v-model="categoryId" label="Category" :options="[{ value: '', label: 'All categories' }, ...categoryOptions]" @update:modelValue="fetch(1)" />
+          <AInput v-model="search" :label="t('common.name')" :placeholder="t('products.searchPlaceholder')" @input="debouncedFetch" />
+          <ASelect v-model="brandId" :label="t('products.columns.brand')" :options="[{ value: '', label: t('products.allBrands') }, ...brandOptions]" @update:modelValue="fetch(1)" />
+          <ASelect v-model="categoryId" :label="t('products.columns.category')" :options="[{ value: '', label: t('products.allCategories') }, ...categoryOptions]" @update:modelValue="fetch(1)" />
         </div>
         <AButton @click="openCreate" size="sm" class="shrink-0 self-end">
-          <Plus :size="14" /> Add Product
+          <Plus :size="14" /> {{ t('products.addProduct') }}
         </AButton>
       </div>
 
       <div class="grid grid-cols-3 gap-3">
-        <ASelect v-model="filterType" label="Type" :options="typeFilterOptions" @update:modelValue="fetch(1)" />
+        <ASelect v-model="filterType" :label="t('products.columns.type')" :options="typeFilterOptions" @update:modelValue="fetch(1)" />
         <AInput v-model="priceMin" label="Price Min (LYD)" type="number" placeholder="0" @input="debouncedFetch" />
         <AInput v-model="priceMax" label="Price Max (LYD)" type="number" placeholder="Any" @input="debouncedFetch" />
       </div>
@@ -44,21 +44,21 @@
       </template>
       <template #cell-price="{ value }">
         <span v-if="value">{{ Number(value).toFixed(2) }} LYD</span>
-        <span v-else class="text-dash-faint">No variants</span>
+        <span v-else class="text-dash-faint">{{ t('products.noVariants') }}</span>
       </template>
-      <template #cell-isNew="{ value }"><span v-if="value" class="text-[10px] text-dash-secondary bg-dash-secondary-lt rounded-full px-2 py-0.5">New</span></template>
+      <template #cell-isNew="{ value }"><span v-if="value" class="text-[10px] text-dash-secondary bg-dash-secondary-lt rounded-full px-2 py-0.5">{{ t('products.newArrival') }}</span></template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
           <RouterLink :to="`/products/${(row as AdminProduct).id}/variants`">
-            <AButton size="sm" variant="ghost">Variants ({{ (row as AdminProduct).variantCount }})</AButton>
+            <AButton size="sm" variant="ghost">{{ t('products.variantsBtn', { count: (row as AdminProduct).variantCount }) }}</AButton>
           </RouterLink>
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminProduct)">Edit</AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminProduct)">Delete</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminProduct)">{{ t('common.edit') }}</AButton>
+          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminProduct)">{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Package" heading="No products" sub="Add your first product to get started">
-          <template #action><AButton size="sm" @click="openCreate"><Plus :size="14" /> Add Product</AButton></template>
+        <AEmptyState :icon="Package" :heading="t('products.noProducts')" :sub="t('products.noProductsSub')">
+          <template #action><AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton></template>
         </AEmptyState>
       </template>
     </ATable>
@@ -66,47 +66,47 @@
     <APagination :meta="meta" @change="changePage" />
 
     <!-- Create / Edit modal -->
-    <AModal :open="modalOpen" :title="editing ? 'Edit Product' : 'Add Product'" @close="modalOpen = false">
+    <AModal :open="modalOpen" :title="editing ? t('products.editProduct') : t('products.addProduct')" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
         <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.name"    label="Name (Arabic)" :error="formErrors.name" required />
-          <AInput v-model="form.name_en" label="Name (English)" />
+          <AInput v-model="form.name"    :label="t('products.nameArabic')" :error="formErrors.name" required />
+          <AInput v-model="form.name_en" :label="t('products.nameEnglish')" />
         </div>
-        <AInput v-model="form.slug" label="Slug (URL-safe)" :disabled="!!editing" :error="formErrors.slug" />
+        <AInput v-model="form.slug" :label="t('products.slugLabel')" :disabled="!!editing" :error="formErrors.slug" />
         <div class="grid grid-cols-2 gap-3">
-          <ASelect v-model="form.brand_id"    label="Brand"    :options="brandOptions"    placeholder="Choose brand…"    :error="formErrors.brand_id" />
-          <ASelect v-model="form.category_id" label="Category" :options="categoryOptions" placeholder="Choose category…" :error="formErrors.category_id" />
+          <ASelect v-model="form.brand_id"    :label="t('products.columns.brand')"    :options="brandOptions"    :placeholder="t('productCreate.chooseBrand')"    :error="formErrors.brand_id" />
+          <ASelect v-model="form.category_id" :label="t('products.columns.category')" :options="categoryOptions" :placeholder="t('productCreate.chooseCategory')" :error="formErrors.category_id" />
         </div>
-        <ASelect v-model="form.type" label="Type" :options="typeOptions" placeholder="Choose type…" :error="formErrors.type" />
-        <ATextarea v-model="form.description" label="Description" />
+        <ASelect v-model="form.type" :label="t('products.typeLabel')" :options="typeOptions" :placeholder="t('productCreate.chooseType')" :error="formErrors.type" />
+        <ATextarea v-model="form.description" :label="t('products.descriptionLabel')" />
         <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.placeholder_bg"  label="Placeholder BG color"  placeholder="#F2E8E5" />
-          <AInput v-model="form.placeholder_dot" label="Placeholder dot color" placeholder="#C9A0A0" />
+          <AInput v-model="form.placeholder_bg"  :label="t('products.placeholderBg')"  placeholder="#F2E8E5" />
+          <AInput v-model="form.placeholder_dot" :label="t('products.placeholderDot')" placeholder="#C9A0A0" />
         </div>
         <div class="flex gap-4 text-xs text-dash-text pt-1">
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" v-model="form.is_new" class="rounded" /> New arrival
+            <input type="checkbox" v-model="form.is_new" class="rounded" /> {{ t('products.newArrival') }}
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" v-model="form.is_bestseller" class="rounded" /> Bestseller
+            <input type="checkbox" v-model="form.is_bestseller" class="rounded" /> {{ t('products.bestseller') }}
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" v-model="form.is_offer" class="rounded" /> On offer
+            <input type="checkbox" v-model="form.is_offer" class="rounded" /> {{ t('products.onOffer') }}
           </label>
         </div>
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save Changes' : 'Add Product' }}</AButton>
+        <AButton variant="secondary" size="sm" @click="modalOpen = false">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? t('products.saveChanges') : t('products.addProduct') }}</AButton>
       </template>
     </AModal>
 
     <!-- Delete confirmation -->
     <AConfirmDialog
       :open="!!deletingProduct"
-      title="Delete product?"
-      :message="`Delete &quot;${deletingProduct?.name}&quot;? This cannot be undone.`"
+      :title="t('products.deleteConfirmTitle')"
+      :message="t('products.deleteConfirmMessage', { name: deletingProduct?.name ?? '' })"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deletingProduct = null"
@@ -116,6 +116,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Plus, Package, ImageOff } from 'lucide-vue-next'
 import { usePagination } from '../composables/usePagination'
 import {
@@ -132,6 +133,8 @@ import AModal          from '../components/ui/AModal.vue'
 import APagination     from '../components/ui/APagination.vue'
 import AEmptyState     from '../components/ui/AEmptyState.vue'
 import AConfirmDialog  from '../components/ui/AConfirmDialog.vue'
+
+const { t } = useI18n()
 
 const search     = ref('')
 const brandId    = ref('')
@@ -156,19 +159,19 @@ const emptyForm = () => ({
 const form = ref(emptyForm())
 
 const typeOptions     = ['EDP','EDT','Parfum','EDC'].map(v => ({ value: v, label: v }))
-const typeFilterOptions = [{ value: '', label: 'All types' }, ...typeOptions]
+const typeFilterOptions = computed(() => [{ value: '', label: t('products.allTypes') }, ...typeOptions])
 const brandOptions    = computed(() => brands.value.map(b => ({ value: String(b.id), label: b.name })))
 const categoryOptions = computed(() => cats.value.map(c => ({ value: String(c.id), label: c.label })))
 
-const cols = [
-  { key: 'name',        label: 'Name' },
-  { key: 'brand',       label: 'Brand' },
-  { key: 'category',    label: 'Category' },
-  { key: 'type',        label: 'Type' },
-  { key: 'price',       label: 'Price' },
-  { key: 'isNew',       label: 'Flags' },
-  { key: 'variantCount',label: 'Variants' },
-]
+const cols = computed(() => [
+  { key: 'name',        label: t('products.columns.name') },
+  { key: 'brand',       label: t('products.columns.brand') },
+  { key: 'category',    label: t('products.columns.category') },
+  { key: 'type',        label: t('products.columns.type') },
+  { key: 'price',       label: t('products.columns.price') },
+  { key: 'isNew',       label: t('products.columns.flags') },
+  { key: 'variantCount',label: t('products.columns.variants') },
+])
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
   apiGetProducts({
