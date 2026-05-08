@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -40,4 +40,8 @@
     box-shadow: 0 4px 16px oklch(18% 0.008 240 / 0.1), 0 1px 4px oklch(18% 0.008 240 / 0.06);
     transform: translateY(-1px);
   }
+}
+
+:root:is([dir="rtl"]) {
+  font-family: 'Cairo', system-ui, sans-serif;
 }
