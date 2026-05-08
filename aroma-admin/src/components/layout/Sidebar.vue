@@ -1,5 +1,5 @@
 <template>
-  <aside class="flex h-screen w-60 flex-col shrink-0 bg-dash-surface border-r border-dash-border">
+  <aside class="flex h-screen w-60 flex-col shrink-0 bg-dash-surface border-r border-dash-border rtl:border-r-0 rtl:border-l">
     <!-- Logo -->
     <div class="flex items-center gap-3 px-5 py-5">
       <div class="h-9 w-9 rounded-xl bg-dash-primary flex items-center justify-center shrink-0 shadow-sm">
@@ -27,7 +27,7 @@
         <button
           @click="navigate"
           :class="[
-            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left group',
+            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left rtl:text-right group',
             isActive
               ? 'bg-dash-secondary text-white shadow-sm'
               : 'text-dash-muted hover:bg-dash-bg hover:text-dash-text',
@@ -42,7 +42,7 @@
           <span
             v-if="item.badge"
             :class="[
-              'ml-auto text-2xs font-semibold rounded-full px-1.5 py-0.5',
+              'ml-auto rtl:ml-0 rtl:mr-auto text-2xs font-semibold rounded-full px-1.5 py-0.5',
               isActive ? 'bg-white/20 text-white' : 'bg-dash-primary-lt text-dash-primary',
             ]"
           >{{ item.badge }}</span>
@@ -60,7 +60,7 @@
         <button
           @click="navigate"
           :class="[
-            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left group',
+            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left rtl:text-right group',
             isActive
               ? 'bg-dash-secondary text-white shadow-sm'
               : 'text-dash-muted hover:bg-dash-bg hover:text-dash-text',

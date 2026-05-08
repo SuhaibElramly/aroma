@@ -6,6 +6,22 @@
       <p class="text-2xs text-dash-muted mt-0.5">{{ todayFormatted }}</p>
     </div>
 
+    <!-- Language toggle pill -->
+    <div class="flex items-center gap-0.5 rounded-full bg-dash-border/50 px-1 py-1">
+      <button
+        :class="locale === 'en'
+          ? 'rounded-full bg-dash-secondary text-white px-3 py-1 text-xs font-medium transition-colors'
+          : 'rounded-full px-3 py-1 text-xs text-dash-muted hover:text-dash-text transition-colors'"
+        @click="locale !== 'en' && toggleLocale()"
+      >EN</button>
+      <button
+        :class="locale === 'ar'
+          ? 'rounded-full bg-dash-secondary text-white px-3 py-1 text-xs font-medium transition-colors'
+          : 'rounded-full px-3 py-1 text-xs text-dash-muted hover:text-dash-text transition-colors'"
+        @click="locale !== 'ar' && toggleLocale()"
+      >AR</button>
+    </div>
+
     <!-- Profile -->
     <button @click="handleLogout" class="flex items-center gap-2.5 rounded-xl px-3 py-1.5 hover:bg-dash-bg transition-colors group">
       <div class="h-7 w-7 rounded-full bg-dash-secondary flex items-center justify-center text-white text-xs font-semibold shrink-0">
@@ -15,7 +31,7 @@
         <p class="text-xs font-medium text-dash-text leading-none">{{ auth.user?.name ?? 'Admin' }}</p>
         <p class="text-2xs text-dash-muted mt-0.5 group-hover:text-dash-danger transition-colors">Sign out</p>
       </div>
-      <LogOut :size="13" class="text-dash-faint group-hover:text-dash-danger transition-colors" />
+      <LogOut :size="13" class="text-dash-faint group-hover:text-dash-danger transition-colors rtl:scale-x-[-1]" />
     </button>
   </header>
 </template>
@@ -26,10 +42,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { LogOut } from 'lucide-vue-next'
 import dayjs from 'dayjs'
 import { useAuthStore } from '../../stores/auth'
+import { useLocale } from '../../composables/useLocale'
 
 const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
+const { locale, toggleLocale } = useLocale()
 
 const titles: Record<string, string> = {
   dashboard:          'Dashboard',
