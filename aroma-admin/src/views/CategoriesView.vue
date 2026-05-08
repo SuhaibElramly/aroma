@@ -5,17 +5,17 @@
       {{ loadError }}
     </div>
     <div class="flex justify-end">
-      <AButton size="sm" @click="openCreate"><Plus :size="14" /> Add Category</AButton>
+      <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('categories.add') }}</AButton>
     </div>
 
     <!-- Filters -->
     <div class="space-y-3">
       <div class="grid grid-cols-1 gap-3">
-        <AInput v-model="filterLabel" label="Label" placeholder="Search label…" @input="debouncedLoad" />
+        <AInput v-model="filterLabel" :label="t('categories.filterLabel')" placeholder="Search label…" @input="debouncedLoad" />
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <AInput v-model="filterMinProducts" label="Min Products" type="number" placeholder="0"   @input="debouncedLoad" />
-        <AInput v-model="filterMaxProducts" label="Max Products" type="number" placeholder="Any" @input="debouncedLoad" />
+        <AInput v-model="filterMinProducts" :label="t('categories.filterMinProducts')" type="number" placeholder="0"   @input="debouncedLoad" />
+        <AInput v-model="filterMaxProducts" :label="t('categories.filterMaxProducts')" type="number" placeholder="Any" @input="debouncedLoad" />
       </div>
     </div>
 
@@ -25,31 +25,31 @@
       </template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCategory)">Edit</AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCategory)">Delete</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCategory)">{{ t('common.edit') }}</AButton>
+          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCategory)">{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Grid3X3" heading="No categories found" />
+        <AEmptyState :icon="Grid3X3" :heading="t('categories.noData')" />
       </template>
     </ATable>
 
-    <AModal :open="modalOpen" :title="editing ? 'Edit Category' : 'Add Category'" @close="modalOpen = false">
+    <AModal :open="modalOpen" :title="editing ? t('categories.editTitle') : t('categories.createTitle')" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
-        <AInput v-model="form.label" label="Label" :error="formErrors.label" />
-        <AInput v-model="form.bg"    label="Background colour" placeholder="#F4EFE8" :error="formErrors.bg" />
+        <AInput v-model="form.label" :label="t('categories.labelField')" :error="formErrors.label" />
+        <AInput v-model="form.bg"    :label="t('categories.bgLabel')" placeholder="#F4EFE8" :error="formErrors.bg" />
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="modalOpen = false">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save' : 'Add' }}</AButton>
+        <AButton variant="secondary" size="sm" @click="modalOpen = false">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? t('common.save') : t('common.add') }}</AButton>
       </template>
     </AModal>
 
     <AConfirmDialog
       :open="!!deletingCat"
-      title="Delete category?"
-      :message="`Delete &quot;${deletingCat?.label}&quot;? Products in this category will lose their category.`"
+      :title="t('categories.deleteTitle')"
+      :message="t('categories.deleteMessage', { name: deletingCat?.label ?? '' })"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deletingCat = null"
@@ -61,7 +61,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Plus, Grid3X3 } from 'lucide-vue-next'
 import { apiGetCategories, apiCreateCategory, apiUpdateCategory, apiDeleteCategory } from '../api/admin'
 import type { AdminCategory } from '../types'
@@ -71,6 +72,8 @@ import AInput         from '../components/ui/AInput.vue'
 import AModal         from '../components/ui/AModal.vue'
 import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
+
+const { t } = useI18n()
 
 const categories = ref<AdminCategory[]>([])
 const loading    = ref(true)
@@ -90,11 +93,11 @@ const filterMaxProducts = ref('')
 const emptyForm = () => ({ label: '', bg: '' })
 const form = ref(emptyForm())
 
-const cols = [
-  { key: 'id',           label: 'ID' },
-  { key: 'label',        label: 'Label' },
-  { key: 'productCount', label: 'Products' },
-]
+const cols = computed(() => [
+  { key: 'id',           label: t('categories.columns.id') },
+  { key: 'label',        label: t('categories.columns.label') },
+  { key: 'productCount', label: t('categories.columns.products') },
+])
 
 async function loadCats() {
   loading.value = true

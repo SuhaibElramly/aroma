@@ -3,7 +3,7 @@
   <div class="space-y-6 max-w-4xl">
     <!-- Breadcrumb -->
     <div class="flex items-center gap-2 text-xs">
-      <RouterLink to="/users" class="text-dash-faint hover:text-dash-text transition-colors">Customers</RouterLink>
+      <RouterLink to="/users" class="text-dash-faint hover:text-dash-text transition-colors">{{ t('userDetail.back') }}</RouterLink>
       <span class="text-dash-border">/</span>
       <span class="text-dash-text font-medium">User #{{ id }}</span>
     </div>
@@ -26,7 +26,7 @@
             : 'border-transparent text-dash-muted hover:text-dash-text',
         ]"
       >
-        {{ tab === 'cart' ? 'Cart' : 'Wishlist' }}
+        {{ tab === 'cart' ? t('userDetail.cart') : t('userDetail.wishlist') }}
         <span v-if="tab === 'cart' && cartItems.length" class="ml-1.5 bg-dash-border rounded-full px-1.5 py-0.5 text-[10px]">{{ cartItems.length }}</span>
         <span v-if="tab === 'wishlist' && wishlistItems.length" class="ml-1.5 bg-dash-border rounded-full px-1.5 py-0.5 text-[10px]">{{ wishlistItems.length }}</span>
       </button>
@@ -38,7 +38,7 @@
         <div v-for="i in 3" :key="i" class="h-16 bg-dash-border rounded-card animate-pulse" />
       </div>
       <div v-else-if="cartItems.length === 0" class="py-12 text-center text-xs text-dash-faint">
-        Cart is empty
+        {{ t('userDetail.cartEmpty') }}
       </div>
       <div v-else class="bg-dash-surface rounded-card shadow-card divide-y divide-dash-border">
         <div
@@ -58,7 +58,7 @@
           </div>
           <div class="text-right">
             <p class="text-xs font-semibold text-dash-text">{{ Number(item.product.price).toFixed(2) }} LYD</p>
-            <p class="text-[10px] text-dash-muted">Qty: {{ item.quantity }}</p>
+            <p class="text-[10px] text-dash-muted">{{ t('userDetail.qty') }}: {{ item.quantity }}</p>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
         <div v-for="i in 3" :key="i" class="h-16 bg-dash-border rounded-card animate-pulse" />
       </div>
       <div v-else-if="wishlistItems.length === 0" class="py-12 text-center text-xs text-dash-faint">
-        Wishlist is empty
+        {{ t('userDetail.wishlistEmpty') }}
       </div>
       <div v-else class="bg-dash-surface rounded-card shadow-card divide-y divide-dash-border">
         <div
@@ -100,12 +100,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Package } from 'lucide-vue-next'
 import { apiGetUserCart, apiGetUserWishlist } from '../api/admin'
 import type { AdminCartItem, AdminWishlistProduct } from '../types'
 import ABadge from '../components/ui/ABadge.vue'
 
 const props  = defineProps<{ id: string }>()
+const { t } = useI18n()
 const userId = Number(props.id)
 
 const activeTab       = ref<'cart' | 'wishlist'>('cart')

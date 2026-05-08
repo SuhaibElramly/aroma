@@ -6,19 +6,19 @@
     </div>
 
     <div class="flex justify-end">
-      <AButton size="sm" @click="openCreate"><Plus :size="14" /> Add Brand</AButton>
+      <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('brands.add') }}</AButton>
     </div>
 
     <!-- Filters -->
     <div class="space-y-3">
       <div class="grid grid-cols-3 gap-3">
-        <AInput v-model="filterName"    label="Name"    placeholder="Search AR / EN…"  @input="debouncedLoad" />
-        <AInput v-model="filterOrigin"  label="Origin"  placeholder="e.g. France"      @input="debouncedLoad" />
-        <AInput v-model="filterTagline" label="Tagline" placeholder="Keyword…"         @input="debouncedLoad" />
+        <AInput v-model="filterName"    :label="t('brands.filterName')"    placeholder="Search AR / EN…"  @input="debouncedLoad" />
+        <AInput v-model="filterOrigin"  :label="t('brands.filterOrigin')"  placeholder="e.g. France"      @input="debouncedLoad" />
+        <AInput v-model="filterTagline" :label="t('brands.filterTagline')" placeholder="Keyword…"         @input="debouncedLoad" />
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <AInput v-model="filterMinProducts" label="Min Products" type="number" placeholder="0"   @input="debouncedLoad" />
-        <AInput v-model="filterMaxProducts" label="Max Products" type="number" placeholder="Any" @input="debouncedLoad" />
+        <AInput v-model="filterMinProducts" :label="t('brands.filterMinProducts')" type="number" placeholder="0"   @input="debouncedLoad" />
+        <AInput v-model="filterMaxProducts" :label="t('brands.filterMaxProducts')" type="number" placeholder="Any" @input="debouncedLoad" />
       </div>
     </div>
 
@@ -37,20 +37,20 @@
       </template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminBrand)">Edit</AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminBrand)">Delete</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminBrand)">{{ t('common.edit') }}</AButton>
+          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminBrand)">{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Tag" heading="No brands found" />
+        <AEmptyState :icon="Tag" :heading="t('brands.noData')" />
       </template>
     </ATable>
 
-    <AModal :open="modalOpen" :title="editing ? 'Edit Brand' : 'Add Brand'" @close="closeModal">
+    <AModal :open="modalOpen" :title="editing ? t('brands.editTitle') : t('brands.createTitle')" @close="closeModal">
       <form class="space-y-3" @submit.prevent>
         <div class="grid grid-cols-2 gap-3">
-          <AInput v-model="form.name"    label="Name (Arabic)"  :error="formErrors.name"    dir="rtl" />
-          <AInput v-model="form.name_en" label="Name (English)" :error="formErrors.name_en" />
+          <AInput v-model="form.name"    :label="t('brands.nameArabic')"  :error="formErrors.name"    dir="rtl" />
+          <AInput v-model="form.name_en" :label="t('brands.nameEnglish')" :error="formErrors.name_en" />
         </div>
 
         <!-- Slug preview — only shown when creating -->
@@ -59,30 +59,30 @@
           class="flex items-center gap-2 rounded-btn bg-dash-bg border border-dash-border px-3 py-2"
         >
           <Link2 :size="12" class="text-dash-faint shrink-0" />
-          <span class="text-2xs text-dash-muted">Brand ID:</span>
+          <span class="text-2xs text-dash-muted">{{ t('brands.brandIdLabel') }}</span>
           <span
             v-if="generatedSlug"
             class="text-2xs font-medium text-dash-text font-mono"
           >{{ generatedSlug }}</span>
-          <span v-else class="text-2xs text-dash-faint italic">type English name above…</span>
+          <span v-else class="text-2xs text-dash-faint italic">{{ t('brands.slugTypingHint') }}</span>
         </div>
 
-        <AInput v-model="form.origin"  label="Country of origin" />
-        <AInput v-model="form.tagline" label="Tagline" />
-        <AInput v-model="form.bg"      label="Background colour" placeholder="#F4EFE8" :error="formErrors.bg" />
+        <AInput v-model="form.origin"  :label="t('brands.originLabel')" />
+        <AInput v-model="form.tagline" :label="t('brands.taglineLabel')" />
+        <AInput v-model="form.bg"      :label="t('brands.bgLabel')" placeholder="#F4EFE8" :error="formErrors.bg" />
 
         <!-- Logo -->
         <div>
-          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2">Logo (optional)</p>
+          <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2">{{ t('brands.logoLabel') }}</p>
           <div v-if="logoPreview" class="flex items-center gap-3">
             <img :src="logoPreview" alt="Brand logo" class="h-12 w-12 object-contain rounded border border-dash-border bg-dash-bg p-1" />
             <AButton size="sm" variant="ghost" type="button" @click="removeLogo">
-              <X :size="12" /> Remove
+              <X :size="12" /> {{ t('common.remove') }}
             </AButton>
           </div>
           <label v-else class="flex items-center gap-2 cursor-pointer rounded-btn border border-dashed border-dash-border px-3 py-2.5 text-xs text-dash-faint hover:border-dash-muted transition-colors">
             <Image :size="14" />
-            Click to upload logo (PNG, JPG — max 2 MB)
+            {{ t('brands.logoUploadHint') }}
             <input type="file" accept="image/*" class="sr-only" @change="pickLogoFile" />
           </label>
         </div>
@@ -90,18 +90,18 @@
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="closeModal">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save' : 'Add' }}</AButton>
+        <AButton variant="secondary" size="sm" @click="closeModal">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? t('brands.save') : t('brands.add') }}</AButton>
       </template>
     </AModal>
 
     <AConfirmDialog
       :open="!!deletingBrand"
-      title="Delete brand?"
+      :title="t('brands.deleteTitle')"
       :message="deletingBrand?.productCount
-        ? `This brand has ${deletingBrand.productCount} products. Reassign them first.`
-        : `Delete &quot;${deletingBrand?.name}&quot;? This cannot be undone.`"
-      confirm-label="Delete"
+        ? t('brands.deleteHasProducts', { count: deletingBrand.productCount })
+        : t('brands.deleteMessage', { name: deletingBrand?.name ?? '' })"
+      :confirm-label="t('common.delete')"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deletingBrand = null"
@@ -115,6 +115,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Plus, Tag, Link2, Image, X } from 'lucide-vue-next'
 import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand, apiUploadBrandLogo, apiDeleteBrandLogo } from '../api/admin'
 import type { AdminBrand } from '../types'
@@ -124,6 +125,8 @@ import AInput         from '../components/ui/AInput.vue'
 import AModal         from '../components/ui/AModal.vue'
 import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
+
+const { t } = useI18n()
 
 // ── Filter state ──────────────────────────────────────────────────────
 const filterName        = ref('')
@@ -158,13 +161,13 @@ const generatedSlug = computed(() =>
   form.value.name_en.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 )
 
-const cols = [
-  { key: 'id',           label: 'ID' },
-  { key: 'name',         label: 'Name' },
-  { key: 'origin',       label: 'Origin' },
-  { key: 'tagline',      label: 'Tagline' },
-  { key: 'productCount', label: 'Products' },
-]
+const cols = computed(() => [
+  { key: 'id',           label: t('brands.columns.id') },
+  { key: 'name',         label: t('brands.columns.name') },
+  { key: 'origin',       label: t('brands.columns.origin') },
+  { key: 'tagline',      label: t('brands.columns.tagline') },
+  { key: 'productCount', label: t('brands.columns.products') },
+])
 
 // ── Data fetching ─────────────────────────────────────────────────────
 async function loadBrands() {

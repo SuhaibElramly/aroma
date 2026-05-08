@@ -6,9 +6,9 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <AInput v-model="search" placeholder="Search by code…" class="w-56" @input="debouncedLoad" />
+      <AInput v-model="search" :placeholder="t('coupons.searchPlaceholder')" class="w-56" @input="debouncedLoad" />
       <div class="ml-auto">
-        <AButton size="sm" @click="openCreate"><Plus :size="14" /> New Coupon</AButton>
+        <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('coupons.add') }}</AButton>
       </div>
     </div>
 
@@ -18,7 +18,7 @@
       </template>
       <template #cell-type="{ row }">
         <span class="text-xs">
-          {{ (row as AdminCoupon).type === 'percentage' ? 'Percentage' : 'Fixed' }}
+          {{ (row as AdminCoupon).type === 'percentage' ? t('coupons.typePercentage') : t('coupons.typeFixed') }}
         </span>
       </template>
       <template #cell-value="{ row }">
@@ -37,7 +37,7 @@
         </span>
       </template>
       <template #cell-expiresAt="{ value }">
-        <span class="text-xs text-dash-muted">{{ value ? value.slice(0, 10) : 'Never' }}</span>
+        <span class="text-xs text-dash-muted">{{ value ? value.slice(0, 10) : t('coupons.never') }}</span>
       </template>
       <template #cell-isActive="{ value }">
         <span
@@ -45,46 +45,46 @@
             ? 'bg-dash-success-lt text-dash-success border-dash-success/20'
             : 'bg-dash-danger-lt text-dash-danger border-dash-danger/20'"
           class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold"
-        >{{ value ? 'Active' : 'Inactive' }}</span>
+        >{{ value ? t('coupons.statusActive') : t('coupons.statusInactive') }}</span>
       </template>
       <template #actions="{ row }">
         <div class="flex gap-1.5 justify-end">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCoupon)">Edit</AButton>
+          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCoupon)">{{ t('common.edit') }}</AButton>
           <AButton size="sm" variant="ghost" @click.stop="handleToggle(row as AdminCoupon)">
-            {{ (row as AdminCoupon).isActive ? 'Disable' : 'Enable' }}
+            {{ (row as AdminCoupon).isActive ? t('coupons.disable') : t('coupons.enable') }}
           </AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCoupon)">Delete</AButton>
+          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCoupon)">{{ t('common.delete') }}</AButton>
         </div>
       </template>
       <template #empty>
-        <AEmptyState :icon="Ticket" heading="No coupons yet" />
+        <AEmptyState :icon="Ticket" :heading="t('coupons.noData')" />
       </template>
     </ATable>
 
     <!-- Create / Edit Modal -->
-    <AModal :open="modalOpen" :title="editing ? 'Edit Coupon' : 'New Coupon'" @close="closeModal">
+    <AModal :open="modalOpen" :title="editing ? t('coupons.editTitle') : t('coupons.createTitle')" @close="closeModal">
       <form class="space-y-3" @submit.prevent>
         <AInput
           v-model="form.code"
-          label="Code (min 4 chars)"
+          :label="t('coupons.form.codeLabel')"
           placeholder="e.g. SAVE20"
           :error="formErrors.code"
           @input="form.code = form.code.toUpperCase()"
         />
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-1">Type</label>
+            <label class="block text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-1">{{ t('coupons.form.typeLabel') }}</label>
             <select
               v-model="form.type"
               class="w-full rounded-btn border border-dash-border bg-dash-bg px-3 py-2 text-sm text-dash-text focus:outline-none focus:ring-1 focus:ring-dash-primary"
             >
-              <option value="percentage">Percentage (%)</option>
-              <option value="fixed">Fixed Amount (LYD)</option>
+              <option value="percentage">{{ t('coupons.form.typePercentage') }}</option>
+              <option value="fixed">{{ t('coupons.form.typeFixed') }}</option>
             </select>
           </div>
           <AInput
             v-model.number="form.value"
-            :label="form.type === 'percentage' ? 'Value (%)' : 'Value (LYD)'"
+            :label="form.type === 'percentage' ? t('coupons.form.valuePercentage') : t('coupons.form.valueFixed')"
             type="number"
             :placeholder="form.type === 'percentage' ? '20' : '5.00'"
             :error="formErrors.value"
@@ -93,41 +93,41 @@
         <div class="grid grid-cols-2 gap-3">
           <AInput
             v-model.number="form.min_order_amount"
-            label="Min Order (LYD)"
+            :label="t('coupons.form.minOrderLabel')"
             type="number"
-            placeholder="Optional"
+            :placeholder="t('coupons.form.optional')"
           />
           <AInput
             v-model.number="form.max_uses"
-            label="Max Uses"
+            :label="t('coupons.form.maxUsesLabel')"
             type="number"
-            placeholder="Optional (∞)"
+            :placeholder="t('coupons.form.optionalUnlimited')"
           />
         </div>
         <AInput
           v-model="form.expires_at"
-          label="Expires At"
+          :label="t('coupons.form.expiresLabel')"
           type="date"
-          placeholder="Optional"
+          :placeholder="t('coupons.form.optional')"
         />
         <label class="flex items-center gap-2 cursor-pointer">
           <input v-model="form.is_active" type="checkbox" class="rounded" />
-          <span class="text-sm text-dash-text">Active</span>
+          <span class="text-sm text-dash-text">{{ t('coupons.form.activeLabel') }}</span>
         </label>
         <p v-if="formErrors.general" class="text-xs text-dash-danger">{{ formErrors.general }}</p>
       </form>
       <template #footer>
-        <AButton variant="secondary" size="sm" @click="closeModal">Cancel</AButton>
-        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? 'Save' : 'Create' }}</AButton>
+        <AButton variant="secondary" size="sm" @click="closeModal">{{ t('common.cancel') }}</AButton>
+        <AButton size="sm" :loading="saving" @click="handleSave">{{ editing ? t('common.save') : t('coupons.create') }}</AButton>
       </template>
     </AModal>
 
     <!-- Delete confirm -->
     <AConfirmDialog
       :open="!!deletingCoupon"
-      title="Delete coupon?"
-      :message="`Delete &quot;${deletingCoupon?.code}&quot;? This cannot be undone.`"
-      confirm-label="Delete"
+      :title="t('coupons.deleteTitle')"
+      :message="t('coupons.deleteMessage', { code: deletingCoupon?.code ?? '' })"
+      :confirm-label="t('common.delete')"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deletingCoupon = null"
@@ -139,7 +139,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Plus, Ticket } from 'lucide-vue-next'
 import {
   apiGetCoupons, apiCreateCoupon, apiUpdateCoupon,
@@ -153,15 +154,17 @@ import AModal from '../components/ui/AModal.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
 
-const cols = [
-  { key: 'code',           label: 'Code' },
-  { key: 'type',           label: 'Type' },
-  { key: 'value',          label: 'Value' },
-  { key: 'minOrderAmount', label: 'Min Order' },
-  { key: 'uses',           label: 'Uses' },
-  { key: 'expiresAt',      label: 'Expires' },
-  { key: 'isActive',       label: 'Status' },
-]
+const { t } = useI18n()
+
+const cols = computed(() => [
+  { key: 'code',           label: t('coupons.columns.code') },
+  { key: 'type',           label: t('coupons.columns.type') },
+  { key: 'value',          label: t('coupons.columns.value') },
+  { key: 'minOrderAmount', label: t('coupons.columns.minOrder') },
+  { key: 'uses',           label: t('coupons.columns.uses') },
+  { key: 'expiresAt',      label: t('coupons.columns.expiry') },
+  { key: 'isActive',       label: t('coupons.columns.status') },
+])
 
 const coupons      = ref<AdminCoupon[]>([])
 const loading      = ref(false)
