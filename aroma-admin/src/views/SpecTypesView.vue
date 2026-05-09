@@ -23,7 +23,7 @@
         <span class="text-xs">{{ value }}</span>
       </template>
       <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end">
+        <div class="flex gap-1.5 justify-end rtl:justify-start">
           <AButton size="sm" variant="ghost" @click.stop="openEdit(row as SpecType)">{{ t('common.edit') }}</AButton>
           <AButton
             size="sm"

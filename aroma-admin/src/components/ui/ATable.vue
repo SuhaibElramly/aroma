@@ -7,9 +7,9 @@
             <th
               v-for="col in columns"
               :key="col.key"
-              class="px-4 py-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider whitespace-nowrap"
+              class="px-4 py-3 text-left rtl:text-right text-2xs font-semibold text-dash-faint uppercase tracking-wider whitespace-nowrap"
             >{{ col.label }}</th>
-            <th v-if="$slots.actions" class="px-4 py-3 text-right text-2xs font-semibold text-dash-faint uppercase tracking-wider" />
+            <th v-if="$slots.actions" class="px-4 py-3 text-right rtl:text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider" />
           </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
                   {{ (row as Record<string, unknown>)[col.key] }}
                 </slot>
               </td>
-              <td v-if="$slots.actions" class="px-4 py-3.5 text-right">
+              <td v-if="$slots.actions" class="px-4 py-3.5 text-right rtl:text-left">
                 <slot name="actions" :row="row" />
               </td>
             </tr>
