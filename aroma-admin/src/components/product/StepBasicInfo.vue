@@ -267,7 +267,7 @@ onMounted(async () => {
       brand_id:        p.brandId,
       category_id:     p.categoryId,
       type:            p.type,
-      description:     '',
+      description:     p.description ?? '',
       is_new:          p.isNew,
       is_bestseller:   p.isBestseller,
       is_offer:        p.isOffer,

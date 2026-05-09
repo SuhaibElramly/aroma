@@ -102,6 +102,7 @@ export interface AdminProduct {
   isNew:        boolean
   isBestseller: boolean
   isOffer:      boolean
+  description?:   string
   variantCount:   number
   price:          string | null
   thumbnailUrl:   string | null
