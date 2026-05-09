@@ -3,13 +3,13 @@
   <div class="min-h-full animate-fade-up">
 
     <!-- Sticky header -->
-    <div class="sticky top-0 z-10 bg-dash-bg border-b border-dash-border -mx-6 px-6 py-3 mb-6 flex items-center justify-between">
+    <div class="sticky top-0 z-10 bg-dash-bg border-b border-dash-border -mx-6 -mt-6 px-6 py-3 mb-6 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <RouterLink
           to="/products"
           class="flex items-center justify-center w-7 h-7 rounded-btn text-dash-muted hover:text-dash-text hover:bg-dash-surface border border-dash-border transition-all duration-150"
         >
-          <ChevronLeft :size="14" />
+          <ChevronLeft :size="14" class="rtl:scale-x-[-1]" />
         </RouterLink>
         <div>
           <p class="text-2xs text-dash-muted leading-none mb-0.5">{{ t('nav.products') }}</p>
@@ -54,7 +54,7 @@
               <Check v-if="isComplete(idx)" :size="10" />
               <span v-else>{{ idx + 1 }}</span>
             </div>
-            <div class="text-left">
+            <div class="text-start">
               <div class="text-xs font-semibold" :class="currentStep === idx ? 'text-dash-text' : 'text-dash-muted'">
                 {{ t(step.labelKey) }}
               </div>

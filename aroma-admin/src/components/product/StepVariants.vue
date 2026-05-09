@@ -144,12 +144,12 @@
           <table class="w-full text-xs border-collapse">
             <thead>
               <tr class="border-b border-dash-border">
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('stepper.variantImages') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('stepper.variantImages') }}</th>
                 <th class="py-2 px-2"></th>
               </tr>
             </thead>
@@ -310,12 +310,12 @@
           <table class="w-full text-xs border-collapse">
             <thead>
               <tr class="border-b border-dash-border">
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
-                <th class="text-left py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('stepper.variantImages') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('stepper.variantImages') }}</th>
                 <th class="py-2 px-2"></th>
               </tr>
             </thead>
