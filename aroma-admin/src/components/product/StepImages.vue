@@ -90,14 +90,17 @@
           </div>
         </div>
         <p class="text-2xs text-dash-faint mt-2 text-center">
-          {{ committed.length + pending.length }} image{{ committed.length + pending.length !== 1 ? 's' : '' }}
-          {{ pending.length > 0 ? `· ${pending.length} pending upload` : '' }}
+          {{ t('stepper.imageCount', committed.length + pending.length) }}
+          <span v-if="pending.length > 0">{{ t('stepper.pendingUpload', pending.length) }}</span>
         </p>
       </div>
 
       <!-- Required error -->
       <p v-if="showRequired" class="mt-2 text-2xs text-dash-danger">{{ t('stepper.imagesRequired') }}</p>
     </section>
+
+    <!-- Upload error -->
+    <p v-if="uploadError" class="text-2xs text-dash-danger mt-1">{{ uploadError }}</p>
 
     <!-- Nav -->
     <div class="flex items-center justify-between pt-2">
@@ -126,6 +129,7 @@ const pending      = ref<Pending[]>([])
 const uploading    = ref(false)
 const dragging     = ref(false)
 const showRequired = ref(false)
+const uploadError  = ref('')
 
 function addFiles(files: File[]) {
   const images    = files.filter(f => f.type.startsWith('image/'))
@@ -171,16 +175,22 @@ async function handleNext() {
     return
   }
   showRequired.value = false
+  uploadError.value = ''
   if (pending.value.length > 0) {
     uploading.value = true
+    let uploadOk = true
     try {
       const { data } = await apiUploadImages(props.productId, pending.value.map(p => p.file))
       pending.value.forEach(p => URL.revokeObjectURL(p.preview))
       pending.value = []
       committed.value = [...committed.value, ...data]
-    } catch { /* silent */ } finally {
+    } catch {
+      uploadError.value = t('common.saveFailed')
+      uploadOk = false
+    } finally {
       uploading.value = false
     }
+    if (!uploadOk) return
   }
   emit('next')
 }

@@ -304,6 +304,8 @@ const en = {
     variantImagesTitle: 'Variant Images',
     variantImagesHint:  'Optional — only if this variant looks different from the product images.',
     uploadingVariantImages: 'Uploading…',
+    imageCount: '{n} image | {n} images',
+    pendingUpload: '· {n} pending',
   },
   productVariants: {
     title: 'Product Variants',

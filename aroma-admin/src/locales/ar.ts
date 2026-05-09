@@ -306,6 +306,8 @@ const ar = {
     variantImagesTitle: 'صور النوع',
     variantImagesHint:  'اختياري — فقط إذا كان هذا النوع يختلف بصرياً عن الصور الرئيسية.',
     uploadingVariantImages: 'جارٍ الرفع…',
+    imageCount: '{n} صورة | {n} صور',
+    pendingUpload: '· {n} معلّق',
   },
   productVariants: {
     title: 'متغيرات المنتج',
