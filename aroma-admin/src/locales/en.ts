@@ -384,10 +384,11 @@ const en = {
     cancelEdit: 'Cancel',
     singlePriceDone: 'Single price',
     multiVariantsDone: 'Multiple variants',
-    variantsGenerated: '{count} variant generated | {count} variants generated',
+    variantsGenerated: '{n} variant generated | {n} variants generated',
     setPrices: 'Set prices',
     combinationsCount: '{count} combinations',
     addSpecValuePlaceholder: 'Add {name} value…',
+    addValuePlaceholder: 'Add {name} value…',
   },
   brands: {
     title: 'Brands',

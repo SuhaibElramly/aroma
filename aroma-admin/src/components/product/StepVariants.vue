@@ -25,7 +25,9 @@
               <span v-if="productType === 'single'" class="text-emerald-400">{{ t('productVariants.singlePriceDone') }}</span>
               <span v-else class="text-emerald-400">{{ t('productVariants.multiVariantsDone') }}</span>
             </span>
-            <span v-else-if="s === 2 && currentWizardStep > 2" class="text-emerald-400">{{ combinationCount }} variant{{ combinationCount !== 1 ? 's' : '' }} generated</span>
+            <span v-else-if="s === 2 && currentWizardStep > 2" class="text-emerald-400">
+              {{ t('productVariants.variantsGenerated', combinationCount) }}
+            </span>
             <span v-else-if="s === 1">{{ t('productVariants.productType') }}</span>
             <span v-else-if="s === 2">{{ t('productVariants.step2') }}</span>
             <span v-else>{{ t('productVariants.setPrices') }}</span>
@@ -100,7 +102,7 @@
               </div>
               <div class="flex gap-2">
                 <input v-model="valueInputs[spec.spec_type_id]" type="text"
-                  :placeholder="`Add ${spec.name} value…`"
+                  :placeholder="t('productVariants.addValuePlaceholder', { name: spec.name })"
                   :class="['flex-1 rounded-btn border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none transition-colors',
                     spec.values.length === 0 ? 'border-dash-danger/60 focus:border-dash-danger' : 'border-dash-border focus:border-dash-primary']"
                   @keydown.enter.prevent="addValue(spec)" />
@@ -269,7 +271,7 @@
                 </div>
                 <div class="flex gap-2">
                   <input v-model="valueInputs[spec.spec_type_id]" type="text"
-                    :placeholder="`Add ${spec.name} value…`"
+                    :placeholder="t('productVariants.addValuePlaceholder', { name: spec.name })"
                     class="flex-1 rounded-btn border border-dash-border bg-dash-bg px-3 py-1.5 text-xs text-dash-text focus:outline-none focus:border-dash-primary"
                     @keydown.enter.prevent="addValue(spec)" />
                   <AButton size="sm" variant="secondary" @click="addValue(spec)">{{ t('common.add') }}</AButton>
@@ -325,6 +327,7 @@
                     <input v-model="row.price" type="number" step="0.01" min="0"
                       :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
                         priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
+                    <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">{{ t('common.fieldRequired') }}</p>
                   </td>
                   <td class="py-1.5 px-1">
                     <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
@@ -425,7 +428,7 @@ const generatingSingle   = ref(false)
 interface AssignedSpec { spec_type_id: number; name: string; unit: string | null; values: string[] }
 const allSpecTypes    = ref<SpecType[]>([])
 const assignedSpecs   = ref<AssignedSpec[]>([])
-const specToAdd       = ref<number | ''>('')
+const specToAdd       = ref<string>('')
 const valueInputs     = ref<Record<number, string>>({})
 const generating      = ref(false)
 const editSpecsExpanded      = ref(false)
@@ -553,7 +556,7 @@ async function setDefault(variantId: number) {
   try {
     await apiSetDefaultVariant(props.productId, variantId)
     variants.value.forEach(v => { v.isDefault = v.id === variantId })
-  } catch { /* silent */ }
+  } catch { pageError.value = t('common.saveFailed') }
 }
 
 // ── Wizard step 1 ─────────────────────────────────────────────────────────────

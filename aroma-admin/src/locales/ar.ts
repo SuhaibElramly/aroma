@@ -386,10 +386,11 @@ const ar = {
     cancelEdit: 'إلغاء',
     singlePriceDone: 'سعر واحد',
     multiVariantsDone: 'متغيرات متعددة',
-    variantsGenerated: '{count} متغير تم إنشاؤه | {count} متغيرات تم إنشاؤها',
+    variantsGenerated: 'تم إنشاء {n} نوع | تم إنشاء {n} نوع',
     setPrices: 'تحديد الأسعار',
     combinationsCount: '{count} تركيبة',
     addSpecValuePlaceholder: 'أضف قيمة {name}…',
+    addValuePlaceholder: 'أضف قيمة {name}…',
   },
   brands: {
     title: 'العلامات التجارية',
