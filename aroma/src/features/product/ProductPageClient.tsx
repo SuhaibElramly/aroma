@@ -50,8 +50,15 @@ export function ProductPageClient({ slug }: { slug: string }) {
   const displayOriginal = activeVariant ? activeVariant.originalPrice : (product.originalPrice ?? null)
   const displayStock    = (activeVariant?.stock ?? product.stock) as import('@/types').StockStatus
 
-  const images = product.images ?? []
-  const displayImg = activeImg ?? product.thumbnailUrl ?? null
+  const images       = product.images ?? []
+  const variantImgs  = activeVariant?.images ?? []
+  const displayImages = variantImgs.length > 0 ? variantImgs : images
+
+  // Only use activeImg if it belongs to the current displayImages set;
+  // otherwise auto-reset to the first image of the new variant
+  const displayImg = (activeImg && displayImages.some(i => i.url === activeImg))
+    ? activeImg
+    : displayImages[0]?.url ?? product.thumbnailUrl ?? null
 
   const handleAdd = () => {
     if (!isLoggedIn) {
@@ -113,9 +120,9 @@ export function ProductPageClient({ slug }: { slug: string }) {
             )}
           </div>
           {/* Thumbnails */}
-          {images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="flex gap-3">
-              {images.map(img => (
+              {displayImages.map(img => (
                 <div
                   key={img.id}
                   onClick={() => setActiveImg(img.url)}
@@ -123,7 +130,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
                   style={{
                     height: 90,
                     backgroundColor: product.placeholder.bg,
-                    border: (activeImg ?? product.thumbnailUrl) === img.url
+                    border: displayImg === img.url
                       ? '2px solid #1C1917'
                       : '2px solid transparent',
                   }}
@@ -140,7 +147,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
             </div>
           )}
           {/* Fallback thumbnails when no real images */}
-          {images.length === 0 && (
+          {displayImages.length === 0 && (
             <div className="flex gap-3">
               {[0, 1, 2].map(i => (
                 <div
