@@ -20,7 +20,7 @@
         <div>
           <h2 class="text-sm font-semibold text-dash-text">{{ t('productVariants.imagesSection') }}</h2>
           <p class="text-2xs text-dash-muted mt-0.5">
-            {{ imagesExpanded ? t('productVariants.clickToSetThumbnail') : `${images.length} image${images.length !== 1 ? 's' : ''} uploaded` }}
+            {{ imagesExpanded ? t('productVariants.clickToSetThumbnail') : t('productVariants.imagesUploaded', images.length) }}
           </p>
         </div>
         <div class="flex items-center gap-2">
@@ -473,7 +473,7 @@
         <div class="bg-dash-surface rounded-card shadow-card p-6 max-w-sm w-full mx-4">
           <h3 class="text-sm font-semibold text-dash-text mb-2">{{ t('productVariants.regenerateConfirmTitle') }}</h3>
           <p class="text-xs text-dash-muted mb-5">
-            This will permanently delete {{ variants.length }} existing variant{{ variants.length !== 1 ? 's' : '' }} and regenerate from your current spec values. Continue?
+            {{ t('productVariants.regenerateConfirmMessage', variants.length) }}
           </p>
           <div class="flex gap-2 justify-end">
             <AButton size="sm" variant="ghost" @click="showRegenerateConfirm = false">{{ t('common.cancel') }}</AButton>
@@ -536,7 +536,7 @@ async function handleUpload(e: Event) {
       images.value[0] = { ...images.value[0], isThumbnail: true }
     }
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Upload failed.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.uploadFailed')
   } finally {
     uploading.value = false
     ;(e.target as HTMLInputElement).value = ''
@@ -549,7 +549,7 @@ async function setThumbnail(img: ProductImage) {
     await apiSetThumbnail(productId, img.id)
     images.value = images.value.map(i => ({ ...i, isThumbnail: i.id === img.id }))
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to set thumbnail.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.setThumbnailFailed')
   }
 }
 
@@ -561,7 +561,7 @@ async function deleteImage(img: ProductImage) {
       images.value[0] = { ...images.value[0], isThumbnail: true }
     }
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to delete image.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.deleteImageFailed')
   }
 }
 
@@ -582,7 +582,7 @@ async function loadVariants() {
       imagesExpanded.value = false
     }
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to load variants.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.loadFailed')
   }
 }
 
@@ -626,7 +626,7 @@ async function loadSpecs() {
     }))
     assignedSpecs.value.forEach(s => { valueInputs.value[s.spec_type_id] = '' })
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to load specs.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.loadSpecsFailed')
   }
 }
 
@@ -696,7 +696,7 @@ async function handleStep1Continue() {
       buildPriceRows(res.data)
       currentStep.value = 3
     } catch (e: unknown) {
-      pageError.value = (e as any)?.response?.data?.message ?? 'Failed to create variant.'
+      pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.createFailed')
     } finally {
       generatingSingle.value = false
     }
@@ -728,7 +728,7 @@ async function doGenerate(force: boolean) {
     editSpecsExpanded.value = false
     if (currentStep.value === 2) currentStep.value = 3
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Generation failed.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.generationFailed')
   } finally {
     generating.value = false
   }
@@ -799,7 +799,7 @@ async function savePrices() {
     variants.value = res.data
     buildPriceRows(res.data)
   } catch (e: unknown) {
-    saveError.value = (e as any)?.response?.data?.message ?? 'Save failed.'
+    saveError.value = (e as any)?.response?.data?.message ?? t('common.saveFailed')
   } finally {
     savingPrices.value = false
   }
@@ -811,7 +811,7 @@ async function setDefault(variantId: number) {
     await apiSetDefaultVariant(productId, variantId)
     variants.value = variants.value.map(v => ({ ...v, isDefault: v.id === variantId }))
   } catch (e: unknown) {
-    pageError.value = (e as any)?.response?.data?.message ?? 'Failed to set default.'
+    pageError.value = (e as any)?.response?.data?.message ?? t('productVariants.setDefaultFailed')
   }
 }
 

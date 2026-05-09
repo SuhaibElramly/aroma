@@ -16,8 +16,8 @@
 
       <div class="grid grid-cols-3 gap-3">
         <ASelect v-model="filterType" :label="t('products.columns.type')" :options="typeFilterOptions" @update:modelValue="fetch(1)" />
-        <AInput v-model="priceMin" label="Price Min (LYD)" type="number" placeholder="0" @input="debouncedFetch" />
-        <AInput v-model="priceMax" label="Price Max (LYD)" type="number" placeholder="Any" @input="debouncedFetch" />
+        <AInput v-model="priceMin" :label="t('products.filterPriceMin')" type="number" placeholder="0" @input="debouncedFetch" />
+        <AInput v-model="priceMax" :label="t('products.filterPriceMax')" type="number" placeholder="Any" @input="debouncedFetch" />
       </div>
     </div>
 

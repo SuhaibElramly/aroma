@@ -5,22 +5,22 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       <AInput
         v-model="searchId"
-        label="Order ID"
+        :label="t('orders.filterOrderId')"
         placeholder="e.g. ORD-001"
       />
       <AInput
         v-model="searchPhone"
-        label="Phone"
+        :label="t('orders.filterPhone')"
         placeholder="e.g. 0912345678"
       />
       <AInput
         v-model="dateFrom"
-        label="From"
+        :label="t('orders.filterFrom')"
         type="date"
       />
       <AInput
         v-model="dateTo"
-        label="To"
+        :label="t('orders.filterTo')"
         type="date"
       />
     </div>

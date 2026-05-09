@@ -5,13 +5,13 @@
     <!-- Filters -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       <AInput v-model="search"     :label="t('users.columns.name')"  :placeholder="t('users.searchPlaceholder')" @input="debouncedFetch" />
-      <AInput v-model="phone"      label="Phone"          placeholder="e.g. 0912345678" />
+      <AInput v-model="phone"      :label="t('users.filterPhone')"      placeholder="e.g. 0912345678" />
       <div class="grid grid-cols-2 gap-2">
-        <AInput v-model="minOrders" label="Min orders" placeholder="0"  type="number" min="0" />
-        <AInput v-model="maxOrders" label="Max orders" placeholder="—"  type="number" min="0" />
+        <AInput v-model="minOrders" :label="t('users.filterMinOrders')" placeholder="0"  type="number" min="0" />
+        <AInput v-model="maxOrders" :label="t('users.filterMaxOrders')" placeholder="—"  type="number" min="0" />
       </div>
-      <AInput v-model="joinedFrom" label="Joined from" type="date" />
-      <AInput v-model="joinedTo"   label="Joined to"   type="date" />
+      <AInput v-model="joinedFrom" :label="t('users.filterJoinedFrom')" type="date" />
+      <AInput v-model="joinedTo"   :label="t('users.filterJoinedTo')"   type="date" />
     </div>
 
     <ATable :columns="cols" :rows="items" :loading="loading" :on-row-click="(row) => router.push(`/users/${(row as AdminUserRow).id}`)">

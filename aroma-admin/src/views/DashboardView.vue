@@ -130,6 +130,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useLocale } from '../composables/useLocale'
 import { TrendingUp, ShoppingBag, Package, Users } from 'lucide-vue-next'
 import { apiGetStats } from '../api/admin'
 import type { DashboardStats, RecentOrderRow } from '../types'
@@ -141,10 +142,11 @@ import AreaChart       from '../components/charts/AreaChart.vue'
 import BarChart        from '../components/charts/BarChart.vue'
 import ComparisonChart from '../components/charts/ComparisonChart.vue'
 
-const { t }   = useI18n()
-const router  = useRouter()
-const auth    = useAuthStore()
-const stats   = ref<DashboardStats | null>(null)
+const { t }      = useI18n()
+const { locale } = useLocale()
+const router     = useRouter()
+const auth       = useAuthStore()
+const stats      = ref<DashboardStats | null>(null)
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -156,17 +158,25 @@ const loading = ref(true)
 const error   = ref<string | null>(null)
 
 // Zero fallbacks shown while loading or when API has no data yet
-const zeros12   = Array(12).fill(0)
-const zeros7    = Array(7).fill(0)
-const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-const weekLabels  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+const zeros12 = Array(12).fill(0)
+const zeros7  = Array(7).fill(0)
+
+const monthLabels = computed(() => {
+  const fmt = new Intl.DateTimeFormat(locale.value === 'ar' ? 'ar-LY' : 'en', { month: 'short' })
+  return Array.from({ length: 12 }, (_, i) => fmt.format(new Date(2024, i, 1)))
+})
+const weekLabels = computed(() => {
+  const fmt = new Intl.DateTimeFormat(locale.value === 'ar' ? 'ar-LY' : 'en', { weekday: 'short' })
+  // Mon=0 offset: Jan 1 2024 is Monday
+  return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2024, 0, i + 1)))
+})
 
 onMounted(async () => {
   try {
     const res = await apiGetStats()
     stats.value = res.data
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Failed to load dashboard data.'
+    error.value = e instanceof Error ? e.message : t('dashboard.loadError')
   } finally {
     loading.value = false
   }

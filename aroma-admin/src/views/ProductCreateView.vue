@@ -205,7 +205,7 @@
             />
             <ASelect
               v-model="form.type"
-              label="Type"
+              :label="t('products.typeLabel')"
               :options="typeOptions"
               :placeholder="t('productCreate.chooseType')"
               :error="formErrors.type"
