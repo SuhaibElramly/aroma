@@ -55,6 +55,9 @@ export const apiUpdateProduct = (id: number, data: Record<string, unknown>) =>
 export const apiDeleteProduct = (id: number) =>
   client.delete(`/admin/products/${id}`)
 
+export const apiGetProduct = (id: number) =>
+  client.get<AdminProduct>(`/admin/products/${id}`)
+
 // ── Variants ──────────────────────────────────────────────────────────
 export const apiGetVariants = (productId: number) =>
   client.get<ProductVariant[]>(`/admin/products/${productId}/variants`)
@@ -138,6 +141,19 @@ export const apiSetThumbnail = (productId: number, imageId: number) =>
 
 export const apiDeleteImage = (productId: number, imageId: number) =>
   client.delete(`/admin/products/${productId}/images/${imageId}`)
+
+// ── Variant Images ────────────────────────────────────────────────────
+export const apiGetVariantImages = (productId: number, variantId: number) =>
+  client.get<ProductImage[]>(`/admin/products/${productId}/variants/${variantId}/images`)
+
+export const apiUploadVariantImages = (productId: number, variantId: number, files: File[]) => {
+  const form = new FormData()
+  files.forEach(f => form.append('images[]', f))
+  return client.post<ProductImage[]>(`/admin/products/${productId}/variants/${variantId}/images`, form)
+}
+
+export const apiDeleteVariantImage = (productId: number, variantId: number, imageId: number) =>
+  client.delete(`/admin/products/${productId}/variants/${variantId}/images/${imageId}`)
 
 // ── Users ─────────────────────────────────────────────────────────────
 export const apiGetUser = (userId: number) =>

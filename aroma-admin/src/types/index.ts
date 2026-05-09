@@ -125,6 +125,7 @@ export interface ProductVariant {
   stock:              StockStatus
   isDefault:          boolean
   specs:              VariantSpec[]
+  images?:            ProductImage[]
 }
 
 export interface ProductImage {

@@ -9,6 +9,7 @@ export interface StorefrontVariant {
   originalPrice: number | null
   stock: StockStatus
   isDefault: boolean
+  images?: { id: number; url: string }[]
 }
 
 export type OrderStatus =
