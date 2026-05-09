@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <ATable :columns="cols" :rows="coupons" :loading="loading">
+    <ATable :columns="cols" :rows="coupons" :loading="loading" :on-row-click="(row) => openOrders(row as AdminCoupon)">
       <template #cell-code="{ value }">
         <span class="font-mono text-xs font-semibold tracking-wider">{{ value }}</span>
       </template>
@@ -48,7 +48,7 @@
         >{{ value ? t('coupons.statusActive') : t('coupons.statusInactive') }}</span>
       </template>
       <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end">
+        <div class="flex gap-1.5 justify-end rtl:justify-start">
           <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCoupon)">{{ t('common.edit') }}</AButton>
           <AButton size="sm" variant="ghost" @click.stop="handleToggle(row as AdminCoupon)">
             {{ (row as AdminCoupon).isActive ? t('coupons.disable') : t('coupons.enable') }}
@@ -122,6 +122,35 @@
       </template>
     </AModal>
 
+    <!-- Coupon Orders Modal -->
+    <AModal
+      :open="!!ordersForCoupon"
+      :title="`Orders using ${ordersForCoupon?.code ?? ''}`"
+      @close="ordersForCoupon = null"
+    >
+      <div v-if="ordersLoading" class="py-6 text-center text-xs text-dash-muted">{{ t('common.loading') }}</div>
+      <div v-else-if="couponOrders.length === 0" class="py-6 text-center text-xs text-dash-muted">
+        No orders have used this coupon yet.
+      </div>
+      <div v-else class="space-y-2">
+        <div
+          v-for="o in couponOrders"
+          :key="o.id"
+          class="flex items-center justify-between rounded-lg border border-dash-border px-4 py-3 hover:bg-dash-bg transition-colors cursor-pointer"
+          @click="router.push(`/orders/${o.id}`)"
+        >
+          <div>
+            <p class="text-xs font-semibold text-dash-text font-mono">{{ o.id }}</p>
+            <p class="text-2xs text-dash-muted mt-0.5">{{ o.user }} · {{ o.date }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-semibold text-dash-text">{{ o.total.toFixed(2) }} LYD</p>
+            <p v-if="o.discountAmount" class="text-2xs text-dash-success mt-0.5">−{{ o.discountAmount.toFixed(2) }} LYD</p>
+          </div>
+        </div>
+      </div>
+    </AModal>
+
     <!-- Delete confirm -->
     <AConfirmDialog
       :open="!!deletingCoupon"
@@ -141,12 +170,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { Plus, Ticket } from 'lucide-vue-next'
 import {
   apiGetCoupons, apiCreateCoupon, apiUpdateCoupon,
-  apiDeleteCoupon, apiToggleCoupon,
+  apiDeleteCoupon, apiToggleCoupon, apiGetCouponOrders,
 } from '../api/admin'
-import type { AdminCoupon } from '../types'
+import type { AdminCoupon, CouponOrder } from '../types'
 import ATable from '../components/ui/ATable.vue'
 import AButton from '../components/ui/AButton.vue'
 import AInput from '../components/ui/AInput.vue'
@@ -155,6 +185,7 @@ import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const cols = computed(() => [
   { key: 'code',           label: t('coupons.columns.code') },
@@ -180,6 +211,24 @@ const deletingCoupon = ref<AdminCoupon | null>(null)
 const deleting       = ref(false)
 const deleteError    = ref('')
 
+// ── Orders modal ───────────────────────────────────────────────────────
+const ordersForCoupon = ref<AdminCoupon | null>(null)
+const couponOrders    = ref<CouponOrder[]>([])
+const ordersLoading   = ref(false)
+
+async function openOrders(coupon: AdminCoupon) {
+  ordersForCoupon.value = coupon
+  couponOrders.value    = []
+  ordersLoading.value   = true
+  try {
+    const res = await apiGetCouponOrders(coupon.id)
+    couponOrders.value = res.data
+  } finally {
+    ordersLoading.value = false
+  }
+}
+
+// ── Form ───────────────────────────────────────────────────────────────
 const emptyForm = () => ({
   code:             '',
   type:             'percentage' as 'percentage' | 'fixed',

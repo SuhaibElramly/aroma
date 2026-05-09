@@ -117,7 +117,7 @@
               <span>{{ (parseFloat(String(order.total)) + parseFloat(String(order.discountAmount))).toFixed(2) }} LYD</span>
             </div>
             <div v-if="order.discountAmount" class="flex justify-between text-sm text-dash-muted px-5 py-3">
-              <span>Coupon <span class="font-mono font-semibold text-dash-text">{{ order.couponCode }}</span></span>
+              <span>{{ t('orderDetail.coupon') }} <span class="font-mono font-semibold text-dash-text">{{ order.couponCode }}</span></span>
               <span class="text-dash-success">−{{ order.discountAmount }} LYD</span>
             </div>
             <div class="flex items-center justify-between px-5 py-4">

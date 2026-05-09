@@ -263,7 +263,7 @@
                   <input v-model="row.price" type="number" step="0.01" min="0"
                     :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
                       priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
-                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">Required</p>
+                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">{{ t('common.fieldRequired') }}</p>
                 </td>
                 <td class="py-1.5 px-1">
                   <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
@@ -430,7 +430,7 @@
                   <input v-model="row.price" type="number" step="0.01" min="0"
                     :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
                       priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
-                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">Required</p>
+                  <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">{{ t('common.fieldRequired') }}</p>
                 </td>
                 <td class="py-1.5 px-1">
                   <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
@@ -782,7 +782,7 @@ const overallStockPreview = computed(() => {
 
 async function savePrices() {
   priceRowErrors.value = priceRows.value.map(r => ({
-    price: !r.price ? 'Required' : undefined,
+    price: !r.price ? t('common.fieldRequired') : undefined,
   }))
   if (priceRowErrors.value.some(e => e.price)) return
 

@@ -36,7 +36,7 @@
         <span class="font-mono text-[10px] text-dash-faint">{{ value }}</span>
       </template>
       <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end">
+        <div class="flex gap-1.5 justify-end rtl:justify-start">
           <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminBrand)">{{ t('common.edit') }}</AButton>
           <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminBrand)">{{ t('common.delete') }}</AButton>
         </div>
@@ -182,7 +182,7 @@ async function loadBrands() {
       max_products: filterMaxProducts.value ? Number(filterMaxProducts.value) : undefined,
     })).data
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load brands.'
+    loadError.value = e instanceof Error ? e.message : t('brands.loadError')
   } finally {
     loading.value = false
   }
@@ -235,10 +235,10 @@ function removeLogo() {
 
 async function handleSave() {
   formErrors.value = {}
-  if (!form.value.name) { formErrors.value.name = 'Name is required'; return }
-  if (!form.value.bg)   { formErrors.value.bg   = 'Colour is required'; return }
+  if (!form.value.name) { formErrors.value.name = t('common.nameRequired'); return }
+  if (!form.value.bg)   { formErrors.value.bg   = t('common.colourRequired'); return }
   if (!editing.value && !generatedSlug.value) {
-    formErrors.value.name_en = 'English name required to generate the brand ID'
+    formErrors.value.name_en = t('brands.nameEnRequired')
     return
   }
 
@@ -262,7 +262,7 @@ async function handleSave() {
     closeModal()
     loadBrands()
   } catch (e: unknown) {
-    formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
+    formErrors.value.general = e instanceof Error ? e.message : t('common.saveFailed')
     loadBrands()
   } finally {
     saving.value = false
@@ -288,7 +288,7 @@ async function handleDelete() {
     deletingBrand.value = null
     loadBrands()
   } catch (e: unknown) {
-    deleteError.value = e instanceof Error ? e.message : 'Delete failed.'
+    deleteError.value = e instanceof Error ? e.message : t('common.deleteFailed')
     deletingBrand.value = null
   } finally {
     deleting.value = false

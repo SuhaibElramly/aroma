@@ -1,9 +1,20 @@
 <!-- aroma-admin/src/views/UsersView.vue -->
 <template>
   <div class="space-y-4">
-    <AInput v-model="search" :placeholder="t('users.searchPlaceholder')" class="w-64" @input="debouncedFetch" />
 
-    <ATable :columns="cols" :rows="items" :loading="loading">
+    <!-- Filters -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <AInput v-model="search"     :label="t('users.columns.name')"  :placeholder="t('users.searchPlaceholder')" @input="debouncedFetch" />
+      <AInput v-model="phone"      label="Phone"          placeholder="e.g. 0912345678" />
+      <div class="grid grid-cols-2 gap-2">
+        <AInput v-model="minOrders" label="Min orders" placeholder="0"  type="number" min="0" />
+        <AInput v-model="maxOrders" label="Max orders" placeholder="—"  type="number" min="0" />
+      </div>
+      <AInput v-model="joinedFrom" label="Joined from" type="date" />
+      <AInput v-model="joinedTo"   label="Joined to"   type="date" />
+    </div>
+
+    <ATable :columns="cols" :rows="items" :loading="loading" :on-row-click="(row) => router.push(`/users/${(row as AdminUserRow).id}`)">
       <template #cell-orderCount="{ value }">
         <span class="font-medium">{{ value }}</span>
         <span class="text-dash-faint text-[10px] ml-1">{{ t('users.columns.orders').toLowerCase() }}</span>
@@ -26,8 +37,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { Users } from 'lucide-vue-next'
 import { apiGetUsers } from '../api/admin'
 import type { AdminUserRow } from '../types'
@@ -38,7 +51,13 @@ import APagination from '../components/ui/APagination.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
 
 const { t } = useI18n()
-const search = ref('')
+const router     = useRouter()
+const search     = ref('')
+const phone      = ref('')
+const joinedFrom = ref('')
+const joinedTo   = ref('')
+const minOrders  = ref('')
+const maxOrders  = ref('')
 
 const cols = computed(() => [
   { key: 'name',       label: t('users.columns.name') },
@@ -49,14 +68,27 @@ const cols = computed(() => [
 ])
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
-  apiGetUsers({ search: search.value || undefined, page }).then(r => r.data),
+  apiGetUsers({
+    search:      search.value.trim()  || undefined,
+    phone:       phone.value.trim()   || undefined,
+    joined_from: joinedFrom.value     || undefined,
+    joined_to:   joinedTo.value       || undefined,
+    min_orders:  minOrders.value !== '' ? Number(minOrders.value) : undefined,
+    max_orders:  maxOrders.value !== '' ? Number(maxOrders.value) : undefined,
+    page,
+  }).then(r => r.data),
 )
 
 let debounceTimer: ReturnType<typeof setTimeout>
 function debouncedFetch() {
   clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => fetch(1), 350)
+  debounceTimer = setTimeout(() => fetch(1), 380)
 }
+
+watch([search, phone, joinedFrom, joinedTo, minOrders, maxOrders], () => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => fetch(1), 380)
+})
 
 onUnmounted(() => clearTimeout(debounceTimer))
 onMounted(() => fetch(1))

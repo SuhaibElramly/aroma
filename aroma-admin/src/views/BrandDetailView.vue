@@ -116,7 +116,7 @@
         <span v-if="value" class="text-[10px] text-dash-secondary bg-dash-secondary-lt rounded-full px-2 py-0.5">{{ t('products.newArrival') }}</span>
       </template>
       <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end">
+        <div class="flex gap-1.5 justify-end rtl:justify-start">
           <RouterLink :to="`/products/${(row as AdminProduct).id}/variants`">
             <AButton size="sm" variant="ghost">{{ t('products.variantsBtn', { count: (row as AdminProduct).variantCount }) }}</AButton>
           </RouterLink>
@@ -287,7 +287,7 @@ async function loadBrand() {
   try {
     brand.value = (await apiGetBrand(props.id)).data
   } catch (e: unknown) {
-    brandError.value = e instanceof Error ? e.message : 'Failed to load brand.'
+    brandError.value = e instanceof Error ? e.message : t('brandDetail.loadError')
   } finally {
     brandLoading.value = false
   }
@@ -380,10 +380,10 @@ function openEdit(p: AdminProduct) {
 
 async function handleSave() {
   formErrors.value = {}
-  if (!form.value.name)        { formErrors.value.name        = 'Name is required';  return }
-  if (!form.value.brand_id)    { formErrors.value.brand_id    = 'Select a brand';    return }
-  if (!form.value.category_id) { formErrors.value.category_id = 'Select a category'; return }
-  if (!form.value.type)        { formErrors.value.type        = 'Select a type';     return }
+  if (!form.value.name)        { formErrors.value.name        = t('common.nameRequired');  return }
+  if (!form.value.brand_id)    { formErrors.value.brand_id    = t('common.selectBrand');    return }
+  if (!form.value.category_id) { formErrors.value.category_id = t('common.selectCategory'); return }
+  if (!form.value.type)        { formErrors.value.type        = t('common.selectType');     return }
 
   saving.value = true
   try {
@@ -405,7 +405,7 @@ async function handleSave() {
     fetch(1)
     loadBrand() // refresh product count in header
   } catch (e: unknown) {
-    formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
+    formErrors.value.general = e instanceof Error ? e.message : t('common.saveFailed')
   } finally {
     saving.value = false
   }
@@ -423,7 +423,7 @@ async function handleDelete() {
     fetch(1)
     loadBrand() // refresh product count in header
   } catch (e: unknown) {
-    deleteError.value = e instanceof Error ? e.message : 'Delete failed.'
+    deleteError.value = e instanceof Error ? e.message : t('common.deleteFailed')
   } finally {
     deleting.value = false
   }

@@ -1,5 +1,30 @@
 <template>
   <div class="space-y-4">
+
+    <!-- Search fields -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <AInput
+        v-model="searchId"
+        label="Order ID"
+        placeholder="e.g. ORD-001"
+      />
+      <AInput
+        v-model="searchPhone"
+        label="Phone"
+        placeholder="e.g. 0912345678"
+      />
+      <AInput
+        v-model="dateFrom"
+        label="From"
+        type="date"
+      />
+      <AInput
+        v-model="dateTo"
+        label="To"
+        type="date"
+      />
+    </div>
+
     <!-- Status filter pills -->
     <div class="flex items-center gap-2 flex-wrap">
       <button
@@ -51,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ShoppingBag } from 'lucide-vue-next'
@@ -62,10 +87,15 @@ import ATable      from '../components/ui/ATable.vue'
 import ABadge      from '../components/ui/ABadge.vue'
 import APagination from '../components/ui/APagination.vue'
 import AEmptyState from '../components/ui/AEmptyState.vue'
+import AInput      from '../components/ui/AInput.vue'
 
 const { t } = useI18n()
 const router       = useRouter()
 const activeStatus = ref('')
+const searchId     = ref('')
+const searchPhone  = ref('')
+const dateFrom     = ref('')
+const dateTo       = ref('')
 
 const statusOptions = computed(() => [
   { value: '',          label: t('orders.filterAll') },
@@ -88,13 +118,29 @@ const cols = computed(() => [
 ])
 
 const { items, meta, loading, fetch, changePage } = usePagination((page) =>
-  apiGetOrders({ status: activeStatus.value || undefined, page }).then((r) => r.data),
+  apiGetOrders({
+    status:    activeStatus.value || undefined,
+    order_id:  searchId.value.trim()    || undefined,
+    phone:     searchPhone.value.trim() || undefined,
+    date_from: dateFrom.value           || undefined,
+    date_to:   dateTo.value             || undefined,
+    page,
+  }).then((r) => r.data),
 )
 
 function setStatus(s: string) {
   activeStatus.value = s
   fetch(1)
 }
+
+let debounceTimer: ReturnType<typeof setTimeout>
+
+watch([searchId, searchPhone, dateFrom, dateTo], () => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => fetch(1), 380)
+})
+
+onUnmounted(() => clearTimeout(debounceTimer))
 
 onMounted(() => fetch(1))
 </script>

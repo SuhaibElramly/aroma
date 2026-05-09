@@ -24,7 +24,7 @@
         <span class="font-mono text-[10px] text-dash-faint">{{ value }}</span>
       </template>
       <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end">
+        <div class="flex gap-1.5 justify-end rtl:justify-start">
           <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCategory)">{{ t('common.edit') }}</AButton>
           <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCategory)">{{ t('common.delete') }}</AButton>
         </div>
@@ -109,7 +109,7 @@ async function loadCats() {
       max_products: filterMaxProducts.value ? Number(filterMaxProducts.value) : undefined,
     })).data
   } catch (e: unknown) {
-    loadError.value = e instanceof Error ? e.message : 'Failed to load categories.'
+    loadError.value = e instanceof Error ? e.message : t('categories.loadError')
   } finally {
     loading.value = false
   }
@@ -131,8 +131,8 @@ function openEdit(c: AdminCategory) {
 
 async function handleSave() {
   formErrors.value = {}
-  if (!form.value.label) { formErrors.value.label = 'Label is required'; return }
-  if (!form.value.bg)    { formErrors.value.bg    = 'Colour is required'; return }
+  if (!form.value.label) { formErrors.value.label = t('categories.labelRequired'); return }
+  if (!form.value.bg)    { formErrors.value.bg    = t('common.colourRequired'); return }
   saving.value = true
   try {
     editing.value
@@ -140,7 +140,7 @@ async function handleSave() {
       : await apiCreateCategory(form.value)
     modalOpen.value = false; loadCats()
   } catch (e: unknown) {
-    formErrors.value.general = e instanceof Error ? e.message : 'Save failed.'
+    formErrors.value.general = e instanceof Error ? e.message : t('common.saveFailed')
   } finally { saving.value = false }
 }
 
@@ -155,7 +155,7 @@ async function handleDelete() {
     deletingCat.value = null
     loadCats()
   } catch (e: unknown) {
-    deleteError.value = e instanceof Error ? e.message : 'Delete failed.'
+    deleteError.value = e instanceof Error ? e.message : t('common.deleteFailed')
     deletingCat.value = null
   } finally {
     deleting.value = false
