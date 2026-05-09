@@ -140,8 +140,8 @@ function canJumpTo(idx: number): boolean {
 }
 
 function stepCircleClass(idx: number): string {
-  if (isComplete(idx)) return 'bg-emerald-500 text-white'
   if (currentStep.value === idx) return 'bg-dash-primary text-white ring-2 ring-dash-primary/30'
+  if (isComplete(idx)) return 'bg-emerald-500 text-white'
   return 'bg-dash-border text-dash-muted'
 }
 
@@ -170,8 +170,9 @@ function handleDone() {
 onMounted(async () => {
   if (mode.value === 'edit') {
     const id = Number(route.params.id)
+    if (!id || isNaN(id)) { router.replace('/products'); return }
     productId.value  = id
-    highestStep.value = 2  // all steps accessible in edit mode
+    highestStep.value = 2
     loading.value    = true
     try {
       const { data } = await apiGetProduct(id)
