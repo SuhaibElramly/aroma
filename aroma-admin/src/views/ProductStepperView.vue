@@ -1,9 +1,9 @@
 <!-- aroma-admin/src/views/ProductStepperView.vue -->
 <template>
-  <div class="min-h-full animate-fade-up">
+  <div class="-m-6 min-h-full flex flex-col">
 
     <!-- Sticky header -->
-    <div class="sticky top-0 z-10 bg-dash-bg border-b border-dash-border -mx-6 -mt-6 px-6 py-3 mb-6 flex items-center justify-between">
+    <div class="sticky top-0 z-10 bg-dash-bg border-b border-dash-border px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <RouterLink
           to="/products"
@@ -26,73 +26,77 @@
       </div>
     </div>
 
-    <!-- Loading state (edit mode initial load) -->
-    <div v-if="loading" class="flex items-center justify-center py-24">
-      <div class="h-6 w-6 animate-spin rounded-full border-2 border-dash-primary border-t-transparent" />
-    </div>
+    <!-- Padded content area -->
+    <div class="flex-1 p-6">
 
-    <template v-else>
-      <!-- Step indicators -->
-      <div class="flex items-center gap-0 mb-8 px-1">
-        <template v-for="(step, idx) in steps" :key="step.key">
-          <!-- Step -->
-          <button
-            type="button"
-            class="flex items-center gap-2.5 flex-1 transition-opacity"
-            :class="[
-              canJumpTo(idx) ? 'cursor-pointer' : 'cursor-default',
-              currentStep === idx ? 'opacity-100' : 'opacity-70 hover:opacity-90',
-            ]"
-            :disabled="!canJumpTo(idx)"
-            @click="canJumpTo(idx) && (currentStep = idx)"
-          >
-            <!-- Circle -->
-            <div
-              class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-all"
-              :class="stepCircleClass(idx)"
-            >
-              <Check v-if="isComplete(idx)" :size="10" />
-              <span v-else>{{ idx + 1 }}</span>
-            </div>
-            <div class="text-start">
-              <div class="text-xs font-semibold" :class="currentStep === idx ? 'text-dash-text' : 'text-dash-muted'">
-                {{ t(step.labelKey) }}
-              </div>
-              <div class="text-2xs" :class="stepSubLabel(idx) === t('stepper.inProgress') ? 'text-dash-primary' : 'text-dash-faint'">
-                {{ stepSubLabel(idx) }}
-              </div>
-            </div>
-          </button>
-          <!-- Connector line -->
-          <div
-            v-if="idx < steps.length - 1"
-            class="flex-1 h-px mx-2 transition-colors"
-            :class="isComplete(idx) ? 'bg-emerald-500' : 'bg-dash-border'"
-          />
-        </template>
+      <!-- Loading state (edit mode initial load) -->
+      <div v-if="loading" class="flex items-center justify-center py-24">
+        <div class="h-6 w-6 animate-spin rounded-full border-2 border-dash-primary border-t-transparent" />
       </div>
 
-      <!-- Step content -->
-      <StepBasicInfo
-        v-if="currentStep === 0"
-        :productId="productId"
-        :initialData="initialProduct"
-        @saved="onBasicInfoSaved"
-      />
-      <StepImages
-        v-else-if="currentStep === 1"
-        :productId="productId!"
-        @next="onImagesNext"
-        @back="currentStep = 0"
-      />
-      <StepVariants
-        v-else-if="currentStep === 2"
-        :productId="productId!"
-        @back="currentStep = 1"
-        @done="handleDone"
-      />
-    </template>
+      <template v-else>
+        <!-- Step indicators -->
+        <div class="flex items-center gap-0 mb-8 px-1">
+          <template v-for="(step, idx) in steps" :key="step.key">
+            <!-- Step -->
+            <button
+              type="button"
+              class="flex items-center gap-2.5 flex-1 transition-opacity"
+              :class="[
+                canJumpTo(idx) ? 'cursor-pointer' : 'cursor-default',
+                currentStep === idx ? 'opacity-100' : 'opacity-70 hover:opacity-90',
+              ]"
+              :disabled="!canJumpTo(idx)"
+              @click="canJumpTo(idx) && (currentStep = idx)"
+            >
+              <!-- Circle -->
+              <div
+                class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 transition-all"
+                :class="stepCircleClass(idx)"
+              >
+                <Check v-if="isComplete(idx)" :size="10" />
+                <span v-else>{{ idx + 1 }}</span>
+              </div>
+              <div class="text-start">
+                <div class="text-xs font-semibold" :class="currentStep === idx ? 'text-dash-text' : 'text-dash-muted'">
+                  {{ t(step.labelKey) }}
+                </div>
+                <div class="text-2xs" :class="stepSubLabel(idx) === t('stepper.inProgress') ? 'text-dash-primary' : 'text-dash-faint'">
+                  {{ stepSubLabel(idx) }}
+                </div>
+              </div>
+            </button>
+            <!-- Connector line -->
+            <div
+              v-if="idx < steps.length - 1"
+              class="flex-1 h-px mx-2 transition-colors"
+              :class="isComplete(idx) ? 'bg-emerald-500' : 'bg-dash-border'"
+            />
+          </template>
+        </div>
 
+        <!-- Step content -->
+        <StepBasicInfo
+          v-if="currentStep === 0"
+          :productId="productId"
+          :initialData="initialProduct"
+          @saved="onBasicInfoSaved"
+        />
+        <StepImages
+          v-else-if="currentStep === 1"
+          :productId="productId!"
+          @next="onImagesNext"
+          @back="currentStep = 0"
+        />
+        <StepVariants
+          v-else-if="currentStep === 2"
+          :productId="productId!"
+          @back="currentStep = 1"
+          @done="handleDone"
+        />
+      </template>
+
+    </div>
   </div>
 </template>
 
