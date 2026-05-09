@@ -2,12 +2,12 @@
   <div class="bg-dash-surface rounded-card p-5 shadow-card transition-card hover-lift">
     <div class="flex items-start justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-dash-text">Revenue</h3>
-        <p class="text-2xs text-dash-muted mt-0.5">Monthly revenue in LYD, rolling 12 months</p>
+        <h3 class="text-sm font-semibold text-dash-text">{{ t('dashboard.revenueChartTitle') }}</h3>
+        <p class="text-2xs text-dash-muted mt-0.5">{{ t('dashboard.revenueChartSub') }}</p>
       </div>
       <div class="flex items-center gap-1.5 text-2xs font-medium text-dash-primary bg-dash-primary-lt rounded-full px-2.5 py-1">
         <span class="h-1.5 w-1.5 rounded-full bg-dash-primary inline-block" />
-        Revenue
+        {{ t('dashboard.revenueLabel') }}
       </div>
     </div>
     <div class="h-52">
@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
@@ -25,6 +26,8 @@ import {
 } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend)
+
+const { t } = useI18n()
 
 const props = defineProps<{
   data:   number[]
@@ -34,7 +37,7 @@ const props = defineProps<{
 const chartData = computed(() => ({
   labels: props.labels,
   datasets: [{
-    label: 'Revenue',
+    label: t('dashboard.revenueLabel'),
     data: props.data,
     fill: true,
     borderColor: 'oklch(67% 0.063 195)',
