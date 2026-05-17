@@ -56,7 +56,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminProductVariantController, AdminProductImageController,
     AdminUserDetailController, AdminCouponController, AdminSpecTypeController,
     AdminProductSpecController, AdminProductVariantGenerateController,
-    AdminProductDiscountController,
+    AdminProductDiscountController, AdminAdminsController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -123,4 +123,10 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::get('/products/{productId}/specs',  [AdminProductSpecController::class, 'show']);
     Route::put('/products/{productId}/specs',  [AdminProductSpecController::class, 'update']);
     Route::post('/products/{productId}/variants/generate', AdminProductVariantGenerateController::class);
+
+    Route::get('/admins',                         [AdminAdminsController::class, 'index']);
+    Route::post('/admins',                        [AdminAdminsController::class, 'store']);
+    Route::put('/admins/{id}',                    [AdminAdminsController::class, 'update']);
+    Route::patch('/admins/{id}/reset-password',   [AdminAdminsController::class, 'resetPassword']);
+    Route::patch('/admins/{id}/toggle-status',    [AdminAdminsController::class, 'toggleStatus']);
 });
