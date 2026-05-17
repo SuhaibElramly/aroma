@@ -46,6 +46,18 @@ export interface DashboardStats {
   weeklyLabels: string[]
 
   recentOrders: RecentOrderRow[]
+
+  // Profit stats (from delivered orders)
+  grossProfit:       number
+  avgMargin:         number
+  cogs:              number
+  categoryBreakdown: Array<{
+    category: string
+    revenue:  number
+    cogs:     number
+    profit:   number
+    margin:   number
+  }>
 }
 
 export interface RecentOrderRow {

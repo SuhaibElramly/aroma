@@ -96,6 +96,8 @@ const ar = {
     totalOrders: 'إجمالي الطلبات',
     products: 'المنتجات',
     customers: 'العملاء',
+    grossProfit: 'إجمالي الربح',
+    avgMargin: 'متوسط الهامش',
     vsLastMonth: 'مقارنةً بالشهر الماضي',
     revenueChart: 'نظرة عامة على الإيرادات',
     ordersChart: 'نظرة عامة على الطلبات',

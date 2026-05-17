@@ -94,6 +94,8 @@ const en = {
     totalOrders: 'Total Orders',
     products: 'Products',
     customers: 'Customers',
+    grossProfit: 'Gross Profit',
+    avgMargin: 'Avg Margin',
     vsLastMonth: 'vs last month',
     revenueChart: 'Revenue Overview',
     ordersChart: 'Orders Overview',

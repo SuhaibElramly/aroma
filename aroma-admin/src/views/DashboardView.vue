@@ -26,24 +26,23 @@
         :featured="true"
       />
       <AStatCard
+        :label="t('dashboard.grossProfit')"
+        :value="stats ? `${stats.grossProfit.toFixed(0)} LYD` : '—'"
+        :icon="TrendingUp"
+        icon-bg="oklch(68% 0.045 140)"
+      />
+      <AStatCard
+        :label="t('dashboard.avgMargin')"
+        :value="stats ? `${stats.avgMargin}%` : '—'"
+        :icon="Package"
+        icon-bg="oklch(75% 0.085 100)"
+      />
+      <AStatCard
         :label="t('dashboard.totalOrders')"
         :value="stats?.totalOrders ?? '—'"
         :change="stats?.ordersChange ?? null"
         :icon="ShoppingBag"
         icon-bg="oklch(72% 0.16 55)"
-      />
-      <AStatCard
-        :label="t('dashboard.products')"
-        :value="stats?.totalProducts ?? '—'"
-        :icon="Package"
-        icon-bg="oklch(52% 0.14 300)"
-      />
-      <AStatCard
-        :label="t('dashboard.customers')"
-        :value="stats?.totalUsers ?? '—'"
-        :change="stats?.usersChange ?? null"
-        :icon="Users"
-        icon-bg="oklch(42% 0.072 235)"
       />
     </div>
 
@@ -57,6 +56,56 @@
         :data="stats?.monthlyOrderCounts ?? zeros12"
         :labels="stats?.monthlyOrderLabels ?? monthLabels"
       />
+    </div>
+
+    <!-- Profit panels row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Profit Breakdown by Category -->
+      <div class="bg-dash-paper rounded-card border border-dash-border p-5">
+        <p class="text-2xs font-medium text-dash-muted uppercase tracking-widest mb-4">Profit Breakdown</p>
+        <ul v-if="stats?.categoryBreakdown?.length" class="space-y-3">
+          <li v-for="cat in stats.categoryBreakdown" :key="cat.category">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-dash-text">{{ cat.category }}</span>
+              <span class="text-xs text-dash-muted">{{ cat.margin }}% margin</span>
+            </div>
+            <div class="h-2 rounded-full bg-dash-bg overflow-hidden flex">
+              <div
+                class="h-full bg-dash-danger/40"
+                :style="{ width: cat.revenue > 0 ? (cat.cogs / cat.revenue * 100) + '%' : '0%' }"
+              ></div>
+              <div
+                class="h-full bg-dash-success"
+                :style="{ width: cat.revenue > 0 ? (cat.profit / cat.revenue * 100) + '%' : '0%' }"
+              ></div>
+            </div>
+          </li>
+        </ul>
+        <p v-else class="text-xs text-dash-muted text-center py-6">No delivered orders yet.</p>
+      </div>
+
+      <!-- P&L Snapshot -->
+      <div class="bg-dash-paper rounded-card border border-dash-border p-5">
+        <p class="text-2xs font-medium text-dash-muted uppercase tracking-widest mb-4">P&amp;L Snapshot</p>
+        <ul class="space-y-2.5">
+          <li class="flex items-center justify-between">
+            <span class="text-xs text-dash-text">Revenue</span>
+            <span class="text-xs font-medium text-dash-text">{{ stats ? Number(stats.totalRevenue).toFixed(2) : '—' }} LYD</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-xs text-dash-muted">Cost of Goods</span>
+            <span class="text-xs text-dash-danger">-{{ stats ? stats.cogs.toFixed(2) : '—' }} LYD</span>
+          </li>
+          <li class="flex items-center justify-between border-t border-dash-border pt-2 mt-1">
+            <span class="text-xs font-medium text-dash-text">Gross Profit</span>
+            <span class="text-xs font-medium text-dash-success">{{ stats ? stats.grossProfit.toFixed(2) : '—' }} LYD</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-xs text-dash-muted">Avg Margin</span>
+            <span class="text-xs font-medium text-dash-primary">{{ stats ? stats.avgMargin : '—' }}%</span>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <!-- Recent orders + comparison chart -->
@@ -131,7 +180,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLocale } from '../composables/useLocale'
-import { TrendingUp, ShoppingBag, Package, Users } from 'lucide-vue-next'
+import { TrendingUp, ShoppingBag, Package } from 'lucide-vue-next'
 import { apiGetStats } from '../api/admin'
 import type { DashboardStats, RecentOrderRow } from '../types'
 import { useAuthStore } from '../stores/auth'
