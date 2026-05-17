@@ -31,6 +31,13 @@ export default {
           // Rose (danger)
           danger:      'oklch(60% 0.13 25)',       // --rose
           'danger-lt': 'oklch(95% 0.025 25)',      // --rose-lt
+          // Backward-compatible aliases (old tokens → new semantic values)
+          surface:        'oklch(98.2% 0.012 80)',    // was dash-surface → now paper
+          secondary:      'oklch(58% 0.075 205)',     // was dash-secondary → now primary (teal)
+          'secondary-dk': 'oklch(46% 0.075 210)',    // was dash-secondary-dk → now primary-dk
+          'secondary-lt': 'oklch(94% 0.025 200)',    // was dash-secondary-lt → now primary-lt
+          orange:         'oklch(75% 0.085 100)',     // was dash-orange → now fig
+          'orange-lt':    'oklch(94% 0.035 100)',    // was dash-orange-lt → now fig-lt
         },
       },
       fontFamily: {
