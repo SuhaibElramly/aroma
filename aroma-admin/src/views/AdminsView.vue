@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-useI18n()
 
 interface AdminUser {
   id: number
@@ -16,6 +13,7 @@ interface AdminUser {
 const admins   = ref<AdminUser[]>([])
 const loading  = ref(true)
 const showForm = ref(false)
+const error    = ref<string | null>(null)
 const form     = ref({ name: '', phone: '', role: 'admin', password: '' })
 
 const BASE    = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
@@ -27,16 +25,21 @@ const headers = () => ({
 })
 
 async function load() {
+  error.value = null
   try {
     loading.value = true
     const res = await fetch(`${BASE}/admin/admins`, { headers: headers() })
+    if (!res.ok) throw new Error(`Failed to load admins: ${res.status}`)
     admins.value = await res.json()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to load admins'
   } finally {
     loading.value = false
   }
 }
 
 async function createAdmin() {
+  error.value = null
   const res = await fetch(`${BASE}/admin/admins`, {
     method: 'POST', headers: headers(), body: JSON.stringify(form.value),
   })
@@ -44,6 +47,10 @@ async function createAdmin() {
     admins.value.push(await res.json())
     showForm.value = false
     form.value = { name: '', phone: '', role: 'admin', password: '' }
+  } else {
+    const body = await res.json().catch(() => ({}))
+    error.value = body.message ?? `Failed to create admin: ${res.status}`
+    return
   }
 }
 
@@ -51,7 +58,11 @@ async function toggleStatus(a: AdminUser) {
   const res = await fetch(`${BASE}/admin/admins/${a.id}/toggle-status`, {
     method: 'PATCH', headers: headers(),
   })
-  if (res.ok) { const updated = await res.json(); Object.assign(a, updated) }
+  if (res.ok) {
+    const updated = await res.json()
+    const idx = admins.value.findIndex(x => x.id === a.id)
+    if (idx !== -1) admins.value[idx] = { ...admins.value[idx], ...updated }
+  }
 }
 
 async function resetPassword(a: AdminUser) {
@@ -64,7 +75,9 @@ async function resetPassword(a: AdminUser) {
 }
 
 function generatePassword() {
-  form.value.password = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6).toUpperCase()
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%'
+  const bytes = crypto.getRandomValues(new Uint8Array(12))
+  form.value.password = Array.from(bytes, b => chars[b % chars.length]).join('')
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -163,6 +176,11 @@ onMounted(load)
         </button>
       </div>
     </form>
+
+    <!-- Error banner -->
+    <div v-if="error" class="rounded-card border border-dash-danger/30 bg-dash-danger-lt px-4 py-3 text-xs text-dash-danger">
+      {{ error }}
+    </div>
 
     <!-- Table -->
     <div v-if="loading" class="text-xs text-dash-muted py-8 text-center">Loading…</div>
