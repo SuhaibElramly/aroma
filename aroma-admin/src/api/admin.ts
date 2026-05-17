@@ -71,6 +71,7 @@ export const apiBulkUpdateVariants = (
   variants: Array<{
     id:                  number
     price:               number
+    cost_price:          number | null
     original_price:      number | null
     quantity:            number
     low_stock_threshold: number

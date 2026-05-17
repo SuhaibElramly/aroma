@@ -120,6 +120,7 @@ export interface ProductVariant {
   id:                 number
   productId:          number
   price:              string
+  costPrice:          number | null
   originalPrice:      string | null
   quantity:           number
   lowStockThreshold:  number
