@@ -23,6 +23,7 @@ export const router = createRouter({
         { path: 'products/new',      name: 'product-create', component: () => import('../views/ProductStepperView.vue') },
         { path: 'products/:id/edit', name: 'product-edit',   component: () => import('../views/ProductStepperView.vue') },
         { path: 'products/:id/variants', redirect: (to) => ({ name: 'product-edit', params: { id: to.params.id } }) },
+        { path: 'products/:id', name: 'product-detail', component: () => import('../views/ProductDetailView.vue'), props: true },
         { path: 'brands',     name: 'brands',            component: () => import('../views/BrandsView.vue') },
         { path: 'brands/:id', name: 'brand-detail',      component: () => import('../views/BrandDetailView.vue'), props: true },
         { path: 'categories', name: 'categories',        component: () => import('../views/CategoriesView.vue') },

@@ -256,3 +256,17 @@ export interface CouponOrder {
   discountAmount: number | null
   status: string
 }
+
+export interface ProductDiscount {
+  id: number
+  product_id: number
+  name: string
+  type: 'percentage' | 'fixed'
+  value: string
+  scope: 'all' | 'specific'
+  variant_ids: number[] | null
+  starts_at: string | null
+  ends_at: string | null
+  is_active: boolean
+  created_at: string
+}
