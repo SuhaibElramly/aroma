@@ -1,114 +1,107 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '../../stores/auth'
+
+const { t, locale } = useI18n()
+const route  = useRoute()
+const router = useRouter()
+const auth   = useAuthStore()
+
+const isActive = (path: string) => route.path.startsWith('/' + path)
+
+const groups = computed(() => [
+  {
+    label: t('nav.workspace'),
+    items: [
+      { key: 'dashboard',  label: t('nav.dashboard'),  icon: '⊞', path: 'dashboard' },
+      { key: 'orders',     label: t('nav.orders'),     icon: '◫', path: 'orders' },
+      { key: 'users',      label: t('nav.customers'),  icon: '◯', path: 'users' },
+    ],
+  },
+  {
+    label: t('nav.catalog'),
+    items: [
+      { key: 'products',   label: t('nav.products'),   icon: '⬡', path: 'products' },
+      { key: 'spec-types', label: t('nav.specTypes'),  icon: '≡',  path: 'spec-types' },
+      { key: 'brands',     label: t('nav.brands'),     icon: '◈', path: 'brands' },
+      { key: 'categories', label: t('nav.categories'), icon: '⊟', path: 'categories' },
+      { key: 'coupons',    label: t('nav.coupons'),    icon: '◇', path: 'coupons' },
+    ],
+  },
+  {
+    label: t('nav.settings'),
+    items: [
+      { key: 'admins', label: t('nav.admins'), icon: '⬤', path: 'admins' },
+    ],
+  },
+])
+
+function signOut() {
+  auth.logout()
+  router.push('/login')
+}
+</script>
+
 <template>
-  <aside class="flex h-screen w-60 flex-col shrink-0 bg-dash-surface border-r border-dash-border rtl:border-r-0 rtl:border-l">
+  <aside
+    class="flex flex-col w-60 shrink-0 h-screen bg-dash-paper border-e border-dash-border"
+    :dir="locale === 'ar' ? 'rtl' : 'ltr'"
+  >
     <!-- Logo -->
-    <div class="flex items-center gap-3 px-5 py-5">
-      <div class="h-9 w-9 rounded-xl bg-dash-primary flex items-center justify-center shrink-0 shadow-sm">
-        <span class="text-[11px] font-bold text-white tracking-widest">AR</span>
+    <div class="flex items-center gap-3 px-5 pt-6 pb-4">
+      <div class="w-9 h-9 rounded-lg bg-dash-bg flex items-center justify-center overflow-hidden shrink-0">
+        <img src="/aroma-logo.png" alt="Aroma" class="w-8 h-8 object-contain" style="mix-blend-mode:multiply" />
       </div>
-      <div>
-        <p class="text-sm font-semibold text-dash-text leading-none">Aroma</p>
-        <p class="text-2xs text-dash-muted mt-0.5">{{ t('topbar.adminConsole') }}</p>
+      <div class="min-w-0">
+        <p class="font-display font-semibold text-dash-text text-sm leading-tight tracking-tight">Aroma</p>
+        <p class="text-2xs text-dash-muted">{{ $t('nav.adminLabel') }}</p>
       </div>
     </div>
 
-    <!-- Divider -->
-    <div class="mx-5 h-px bg-dash-border" />
+    <!-- Search -->
+    <div class="px-3 mb-3">
+      <div class="flex items-center gap-2 px-3 py-2 rounded-btn bg-dash-bg border border-dash-border text-dash-muted text-xs cursor-pointer hover:border-dash-primary/40 transition-colors">
+        <span class="opacity-60">⌕</span>
+        <span class="flex-1">{{ $t('nav.search') }}</span>
+        <kbd class="opacity-50 font-sans">⌘K</kbd>
+      </div>
+    </div>
 
-    <!-- Nav -->
-    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-      <p class="px-3 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">{{ t('nav.main') }}</p>
-      <RouterLink
-        v-for="item in mainItems"
-        :key="item.to"
-        :to="item.to"
-        custom
-        v-slot="{ navigate, isActive }"
-      >
-        <button
-          @click="navigate"
-          :class="[
-            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left rtl:text-right group',
-            isActive
-              ? 'bg-dash-secondary text-white shadow-sm'
-              : 'text-dash-muted hover:bg-dash-bg hover:text-dash-text',
-          ]"
-        >
-          <component
-            :is="item.icon"
-            :size="16"
-            :class="isActive ? 'text-white' : 'text-dash-faint group-hover:text-dash-primary transition-colors'"
-          />
-          <span>{{ item.label }}</span>
-          <span
-            v-if="item.badge"
-            :class="[
-              'ml-auto rtl:ml-0 rtl:mr-auto text-2xs font-semibold rounded-full px-1.5 py-0.5',
-              isActive ? 'bg-white/20 text-white' : 'bg-dash-primary-lt text-dash-primary',
-            ]"
-          >{{ item.badge }}</span>
-        </button>
-      </RouterLink>
-
-      <p class="px-3 mt-4 mb-2 text-2xs font-semibold text-dash-faint uppercase tracking-widest">{{ t('nav.catalog') }}</p>
-      <RouterLink
-        v-for="item in catalogItems"
-        :key="item.to"
-        :to="item.to"
-        custom
-        v-slot="{ navigate, isActive }"
-      >
-        <button
-          @click="navigate"
-          :class="[
-            'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left rtl:text-right group',
-            isActive
-              ? 'bg-dash-secondary text-white shadow-sm'
-              : 'text-dash-muted hover:bg-dash-bg hover:text-dash-text',
-          ]"
-        >
-          <component
-            :is="item.icon"
-            :size="16"
-            :class="isActive ? 'text-white' : 'text-dash-faint group-hover:text-dash-primary transition-colors'"
-          />
-          <span>{{ item.label }}</span>
-        </button>
-      </RouterLink>
+    <!-- Nav groups -->
+    <nav class="flex-1 overflow-y-auto px-3 space-y-5 py-1">
+      <div v-for="group in groups" :key="group.label">
+        <p class="text-2xs font-medium text-dash-faint uppercase tracking-widest px-2 mb-1">{{ group.label }}</p>
+        <ul class="space-y-0.5">
+          <li v-for="item in group.items" :key="item.key">
+            <router-link
+              :to="'/' + item.path"
+              class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn text-sm transition-colors"
+              :class="isActive(item.path)
+                ? 'bg-dash-text text-white font-medium'
+                : 'text-dash-text-2 hover:bg-dash-bg'"
+            >
+              <span class="text-base leading-none opacity-70">{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </router-link>
+          </li>
+        </ul>
+      </div>
     </nav>
 
-    <!-- Footer -->
-    <div class="px-5 py-4 border-t border-dash-border">
-      <div class="flex items-center gap-2.5">
-        <div class="h-7 w-7 rounded-full bg-dash-secondary-lt flex items-center justify-center text-dash-secondary text-2xs font-semibold shrink-0">
-          A
+    <!-- User card -->
+    <div class="border-t border-dash-border px-3 py-3 mt-auto">
+      <div class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn hover:bg-dash-bg transition-colors cursor-default">
+        <div class="w-8 h-8 rounded-full bg-dash-primary/20 flex items-center justify-center text-dash-primary font-semibold text-xs shrink-0">
+          {{ auth.user?.name?.[0]?.toUpperCase() ?? 'A' }}
         </div>
-        <div class="min-w-0">
-          <p class="text-xs font-medium text-dash-text truncate">Admin</p>
-          <p class="text-2xs text-dash-faint truncate">aromashop.ly</p>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-dash-text truncate">{{ auth.user?.name }}</p>
+          <p class="text-2xs text-dash-muted truncate">{{ auth.user?.email }}</p>
         </div>
+        <button @click="signOut" class="text-dash-muted hover:text-dash-danger transition-colors text-sm" :title="$t('topbar.signOut')">⇥</button>
       </div>
     </div>
   </aside>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { LayoutDashboard, ShoppingBag, Package, Tag, Grid3X3, Users, Ticket, SlidersHorizontal } from 'lucide-vue-next'
-
-const { t } = useI18n()
-
-const mainItems = computed(() => [
-  { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
-  { to: '/orders',    label: t('nav.orders'),    icon: ShoppingBag },
-  { to: '/users',     label: t('nav.customers'), icon: Users },
-])
-
-const catalogItems = computed(() => [
-  { to: '/products',   label: t('nav.products'),   icon: Package },
-  { to: '/spec-types', label: t('nav.specTypes'),  icon: SlidersHorizontal },
-  { to: '/brands',     label: t('nav.brands'),     icon: Tag },
-  { to: '/categories', label: t('nav.categories'), icon: Grid3X3 },
-  { to: '/coupons',    label: t('nav.coupons'),    icon: Ticket },
-])
-</script>

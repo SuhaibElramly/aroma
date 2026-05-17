@@ -46,6 +46,11 @@ const ar = {
     brands: 'العلامات التجارية',
     categories: 'التصنيفات',
     coupons: 'القسائم',
+    workspace: 'الرئيسية',
+    adminLabel: 'المشرف',
+    search: 'بحث',
+    settings: 'الإعدادات',
+    admins: 'المشرفون',
   },
   topbar: {
     signOut: 'تسجيل الخروج',

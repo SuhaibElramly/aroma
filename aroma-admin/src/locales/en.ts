@@ -44,6 +44,11 @@ const en = {
     brands: 'Brands',
     categories: 'Categories',
     coupons: 'Coupons',
+    workspace: 'Workspace',
+    adminLabel: 'Admin',
+    search: 'Search',
+    settings: 'Settings',
+    admins: 'Admins',
   },
   topbar: {
     signOut: 'Sign Out',
