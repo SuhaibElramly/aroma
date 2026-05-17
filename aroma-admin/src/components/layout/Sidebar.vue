@@ -82,7 +82,7 @@ function signOut() {
                 ? 'bg-dash-text text-white font-medium'
                 : 'text-dash-text-2 hover:bg-dash-bg'"
             >
-              <span class="text-base leading-none opacity-70">{{ item.icon }}</span>
+              <span class="text-base leading-none opacity-70" aria-hidden="true">{{ item.icon }}</span>
               <span>{{ item.label }}</span>
             </router-link>
           </li>
@@ -92,7 +92,7 @@ function signOut() {
 
     <!-- User card -->
     <div class="border-t border-dash-border px-3 py-3 mt-auto">
-      <div class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn hover:bg-dash-bg transition-colors cursor-default">
+      <div v-if="auth.user" class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn hover:bg-dash-bg transition-colors cursor-default">
         <div class="w-8 h-8 rounded-full bg-dash-primary/20 flex items-center justify-center text-dash-primary font-semibold text-xs shrink-0">
           {{ auth.user?.name?.[0]?.toUpperCase() ?? 'A' }}
         </div>
