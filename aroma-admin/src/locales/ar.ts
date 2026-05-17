@@ -55,6 +55,10 @@ const ar = {
   topbar: {
     signOut: 'تسجيل الخروج',
     adminConsole: 'لوحة الإدارة',
+    newProduct: 'منتج جديد',
+    notifications: 'الإشعارات',
+    markAllRead: 'تعليم الكل مقروءًا',
+    noNotifications: 'لا إشعارات جديدة',
   },
   pageTitles: {
     dashboard: 'لوحة التحكم',
