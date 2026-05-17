@@ -56,6 +56,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminProductVariantController, AdminProductImageController,
     AdminUserDetailController, AdminCouponController, AdminSpecTypeController,
     AdminProductSpecController, AdminProductVariantGenerateController,
+    AdminProductDiscountController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -82,6 +83,11 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::post('/products/{productId}/images',                       [AdminProductImageController::class, 'store']);
     Route::patch('/products/{productId}/images/{imageId}/thumbnail',  [AdminProductImageController::class, 'setThumbnail']);
     Route::delete('/products/{productId}/images/{imageId}',           [AdminProductImageController::class, 'destroy']);
+
+    Route::get('/products/{productId}/discounts',                       [AdminProductDiscountController::class, 'index']);
+    Route::post('/products/{productId}/discounts',                      [AdminProductDiscountController::class, 'store']);
+    Route::delete('/products/{productId}/discounts/{discountId}',       [AdminProductDiscountController::class, 'destroy']);
+    Route::patch('/products/{productId}/discounts/{discountId}/toggle', [AdminProductDiscountController::class, 'toggle']);
 
     Route::get('/brands', [AdminBrandController::class, 'index']);
     Route::post('/brands', [AdminBrandController::class, 'store']);
