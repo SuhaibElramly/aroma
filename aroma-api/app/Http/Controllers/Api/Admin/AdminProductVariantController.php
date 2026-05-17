@@ -31,6 +31,7 @@ class AdminProductVariantController extends Controller
         $data = $request->validate([
             'price'                => 'required|numeric|min:0',
             'original_price'       => 'nullable|numeric|min:0',
+            'cost_price'           => 'nullable|numeric|min:0',
             'quantity'             => 'required|integer|min:0',
             'low_stock_threshold'  => 'sometimes|integer|min:0',
             'specs'                => 'present|array',
@@ -43,6 +44,7 @@ class AdminProductVariantController extends Controller
                 'product_id'          => $productId,
                 'price'               => $data['price'],
                 'original_price'      => $data['original_price'] ?? null,
+                'cost_price'          => $data['cost_price'] ?? null,
                 'quantity'            => $data['quantity'],
                 'low_stock_threshold' => $data['low_stock_threshold'] ?? 5,
             ]);
@@ -69,6 +71,7 @@ class AdminProductVariantController extends Controller
         $data = $request->validate([
             'price'                => 'sometimes|numeric|min:0',
             'original_price'       => 'nullable|numeric|min:0',
+            'cost_price'           => 'nullable|numeric|min:0',
             'quantity'             => 'sometimes|integer|min:0',
             'low_stock_threshold'  => 'sometimes|integer|min:0',
             'specs'                => 'sometimes|array',
@@ -107,6 +110,7 @@ class AdminProductVariantController extends Controller
             ],
             'variants.*.price'               => 'required|numeric|min:0',
             'variants.*.original_price'      => 'nullable|numeric|min:0',
+            'variants.*.cost_price'          => 'nullable|numeric|min:0',
             'variants.*.quantity'            => 'required|integer|min:0',
             'variants.*.low_stock_threshold' => 'sometimes|integer|min:0',
         ]);
@@ -123,6 +127,7 @@ class AdminProductVariantController extends Controller
                 $variantMap[$item['id']]->update([
                     'price'               => $item['price'],
                     'original_price'      => $item['original_price'] ?? null,
+                    'cost_price'          => $item['cost_price'] ?? $variantMap[$item['id']]->cost_price,
                     'quantity'            => $item['quantity'],
                     'low_stock_threshold' => $item['low_stock_threshold'] ?? $variantMap[$item['id']]->low_stock_threshold,
                 ]);
@@ -196,6 +201,7 @@ class AdminProductVariantController extends Controller
             'id'                => $v->id,
             'productId'         => $v->product_id,
             'price'             => $v->price,
+            'costPrice'         => $v->cost_price,
             'originalPrice'     => $v->original_price,
             'quantity'          => $v->quantity,
             'lowStockThreshold' => $v->low_stock_threshold,
