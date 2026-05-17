@@ -619,6 +619,25 @@ const en = {
     page: 'Page',
     perPage: 'Per page',
   },
+  admins: {
+    title: 'Admins',
+    newAdmin: 'New admin',
+    members: 'Members',
+    name: 'Name',
+    phone: 'Phone',
+    role: 'Role',
+    status: 'Status',
+    active: 'Active',
+    suspended: 'Suspended',
+    actions: 'Actions',
+    editRole: 'Edit role',
+    resetPassword: 'Reset password',
+    suspend: 'Suspend',
+    activate: 'Activate',
+    createAdmin: 'Create admin',
+    tempPassword: 'Temporary password',
+    generate: 'Generate',
+  },
 } as const
 
 export type Messages = typeof en

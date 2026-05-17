@@ -31,6 +31,7 @@ export const router = createRouter({
         { path: 'users/:id',  name: 'user-detail',       component: () => import('../views/UserDetailView.vue'), props: true },
         { path: 'coupons', name: 'coupons', component: () => import('../views/CouponsView.vue') },
         { path: 'spec-types', name: 'spec-types', component: () => import('../views/SpecTypesView.vue') },
+        { path: 'admins', name: 'admins', component: () => import('../views/AdminsView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

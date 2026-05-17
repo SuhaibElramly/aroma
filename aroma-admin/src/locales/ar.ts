@@ -621,6 +621,25 @@ const ar = {
     page: 'صفحة',
     perPage: 'في الصفحة',
   },
+  admins: {
+    title: 'المشرفون',
+    newAdmin: 'مشرف جديد',
+    members: 'الأعضاء',
+    name: 'الاسم',
+    phone: 'الهاتف',
+    role: 'الدور',
+    status: 'الحالة',
+    active: 'نشط',
+    suspended: 'موقوف',
+    actions: 'إجراءات',
+    editRole: 'تعديل الدور',
+    resetPassword: 'إعادة تعيين كلمة المرور',
+    suspend: 'إيقاف',
+    activate: 'تفعيل',
+    createAdmin: 'إنشاء مشرف',
+    tempPassword: 'كلمة مرور مؤقتة',
+    generate: 'توليد',
+  },
 } satisfies MessageSchema
 
 export default ar
