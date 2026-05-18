@@ -3,7 +3,7 @@ import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
-  SpecType, ProductSpec,
+  SpecType, ProductSpec, AdminUserOrder,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
