@@ -46,6 +46,18 @@ export interface DashboardStats {
   weeklyLabels: string[]
 
   recentOrders: RecentOrderRow[]
+
+  // Profit stats (from delivered orders)
+  grossProfit:       number
+  avgMargin:         number
+  cogs:              number
+  categoryBreakdown: Array<{
+    category: string
+    revenue:  number
+    cogs:     number
+    profit:   number
+    margin:   number
+  }>
 }
 
 export interface RecentOrderRow {
@@ -120,6 +132,7 @@ export interface ProductVariant {
   id:                 number
   productId:          number
   price:              string
+  costPrice:          string | null
   originalPrice:      string | null
   quantity:           number
   lowStockThreshold:  number
@@ -242,4 +255,18 @@ export interface CouponOrder {
   total: number
   discountAmount: number | null
   status: string
+}
+
+export interface ProductDiscount {
+  id: number
+  product_id: number
+  name: string
+  type: 'percentage' | 'fixed'
+  value: string
+  scope: 'all' | 'specific'
+  variant_ids: number[] | null
+  starts_at: string | null
+  ends_at: string | null
+  is_active: boolean
+  created_at: string
 }

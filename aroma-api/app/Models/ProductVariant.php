@@ -11,12 +11,13 @@ class ProductVariant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'price', 'original_price',
+        'product_id', 'price', 'cost_price', 'original_price',
         'quantity', 'low_stock_threshold', 'stock', 'is_default',
     ];
 
     protected $casts = [
         'price'               => 'decimal:2',
+        'cost_price'          => 'decimal:2',
         'original_price'      => 'decimal:2',
         'quantity'            => 'integer',
         'low_stock_threshold' => 'integer',

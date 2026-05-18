@@ -3,7 +3,7 @@ import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
-  SpecType, ProductSpec,
+  SpecType, ProductSpec, AdminUserOrder,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -71,6 +71,7 @@ export const apiBulkUpdateVariants = (
   variants: Array<{
     id:                  number
     price:               number
+    cost_price:          number | null
     original_price:      number | null
     quantity:            number
     low_stock_threshold: number

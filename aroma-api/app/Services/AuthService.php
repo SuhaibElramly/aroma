@@ -19,7 +19,17 @@ class AuthService
 
     public function login(string $email, string $password): bool
     {
-        return Auth::attempt(['email' => $email, 'password' => $password]);
+        // Try email first, then phone (admin users log in with phone number)
+        $user = User::where('email', $email)
+            ->orWhere('phone', $email)
+            ->first();
+
+        if (!$user || !Hash::check($password, $user->password)) {
+            return false;
+        }
+
+        Auth::login($user);
+        return true;
     }
 
     public function changePassword(User $user, string $currentPassword, string $newPassword): bool

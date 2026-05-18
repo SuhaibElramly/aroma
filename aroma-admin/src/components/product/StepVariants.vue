@@ -145,7 +145,9 @@
             <thead>
               <tr class="border-b border-dash-border">
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Cost (LYD)</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Margin</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
@@ -157,11 +159,32 @@
               <template v-for="(row, ri) in priceRows" :key="row.id">
                 <tr class="border-b border-dash-border/50" :class="expandedVariantImages === row.id ? '' : 'last:border-0'">
                   <td class="py-2 px-2 font-semibold text-dash-text whitespace-nowrap">{{ variantLabel(row.id) }}</td>
+                  <!-- Cost -->
+                  <td class="px-2 py-2">
+                    <input
+                      v-model="row.costPrice"
+                      type="number" min="0" step="0.01"
+                      class="w-20 rounded-btn border border-dash-border px-2 py-1.5 text-xs text-dash-text bg-dash-bg focus:outline-none focus:border-dash-primary"
+                      placeholder="0.00"
+                    />
+                  </td>
                   <td class="py-1.5 px-1">
                     <input v-model="row.price" type="number" step="0.01" min="0"
                       :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
                         priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
                     <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">{{ t('common.fieldRequired') }}</p>
+                  </td>
+                  <!-- Margin -->
+                  <td class="px-2 py-2 min-w-[80px]">
+                    <template v-if="Number(row.price) > 0 && row.costPrice !== ''">
+                      <span
+                        class="text-xs font-medium"
+                        :class="(Number(row.price) - Number(row.costPrice)) >= 0 ? 'text-dash-success' : 'text-dash-danger'"
+                      >
+                        {{ Math.round(((Number(row.price) - Number(row.costPrice)) / Number(row.price)) * 100) }}%
+                      </span>
+                    </template>
+                    <span v-else class="text-dash-faint text-xs">—</span>
                   </td>
                   <td class="py-1.5 px-1">
                     <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
@@ -191,7 +214,7 @@
                 </tr>
                 <!-- Expanded variant image panel -->
                 <tr v-if="expandedVariantImages === row.id" :key="`img-${row.id}`" class="border-b border-dash-border/50">
-                  <td colspan="7" class="px-2 pb-1">
+                  <td colspan="9" class="px-2 pb-1">
                     <VariantImagePanel
                       :productId="productId"
                       :variantId="row.id"
@@ -311,7 +334,9 @@
             <thead>
               <tr class="border-b border-dash-border">
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.variantCol') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Cost (LYD)</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.priceLyd') }}</th>
+                <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">Margin</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.originalPrice') }}</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.qty') }}</th>
                 <th class="text-start py-2 px-2 text-2xs font-semibold text-dash-muted uppercase tracking-wide">{{ t('productVariants.lowAt') }}</th>
@@ -323,11 +348,32 @@
               <template v-for="(row, ri) in priceRows" :key="row.id">
                 <tr class="border-b border-dash-border/50">
                   <td class="py-2 px-2 font-semibold text-dash-text whitespace-nowrap">{{ variantLabel(row.id) }}</td>
+                  <!-- Cost -->
+                  <td class="px-2 py-2">
+                    <input
+                      v-model="row.costPrice"
+                      type="number" min="0" step="0.01"
+                      class="w-20 rounded-btn border border-dash-border px-2 py-1.5 text-xs text-dash-text bg-dash-bg focus:outline-none focus:border-dash-primary"
+                      placeholder="0.00"
+                    />
+                  </td>
                   <td class="py-1.5 px-1">
                     <input v-model="row.price" type="number" step="0.01" min="0"
                       :class="['w-24 px-2 py-1 rounded-btn border text-xs bg-dash-bg text-dash-text focus:outline-none focus:border-dash-primary',
                         priceRowErrors[ri]?.price ? 'border-dash-danger' : 'border-dash-border']" />
                     <p v-if="priceRowErrors[ri]?.price" class="text-2xs text-dash-danger mt-0.5">{{ t('common.fieldRequired') }}</p>
+                  </td>
+                  <!-- Margin -->
+                  <td class="px-2 py-2 min-w-[80px]">
+                    <template v-if="Number(row.price) > 0 && row.costPrice !== ''">
+                      <span
+                        class="text-xs font-medium"
+                        :class="(Number(row.price) - Number(row.costPrice)) >= 0 ? 'text-dash-success' : 'text-dash-danger'"
+                      >
+                        {{ Math.round(((Number(row.price) - Number(row.costPrice)) / Number(row.price)) * 100) }}%
+                      </span>
+                    </template>
+                    <span v-else class="text-dash-faint text-xs">—</span>
                   </td>
                   <td class="py-1.5 px-1">
                     <input v-model="row.originalPrice" type="number" step="0.01" min="0" placeholder="—"
@@ -356,7 +402,7 @@
                   </td>
                 </tr>
                 <tr v-if="expandedVariantImages === row.id" :key="`img-${row.id}`" class="border-b border-dash-border/50">
-                  <td colspan="7" class="px-2 pb-1">
+                  <td colspan="9" class="px-2 pb-1">
                     <VariantImagePanel :productId="productId" :variantId="row.id"
                       @update:imageCount="(n) => variantImageCounts[row.id] = n" />
                   </td>
@@ -494,7 +540,7 @@ async function doGenerate(force: boolean) {
 }
 
 // ── Price rows ────────────────────────────────────────────────────────────────
-interface PriceRow { id: number; price: string; originalPrice: string; quantity: string; lowStockThreshold: string }
+interface PriceRow { id: number; price: string; costPrice: string; originalPrice: string; quantity: string; lowStockThreshold: string }
 const priceRows      = ref<PriceRow[]>([])
 const priceRowErrors = ref<Record<number, { price?: string }>>({})
 const savingPrices   = ref(false)
@@ -506,6 +552,7 @@ function initPriceRows(vs: ProductVariant[]) {
   priceRows.value = vs.map(v => ({
     id:               v.id,
     price:            v.price,
+    costPrice:        v.costPrice != null ? String(v.costPrice) : '',
     originalPrice:    v.originalPrice ?? '',
     quantity:         String(v.quantity),
     lowStockThreshold: String(v.lowStockThreshold),
@@ -542,6 +589,7 @@ async function savePrices() {
     await apiBulkUpdateVariants(props.productId, priceRows.value.map(r => ({
       id:                  r.id,
       price:               Number(r.price),
+      cost_price:          r.costPrice !== '' ? Number(r.costPrice) : null,
       original_price:      r.originalPrice ? Number(r.originalPrice) : null,
       quantity:            Number(r.quantity) || 0,
       low_stock_threshold: Number(r.lowStockThreshold) || 0,

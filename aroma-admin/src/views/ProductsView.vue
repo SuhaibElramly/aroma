@@ -36,7 +36,9 @@
             <ImageOff v-else :size="14" class="text-dash-faint" />
           </div>
           <div>
-            <p class="font-medium text-dash-text text-xs">{{ (row as AdminProduct).name }}</p>
+            <RouterLink :to="`/products/${(row as AdminProduct).id}`" class="font-medium text-dash-text hover:text-dash-primary transition-colors text-xs">
+              {{ (row as AdminProduct).name }}
+            </RouterLink>
             <p v-if="(row as AdminProduct).nameEn" class="text-2xs text-dash-faint">{{ (row as AdminProduct).nameEn }}</p>
           </div>
         </div>
