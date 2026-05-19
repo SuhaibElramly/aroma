@@ -1,53 +1,41 @@
 <template>
-  <div
-    class="bg-dash-surface rounded-card p-5 shadow-card transition-card hover-lift flex flex-col gap-3"
-    :class="featured ? 'col-span-2 sm:col-span-1' : ''"
-  >
-    <!-- Header row -->
-    <div class="flex items-start justify-between gap-2">
-      <p class="text-xs font-medium text-dash-muted leading-snug">{{ label }}</p>
-      <div
-        v-if="iconBg"
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-        :style="{ backgroundColor: iconBg + '20' }"
-      >
-        <component :is="icon" :size="15" :style="{ color: iconBg }" />
-      </div>
+  <div class="bg-dash-paper border border-dash-border rounded-card shadow-card p-5 flex flex-col gap-3">
+    <!-- Label -->
+    <p class="text-[12px] font-medium text-dash-muted leading-snug">{{ label }}</p>
+
+    <!-- Value + suffix -->
+    <div class="flex items-baseline gap-1.5 whitespace-nowrap">
+      <span class="font-display text-[30px] leading-none text-dash-text tabular-nums">{{ value }}</span>
+      <span v-if="suffix" class="text-[12.5px] font-medium text-dash-muted">{{ suffix }}</span>
     </div>
 
-    <!-- Value -->
-    <div class="flex items-end justify-between gap-3">
-      <p class="text-2xl font-bold text-dash-text tabular-nums leading-none">{{ value }}</p>
-
-      <!-- Change chip -->
-      <div
-        v-if="change !== undefined"
+    <!-- Bottom row: change chip + hint -->
+    <div class="flex items-center justify-between gap-3">
+      <span
+        v-if="change !== undefined && change !== null"
         :class="[
-          'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold shrink-0 mb-0.5',
+          'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold shrink-0',
           change >= 0
-            ? 'bg-dash-success-lt text-dash-success'
+            ? 'bg-dash-success-lt text-dash-success-dk'
             : 'bg-dash-danger-lt text-dash-danger',
         ]"
       >
         <span>{{ change >= 0 ? '↑' : '↓' }}</span>
-        <span>{{ Math.abs(change) }}%</span>
-      </div>
-    </div>
+        <span>{{ change >= 0 ? '+' : '' }}{{ change }}%</span>
+      </span>
+      <span v-else class="inline-flex shrink-0" />
 
-    <!-- Sub label -->
-    <p v-if="sub" class="text-2xs text-dash-faint -mt-1">{{ sub }}</p>
+      <span v-if="hint" class="text-[11.5px] text-dash-faint truncate text-right rtl:text-left">{{ hint }}</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
 withDefaults(defineProps<{
-  label:     string
-  value:     string | number
-  change?:   number
-  sub?:      string
-  icon?:     Component
-  iconBg?:   string
-  featured?: boolean
-}>(), { featured: false })
+  label:   string
+  value:   string | number
+  suffix?: string
+  change?: number | null
+  hint?:   string
+}>(), {})
 </script>
