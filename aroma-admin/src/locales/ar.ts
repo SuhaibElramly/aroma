@@ -125,6 +125,8 @@ const ar = {
     avgMarginLabel: 'متوسط الهامش',
     noDeliveredOrders: 'لا توجد طلبات مسلّمة بعد.',
     profitLabel: 'ربح',
+    profitBreakdown: 'توزيع الأرباح',
+    byCategory: 'حسب التصنيف',
     columns: {
       order: 'الطلب',
       customer: 'العميل',
@@ -670,6 +672,16 @@ const ar = {
     joined: 'تاريخ الانضمام',
     noAdmins: 'لا يوجد مشرفون.',
     ownerLabel: 'المالك',
+    kpiAllAdmins: 'جميع المشرفين',
+    kpiOnTeam: 'في الفريق',
+    kpiActive: 'نشطون',
+    kpiSignedInWeek: 'سجّلوا الدخول هذا الأسبوع',
+    kpiRoles: 'الأدوار المحددة',
+    kpiWithPermissions: 'بصلاحيات مخصصة',
+    kpiSuspended: 'موقوفون',
+    kpiNoAccess: 'بدون صلاحية الوصول',
+    tabTeam: 'أعضاء الفريق',
+    tabRoles: 'الأدوار والصلاحيات',
   },
 } satisfies MessageSchema
 

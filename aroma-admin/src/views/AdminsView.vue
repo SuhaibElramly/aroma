@@ -199,24 +199,24 @@ onMounted(load)
     <!-- KPI strip -->
     <div class="grid grid-cols-4 gap-4">
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">All admins</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ $t('admins.kpiAllAdmins') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ stats.total }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">on the team</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ $t('admins.kpiOnTeam') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Active</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ $t('admins.kpiActive') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ stats.active }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">signed in this week</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ $t('admins.kpiSignedInWeek') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Defined roles</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ $t('admins.kpiRoles') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ stats.roles }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">with custom permissions</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ $t('admins.kpiWithPermissions') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Suspended</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ $t('admins.kpiSuspended') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ stats.suspended }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">no access right now</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ $t('admins.kpiNoAccess') }}</p>
       </div>
     </div>
 
@@ -225,7 +225,7 @@ onMounted(load)
       <!-- Tab pills -->
       <div class="flex items-center gap-1 p-1 rounded-lg border border-dash-border-lt bg-dash-paper-2">
         <button
-          v-for="[key, label] in [['members', 'Team members'], ['roles', 'Roles & permissions']]"
+          v-for="[key, label] in [['members', $t('admins.tabTeam')], ['roles', $t('admins.tabRoles')]]"
           :key="key"
           class="px-3 py-1.5 rounded-md text-[12px] font-medium whitespace-nowrap transition-all"
           :style="{

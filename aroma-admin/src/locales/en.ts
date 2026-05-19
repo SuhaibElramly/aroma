@@ -123,6 +123,8 @@ const en = {
     avgMarginLabel: 'Avg margin',
     noDeliveredOrders: 'No delivered orders yet.',
     profitLabel: 'profit',
+    profitBreakdown: 'Profit breakdown',
+    byCategory: 'By category',
     columns: {
       order: 'Order',
       customer: 'Customer',
@@ -668,6 +670,16 @@ const en = {
     joined: 'Joined',
     noAdmins: 'No admins found.',
     ownerLabel: 'Owner',
+    kpiAllAdmins: 'All admins',
+    kpiOnTeam: 'on the team',
+    kpiActive: 'Active',
+    kpiSignedInWeek: 'signed in this week',
+    kpiRoles: 'Defined roles',
+    kpiWithPermissions: 'with custom permissions',
+    kpiSuspended: 'Suspended',
+    kpiNoAccess: 'no access right now',
+    tabTeam: 'Team members',
+    tabRoles: 'Roles & permissions',
   },
 } as const
 

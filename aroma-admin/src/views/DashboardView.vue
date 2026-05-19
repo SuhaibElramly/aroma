@@ -59,7 +59,7 @@
       <div class="col-span-2 bg-dash-paper border border-dash-border rounded-card shadow-card p-6">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Profit breakdown</p>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">{{ t('dashboard.profitBreakdown') }}</p>
             <div class="mt-2 flex items-baseline gap-3 flex-wrap">
               <span class="font-display text-[28px] leading-none tabular-nums text-dash-text">
                 {{ stats ? (stats.grossProfit / 1000).toFixed(1) + 'k' : '—' }}
@@ -171,8 +171,8 @@
       <div class="col-span-2 bg-dash-paper border border-dash-border rounded-card shadow-card overflow-hidden">
         <div class="px-6 py-5 flex items-center justify-between border-b border-dash-border-lt">
           <div>
-            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Recent orders</p>
-            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">Latest activity</h3>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">{{ t('dashboard.recentOrders') }}</p>
+            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">{{ t('dashboard.latestActivity') }}</h3>
           </div>
           <RouterLink
             to="/orders"
@@ -244,8 +244,8 @@
       <div class="bg-dash-paper border border-dash-border rounded-card shadow-card p-6">
         <div class="flex items-start justify-between">
           <div>
-            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Top products</p>
-            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">By category</h3>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">{{ t('dashboard.topProducts') }}</p>
+            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">{{ t('dashboard.byCategory') }}</h3>
           </div>
           <span class="text-[11px] text-dash-muted shrink-0">last 30 days</span>
         </div>
