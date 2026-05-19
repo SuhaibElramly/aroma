@@ -3,6 +3,19 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../stores/auth'
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Users,
+  Package,
+  SlidersHorizontal,
+  Tag,
+  Grid3X3,
+  Ticket,
+  ShieldCheck,
+  Search,
+  LogOut,
+} from 'lucide-vue-next'
 
 const { t, locale } = useI18n()
 const route  = useRoute()
@@ -15,28 +28,38 @@ const groups = computed(() => [
   {
     label: t('nav.workspace'),
     items: [
-      { key: 'dashboard',  label: t('nav.dashboard'),  icon: '⊞', path: 'dashboard' },
-      { key: 'orders',     label: t('nav.orders'),     icon: '◫', path: 'orders' },
-      { key: 'users',      label: t('nav.customers'),  icon: '◯', path: 'users' },
+      { key: 'dashboard',  label: t('nav.dashboard'),  icon: LayoutDashboard, path: 'dashboard',  badge: null },
+      { key: 'orders',     label: t('nav.orders'),     icon: ShoppingBag,     path: 'orders',     badge: '12' },
+      { key: 'users',      label: t('nav.customers'),  icon: Users,           path: 'users',      badge: null },
     ],
   },
   {
     label: t('nav.catalog'),
     items: [
-      { key: 'products',   label: t('nav.products'),   icon: '⬡', path: 'products' },
-      { key: 'spec-types', label: t('nav.specTypes'),  icon: '≡',  path: 'spec-types' },
-      { key: 'brands',     label: t('nav.brands'),     icon: '◈', path: 'brands' },
-      { key: 'categories', label: t('nav.categories'), icon: '⊟', path: 'categories' },
-      { key: 'coupons',    label: t('nav.coupons'),    icon: '◇', path: 'coupons' },
+      { key: 'products',   label: t('nav.products'),   icon: Package,           path: 'products',   badge: null },
+      { key: 'spec-types', label: t('nav.specTypes'),  icon: SlidersHorizontal, path: 'spec-types', badge: null },
+      { key: 'brands',     label: t('nav.brands'),     icon: Tag,               path: 'brands',     badge: null },
+      { key: 'categories', label: t('nav.categories'), icon: Grid3X3,           path: 'categories', badge: null },
+      { key: 'coupons',    label: t('nav.coupons'),    icon: Ticket,            path: 'coupons',    badge: null },
     ],
   },
   {
     label: t('nav.settings'),
     items: [
-      { key: 'admins', label: t('nav.admins'), icon: '⬤', path: 'admins' },
+      { key: 'admins', label: t('nav.admins'), icon: ShieldCheck, path: 'admins', badge: null },
     ],
   },
 ])
+
+const userInitials = computed(() => {
+  const name = auth.user?.name ?? ''
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((w: string) => w[0]?.toUpperCase() ?? '')
+    .join('')
+    || 'A'
+})
 
 function signOut() {
   auth.logout()
@@ -46,61 +69,88 @@ function signOut() {
 
 <template>
   <aside
-    class="flex flex-col w-60 shrink-0 h-screen bg-dash-paper border-e border-dash-border"
+    class="flex flex-col w-[228px] shrink-0 h-screen bg-dash-paper border-e border-dash-border"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <!-- Logo -->
-    <div class="flex items-center gap-3 px-5 pt-6 pb-4">
-      <div class="w-9 h-9 rounded-lg bg-dash-bg flex items-center justify-center overflow-hidden shrink-0">
-        <img src="/aroma-logo.png" alt="Aroma" class="w-8 h-8 object-contain" style="mix-blend-mode:multiply" />
-      </div>
-      <div class="min-w-0">
-        <p class="font-display font-semibold text-dash-text text-sm leading-tight tracking-tight">Aroma</p>
-        <p class="text-2xs text-dash-muted">{{ $t('nav.adminLabel') }}</p>
+    <div class="flex items-center gap-3 px-5 pt-5 pb-4">
+      <img
+        src="/aroma-logo.png"
+        alt="Aroma"
+        class="h-12 w-auto select-none shrink-0"
+        style="mix-blend-mode: multiply"
+      />
+      <div class="leading-tight min-w-0">
+        <p class="font-display text-[16px] -mb-0.5 text-dash-text">Aroma</p>
+        <p class="text-[10px] tracking-[.18em] uppercase text-dash-faint">{{ $t('nav.adminLabel') }}</p>
       </div>
     </div>
 
     <!-- Search -->
-    <div class="px-3 mb-3">
-      <div class="flex items-center gap-2 px-3 py-2 rounded-btn bg-dash-bg border border-dash-border text-dash-muted text-xs cursor-pointer hover:border-dash-primary/40 transition-colors">
-        <span class="opacity-60">⌕</span>
-        <span class="flex-1">{{ $t('nav.search') }}</span>
-        <kbd class="opacity-50 font-sans">⌘K</kbd>
+    <div class="px-3 mb-1">
+      <div class="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-dash-border-lt bg-dash-paper-2 cursor-pointer">
+        <Search :size="14" class="text-dash-faint shrink-0" />
+        <span class="flex-1 text-[12.5px] text-dash-muted">{{ $t('nav.search') }}…</span>
+        <kbd class="text-[10px] px-1.5 py-0.5 rounded border border-dash-border-lt bg-white text-dash-faint">⌘K</kbd>
       </div>
     </div>
 
     <!-- Nav groups -->
-    <nav class="flex-1 overflow-y-auto px-3 space-y-5 py-1">
-      <div v-for="group in groups" :key="group.label">
-        <p class="text-2xs font-medium text-dash-faint uppercase tracking-widest px-2 mb-1">{{ group.label }}</p>
-        <ul class="space-y-0.5">
-          <li v-for="item in group.items" :key="item.key">
-            <router-link
-              :to="'/' + item.path"
-              class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn text-sm transition-colors"
+    <nav class="flex-1 overflow-y-auto px-3 pt-2 space-y-4">
+      <div v-for="group in groups" :key="group.label" class="mb-4">
+        <p class="px-2.5 mb-1.5 text-[10px] font-semibold tracking-[.18em] uppercase text-dash-faint">
+          {{ group.label }}
+        </p>
+        <div class="space-y-0.5">
+          <router-link
+            v-for="item in group.items"
+            :key="item.key"
+            :to="'/' + item.path"
+            class="w-full flex items-center gap-3 rounded-lg ps-3 pe-2 py-2 text-[13px] font-medium rtl:text-right transition-colors"
+            :class="isActive(item.path)
+              ? 'bg-dash-text text-white'
+              : 'text-dash-text-2 hover:bg-dash-bg'"
+          >
+            <component
+              :is="item.icon"
+              :size="18"
+              :class="isActive(item.path) ? 'text-dash-primary-lt' : 'text-dash-muted'"
+            />
+            <span class="flex-1">{{ item.label }}</span>
+            <span
+              v-if="item.badge"
+              class="text-[10px] font-semibold rounded-full px-1.5 py-0.5"
               :class="isActive(item.path)
-                ? 'bg-dash-text text-white font-medium'
-                : 'text-dash-text-2 hover:bg-dash-bg'"
+                ? 'bg-white/[.12] text-white'
+                : 'bg-dash-fig-lt text-dash-fig'"
             >
-              <span class="text-base leading-none opacity-70" aria-hidden="true">{{ item.icon }}</span>
-              <span>{{ item.label }}</span>
-            </router-link>
-          </li>
-        </ul>
+              {{ item.badge }}
+            </span>
+          </router-link>
+        </div>
       </div>
     </nav>
 
     <!-- User card -->
     <div class="border-t border-dash-border px-3 py-3 mt-auto">
-      <div v-if="auth.user" class="flex items-center gap-2.5 px-2.5 py-2 rounded-btn hover:bg-dash-bg transition-colors cursor-default">
-        <div class="w-8 h-8 rounded-full bg-dash-primary/20 flex items-center justify-center text-dash-primary font-semibold text-xs shrink-0">
-          {{ auth.user?.name?.[0]?.toUpperCase() ?? 'A' }}
+      <div
+        v-if="auth.user"
+        class="flex items-center gap-2.5 p-1.5 rounded-lg bg-dash-paper-2 cursor-default"
+      >
+        <div class="h-8 w-8 rounded-full grid place-items-center text-[12px] font-semibold text-white bg-dash-text shrink-0">
+          {{ userInitials }}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-xs font-medium text-dash-text truncate">{{ auth.user?.name }}</p>
-          <p class="text-2xs text-dash-muted truncate">{{ auth.user?.email }}</p>
+        <div class="flex-1 min-w-0 leading-tight">
+          <p class="text-[12.5px] font-semibold text-dash-text truncate">{{ auth.user?.name }}</p>
+          <p class="text-[10.5px] text-dash-muted truncate">{{ auth.user?.email }}</p>
         </div>
-        <button @click="signOut" class="text-dash-muted hover:text-dash-danger transition-colors text-sm" :title="$t('topbar.signOut')">⇥</button>
+        <button
+          @click="signOut"
+          class="text-dash-faint hover:text-dash-danger transition-colors shrink-0 p-1"
+          :title="$t('topbar.signOut')"
+        >
+          <LogOut :size="15" />
+        </button>
       </div>
     </div>
   </aside>
