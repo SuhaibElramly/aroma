@@ -418,7 +418,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { X, ChevronUp, ChevronDown, Zap, Upload, AlertCircle } from 'lucide-vue-next'
@@ -727,18 +727,27 @@ function resetForm() {
 }
 
 // Body scroll lock + Esc to close
+const escHandler = ref<((e: KeyboardEvent) => void) | null>(null)
+
 watch(isOpen, (val) => {
   if (val) {
     document.body.style.overflow = 'hidden'
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
-    document.addEventListener('keydown', handler)
-    ;(window as any).__npDrawerEsc = handler
+    escHandler.value = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    document.addEventListener('keydown', escHandler.value)
   } else {
     document.body.style.overflow = ''
-    if ((window as any).__npDrawerEsc) {
-      document.removeEventListener('keydown', (window as any).__npDrawerEsc)
-      delete (window as any).__npDrawerEsc
+    if (escHandler.value) {
+      document.removeEventListener('keydown', escHandler.value)
+      escHandler.value = null
     }
+  }
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+  if (escHandler.value) {
+    document.removeEventListener('keydown', escHandler.value)
+    escHandler.value = null
   }
 })
 
