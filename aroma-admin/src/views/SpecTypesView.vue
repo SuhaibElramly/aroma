@@ -57,7 +57,7 @@
           <button
             v-for="(spec, i) in filteredSpecTypes"
             :key="spec.id"
-            class="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-dash-paper-2"
+            class="w-full flex items-center gap-3 px-4 py-3 text-start transition-colors hover:bg-dash-paper-2"
             :class="{ 'bg-dash-primary-lt': selectedSpec?.id === spec.id }"
             @click="selectSpec(spec)"
           >

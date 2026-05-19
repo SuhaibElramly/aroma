@@ -13,31 +13,53 @@ import {
   Ticket,
 } from 'lucide-vue-next'
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const { applyLocale } = useLocale()
 const route  = useRoute()
 const router = useRouter()
 
-// Map route names → eyebrow + heading
-const PAGE_META: Record<string, { eyebrow: string; heading: string }> = {
-  dashboard:        { eyebrow: 'WORKSPACE',   heading: 'Dashboard' },
-  orders:           { eyebrow: 'WORKSPACE',   heading: 'Orders' },
-  'order-detail':   { eyebrow: 'ORDERS',      heading: 'Order Detail' },
-  users:            { eyebrow: 'WORKSPACE',   heading: 'Customers' },
-  'user-detail':    { eyebrow: 'CUSTOMERS',   heading: 'Customer Detail' },
-  products:         { eyebrow: 'CATALOG',     heading: 'Products' },
-  'product-create': { eyebrow: 'PRODUCTS',    heading: 'New Product' },
-  'product-edit':   { eyebrow: 'PRODUCTS',    heading: 'Edit Product' },
-  'product-detail': { eyebrow: 'PRODUCTS',    heading: 'Product Detail' },
-  brands:           { eyebrow: 'CATALOG',     heading: 'Brands' },
-  'brand-detail':   { eyebrow: 'BRANDS',      heading: 'Brand Detail' },
-  categories:       { eyebrow: 'CATALOG',     heading: 'Categories' },
-  coupons:          { eyebrow: 'CATALOG',     heading: 'Coupons' },
-  'spec-types':     { eyebrow: 'CATALOG',     heading: 'Spec Types' },
-  admins:           { eyebrow: 'SETTINGS',    heading: 'Admins' },
-}
-
-const meta = computed(() => PAGE_META[route.name as string] ?? { eyebrow: '', heading: '' })
+// Map route names → eyebrow + heading (reactive i18n)
+const meta = computed(() => {
+  const routeName = route.name as string
+  const eyebrowMap: Record<string, string> = {
+    dashboard:        t('nav.workspace'),
+    orders:           t('nav.workspace'),
+    'order-detail':   t('nav.orders'),
+    users:            t('nav.workspace'),
+    'user-detail':    t('nav.customers'),
+    products:         t('nav.catalog'),
+    'product-create': t('nav.products'),
+    'product-edit':   t('nav.products'),
+    'product-detail': t('nav.products'),
+    brands:           t('nav.catalog'),
+    'brand-detail':   t('nav.brands'),
+    categories:       t('nav.catalog'),
+    coupons:          t('nav.catalog'),
+    'spec-types':     t('nav.catalog'),
+    admins:           t('nav.settings'),
+  }
+  const headingMap: Record<string, string> = {
+    dashboard:        t('pageTitles.dashboard'),
+    orders:           t('pageTitles.orders'),
+    'order-detail':   t('pageTitles.orderDetail'),
+    users:            t('pageTitles.users'),
+    'user-detail':    t('pageTitles.userDetail'),
+    products:         t('pageTitles.products'),
+    'product-create': t('productCreate.newProduct'),
+    'product-edit':   t('products.editProduct'),
+    'product-detail': t('pageTitles.products'),
+    brands:           t('pageTitles.brands'),
+    'brand-detail':   t('pageTitles.brandDetail'),
+    categories:       t('pageTitles.categories'),
+    coupons:          t('pageTitles.coupons'),
+    'spec-types':     t('pageTitles.specTypes'),
+    admins:           t('admins.title'),
+  }
+  return {
+    eyebrow: eyebrowMap[routeName] ?? '',
+    heading: headingMap[routeName] ?? '',
+  }
+})
 
 // Date
 const today = computed(() =>
