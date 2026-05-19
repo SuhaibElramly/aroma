@@ -277,16 +277,16 @@
             </div>
             <div class="min-w-0">
               <p class="font-display text-[15px] text-dash-text">{{ order.user }}</p>
-              <p class="text-[10.5px] text-dash-faint">Customer since {{ customerSince }}</p>
+              <p class="text-[10.5px] text-dash-faint">{{ t('orderDetail.customerSince') }} {{ customerSince }}</p>
             </div>
           </div>
           <div class="mt-3 pt-3 border-t border-dash-border-lt space-y-1.5 text-[11.5px]">
             <p class="flex items-center gap-2 text-dash-text-2">
-              <span class="text-dash-faint shrink-0">Email</span>
+              <span class="text-dash-faint shrink-0">{{ t('orderDetail.emailLabel') }}</span>
               <span class="tabular-nums truncate">{{ order.userEmail }}</span>
             </p>
             <p class="flex items-center gap-2 text-dash-text-2">
-              <span class="text-dash-faint shrink-0">Lifetime</span>
+              <span class="text-dash-faint shrink-0">{{ t('orderDetail.lifetimeLabel') }}</span>
               <span class="text-dash-text">{{ order.user }}</span>
             </p>
           </div>
@@ -304,14 +304,14 @@
           </div>
           <div class="mt-3 text-[12.5px] leading-relaxed text-dash-text-2">
             <template v-if="order.isPickup">
-              <p class="font-semibold text-dash-text">Aroma flagship store</p>
-              <p class="text-dash-muted">Algeria Square, Benghazi</p>
-              <p class="text-[11px] mt-1 text-dash-faint">Ready for collection · ID required</p>
+              <p class="font-semibold text-dash-text">{{ t('orderDetail.storeNameLabel') }}</p>
+              <p class="text-dash-muted">{{ t('orderDetail.storeAddressLabel') }}</p>
+              <p class="text-[11px] mt-1 text-dash-faint">{{ t('orderDetail.collectionNote') }}</p>
             </template>
             <template v-else>
               <p class="font-semibold text-dash-text">{{ order.user }}</p>
               <p class="text-dash-muted">{{ t('orderDetail.homeDelivery') }}</p>
-              <p class="text-[11px] mt-2 tabular-nums text-dash-faint">Courier: Aroma Express · ETA 1–2 days</p>
+              <p class="text-[11px] mt-2 tabular-nums text-dash-faint">{{ t('orderDetail.courierNote') }}</p>
             </template>
           </div>
         </div>
@@ -326,9 +326,9 @@
             >VISA</div>
             <div>
               <p class="text-[12.5px] font-semibold tabular-nums text-dash-text">•••• 4218</p>
-              <p class="text-[10.5px] text-dash-muted">Paid · {{ order.date }}</p>
+              <p class="text-[10.5px] text-dash-muted">{{ t('orderDetail.paidLabel') }} · {{ order.date }}</p>
             </div>
-            <ABadge status="paid" class="ml-auto" />
+            <ABadge status="paid" class="ms-auto" />
           </div>
           <div class="mt-3 pt-3 border-t border-dash-border-lt flex items-center justify-between text-[12.5px]">
             <span class="text-dash-muted">{{ t('orderDetail.amountCharged') }}</span>
@@ -362,7 +362,7 @@ import ASelect   from '../components/ui/ASelect.vue'
 import ATextarea from '../components/ui/ATextarea.vue'
 import AButton   from '../components/ui/AButton.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const props = defineProps<{ id: string }>()
 
 const order          = ref<AdminOrder | null>(null)
@@ -410,10 +410,11 @@ const initials = computed(() => {
 })
 
 const customerSince = computed(() => {
-  // Estimate from order date or fallback
   if (!order.value?.date) return '—'
   const d = new Date(order.value.date)
-  return isNaN(d.getTime()) ? order.value.date : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+  return isNaN(d.getTime())
+    ? order.value.date
+    : d.toLocaleDateString(locale.value === 'ar' ? 'ar-LY' : 'en-GB', { month: 'short', year: 'numeric' })
 })
 
 // Build timeline steps from the order's timeline or synthesise from status
@@ -430,9 +431,17 @@ const timelineSteps = computed(() => {
 
   if (order.value?.timeline?.length) {
     // Use API-provided timeline
+    const statusLabelMap: Record<string, string> = {
+      placed:    t('orders.filterPlaced'),
+      confirmed: t('orders.filterConfirmed'),
+      preparing: t('orders.filterPreparing'),
+      ready:     t('orders.filterReady'),
+      delivered: t('orders.filterDelivered'),
+      cancelled: t('orders.filterCancelled'),
+    }
     return order.value.timeline.map((entry, i) => ({
       key:       entry.status,
-      label:     entry.status.charAt(0).toUpperCase() + entry.status.slice(1),
+      label:     statusLabelMap[entry.status] ?? (entry.status.charAt(0).toUpperCase() + entry.status.slice(1)),
       done:      entry.done,
       date:      entry.date,
       isCurrent: !entry.done && (i === 0 || order.value!.timeline![i - 1]?.done),
