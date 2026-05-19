@@ -1,10 +1,5 @@
 <template>
-  <div class="space-y-6 max-w-[1400px]">
-    <!-- Welcome -->
-    <div>
-      <h2 class="text-lg font-semibold text-dash-text">{{ t('dashboard.greeting', { timeOfDay: t(`dashboard.timeOfDay.${greeting}`), name: auth.user?.name ?? 'Admin' }) }} 👋</h2>
-      <p class="text-sm text-dash-muted mt-0.5">{{ t('dashboard.subtitle') }}</p>
-    </div>
+  <div class="px-9 pb-12 pt-4 space-y-5 max-w-[1280px]">
 
     <!-- Error -->
     <div
@@ -14,118 +9,181 @@
       {{ error }}
     </div>
 
-    <!-- Stat cards -->
+    <!-- KPI row -->
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
       <AStatCard
         :label="t('dashboard.totalRevenue')"
-        :value="stats ? `${Number(stats.totalRevenue).toFixed(0)} LYD` : '—'"
-        :change="stats?.revenueChange ?? null"
-        :sub="t('dashboard.vsLastMonth')"
-        :icon="TrendingUp"
-        icon-bg="oklch(67% 0.063 195)"
-        :featured="true"
+        :value="stats ? Number(stats.totalRevenue).toLocaleString('en', { maximumFractionDigits: 0 }) : '—'"
+        suffix="LYD"
+        :change="stats?.revenueChange ?? undefined"
+        hint="vs last month"
       />
       <AStatCard
         :label="t('dashboard.grossProfit')"
-        :value="stats ? `${stats.grossProfit.toFixed(0)} LYD` : '—'"
-        :icon="TrendingUp"
-        icon-bg="oklch(68% 0.045 140)"
+        :value="stats ? stats.grossProfit.toLocaleString('en', { maximumFractionDigits: 0 }) : '—'"
+        suffix="LYD"
+        :hint="stats ? `${stats.avgMargin}% margin` : undefined"
       />
       <AStatCard
         :label="t('dashboard.avgMargin')"
-        :value="stats ? `${stats.avgMargin}%` : '—'"
-        :icon="Package"
-        icon-bg="oklch(75% 0.085 100)"
+        :value="stats ? stats.avgMargin : '—'"
+        suffix="%"
       />
       <AStatCard
         :label="t('dashboard.totalOrders')"
         :value="stats?.totalOrders ?? '—'"
-        :change="stats?.ordersChange ?? null"
-        :icon="ShoppingBag"
-        icon-bg="oklch(72% 0.16 55)"
+        suffix="orders"
+        :change="stats?.ordersChange ?? undefined"
+        hint="this month"
       />
     </div>
 
-    <!-- Charts row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <AreaChart
-        :data="stats?.monthlyRevenueAmounts ?? zeros12"
-        :labels="stats?.monthlyRevenueLabels ?? monthLabels"
-      />
+    <!-- Charts row: AreaChart col-span-2 + BarChart col-span-1 -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="col-span-2">
+        <AreaChart
+          :data="stats?.monthlyRevenueAmounts ?? zeros12"
+          :labels="stats?.monthlyRevenueLabels ?? monthLabels"
+        />
+      </div>
       <BarChart
         :data="stats?.monthlyOrderCounts ?? zeros12"
         :labels="stats?.monthlyOrderLabels ?? monthLabels"
       />
     </div>
 
-    <!-- Profit panels row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <!-- Profit Breakdown by Category -->
-      <div class="bg-dash-paper rounded-card border border-dash-border p-5">
-        <p class="text-2xs font-medium text-dash-muted uppercase tracking-widest mb-4">Profit Breakdown</p>
-        <ul v-if="stats?.categoryBreakdown?.length" class="space-y-3">
-          <li v-for="cat in stats.categoryBreakdown" :key="cat.category">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs text-dash-text">{{ cat.category }}</span>
-              <span class="text-xs text-dash-muted">{{ cat.margin }}% margin</span>
+    <!-- P&L row: ProfitBreakdown col-span-2 + P&L snapshot col-span-1 -->
+    <div class="grid grid-cols-3 gap-4">
+
+      <!-- Profit Breakdown -->
+      <div class="col-span-2 bg-dash-paper border border-dash-border rounded-card shadow-card p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Profit breakdown</p>
+            <div class="mt-2 flex items-baseline gap-3 flex-wrap">
+              <span class="font-display text-[28px] leading-none tabular-nums text-dash-text">
+                {{ stats ? (stats.grossProfit / 1000).toFixed(1) + 'k' : '—' }}
+              </span>
+              <span class="text-[12.5px] font-medium text-dash-muted">LYD gross profit · 30 days</span>
+              <span
+                v-if="stats"
+                class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-dash-success-lt text-dash-success-dk"
+              >
+                {{ stats.avgMargin }}% margin
+              </span>
             </div>
-            <div class="h-2 rounded-full bg-dash-bg overflow-hidden flex">
+          </div>
+          <div class="flex items-center gap-4 text-[11px] shrink-0">
+            <span class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-dash-primary" />
+              <span class="text-dash-muted">Revenue</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-dash-success" />
+              <span class="text-dash-muted">Profit</span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-dash-border border border-dash-border" />
+              <span class="text-dash-muted">Cost</span>
+            </span>
+          </div>
+        </div>
+
+        <ul v-if="stats?.categoryBreakdown?.length" class="mt-5 space-y-3" dir="ltr">
+          <li v-for="cat in stats.categoryBreakdown" :key="cat.category">
+            <div class="flex items-center justify-between text-[12px] mb-1.5">
+              <span class="font-medium text-dash-text">{{ cat.category }}</span>
+              <span class="text-dash-muted tabular-nums whitespace-nowrap">
+                <span class="font-semibold text-dash-text">{{ (cat.profit / 1000).toFixed(1) }}k</span>
+                {{ t('dashboard.profitLabel') }} · {{ cat.margin }}%
+              </span>
+            </div>
+            <div
+              class="h-3 rounded-full overflow-hidden relative bg-dash-bg"
+              :style="{ width: cat.revenue > 0 ? Math.min((cat.revenue / maxCategoryRevenue) * 100, 100) + '%' : '0%' }"
+            >
               <div
-                class="h-full bg-dash-danger/40"
-                :style="{ width: cat.revenue > 0 ? (cat.cogs / cat.revenue * 100) + '%' : '0%' }"
-              ></div>
+                class="absolute inset-y-0 start-0 border-e border-dashed border-dash-border"
+                :style="{ width: cat.revenue > 0 ? (cat.cogs / cat.revenue * 100) + '%' : '0%', background: 'oklch(93% 0.01 25)' }"
+              />
               <div
-                class="h-full bg-dash-success"
-                :style="{ width: cat.revenue > 0 ? (cat.profit / cat.revenue * 100) + '%' : '0%' }"
-              ></div>
+                class="absolute inset-y-0 bg-dash-success"
+                :style="{
+                  left: cat.revenue > 0 ? (cat.cogs / cat.revenue * 100) + '%' : '0%',
+                  right: '0'
+                }"
+              />
             </div>
           </li>
         </ul>
-        <p v-else class="text-xs text-dash-muted text-center py-6">No delivered orders yet.</p>
+        <p v-else class="text-xs text-dash-muted text-center py-6">{{ t('dashboard.noDeliveredOrders') }}</p>
       </div>
 
       <!-- P&L Snapshot -->
-      <div class="bg-dash-paper rounded-card border border-dash-border p-5">
-        <p class="text-2xs font-medium text-dash-muted uppercase tracking-widest mb-4">P&amp;L Snapshot</p>
-        <ul class="space-y-2.5">
-          <li class="flex items-center justify-between">
-            <span class="text-xs text-dash-text">Revenue</span>
-            <span class="text-xs font-medium text-dash-text">{{ stats ? Number(stats.totalRevenue).toFixed(2) : '—' }} LYD</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-xs text-dash-muted">Cost of Goods</span>
-            <span class="text-xs text-dash-danger">-{{ stats ? stats.cogs.toFixed(2) : '—' }} LYD</span>
-          </li>
-          <li class="flex items-center justify-between border-t border-dash-border pt-2 mt-1">
-            <span class="text-xs font-medium text-dash-text">Gross Profit</span>
-            <span class="text-xs font-medium text-dash-success">{{ stats ? stats.grossProfit.toFixed(2) : '—' }} LYD</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-xs text-dash-muted">Avg Margin</span>
-            <span class="text-xs font-medium text-dash-primary">{{ stats ? stats.avgMargin : '—' }}%</span>
-          </li>
-        </ul>
+      <div class="bg-dash-paper border border-dash-border rounded-card shadow-card p-6">
+        <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('dashboard.plSnapshot') }}</p>
+        <h3 class="font-display text-[18px] mt-0.5 leading-tight text-dash-text">{{ t('dashboard.thisMonth') }}</h3>
+        <div class="mt-4 space-y-3">
+          <div class="flex items-baseline justify-between">
+            <span class="text-[12.5px] text-dash-muted">{{ t('dashboard.revenue') }}</span>
+            <span class="text-end whitespace-nowrap">
+              <span class="tabular-nums font-display text-[15px] text-dash-text">
+                {{ stats ? Number(stats.totalRevenue).toLocaleString('en', { maximumFractionDigits: 0 }) : '—' }}
+                <span class="text-[10.5px] font-normal text-dash-muted">LYD</span>
+              </span>
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-[12.5px] text-dash-muted">{{ t('dashboard.costOfGoods') }}</span>
+            <span class="text-end whitespace-nowrap">
+              <span class="tabular-nums font-display text-[15px] text-dash-danger">
+                −{{ stats ? stats.cogs.toLocaleString('en', { maximumFractionDigits: 0 }) : '—' }}
+                <span class="text-[10.5px] font-normal text-dash-muted">LYD</span>
+              </span>
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between border-t border-dash-border pt-2 mt-1">
+            <span class="text-[12.5px] text-dash-muted">{{ t('dashboard.grossProfit') }}</span>
+            <span class="text-end whitespace-nowrap">
+              <span class="tabular-nums font-display text-[15px] text-dash-success-dk">
+                {{ stats ? stats.grossProfit.toLocaleString('en', { maximumFractionDigits: 0 }) : '—' }}
+                <span class="text-[10.5px] font-normal text-dash-muted">LYD</span>
+              </span>
+            </span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-[12.5px] text-dash-muted">{{ t('dashboard.avgMarginLabel') }}</span>
+            <span class="text-end whitespace-nowrap">
+              <span class="tabular-nums font-display text-[15px] text-dash-primary">
+                {{ stats ? stats.avgMargin : '—' }}
+                <span class="text-[10.5px] font-normal text-dash-muted">%</span>
+              </span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Recent orders + comparison chart -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-      <!-- Recent orders table -->
-      <div class="xl:col-span-2 bg-dash-surface rounded-card shadow-card p-5">
-        <div class="flex items-center justify-between mb-4">
+    <!-- Bottom row: RecentOrders col-span-2 + TopProducts col-span-1 -->
+    <div class="grid grid-cols-3 gap-4">
+
+      <!-- Recent Orders -->
+      <div class="col-span-2 bg-dash-paper border border-dash-border rounded-card shadow-card overflow-hidden">
+        <div class="px-6 py-5 flex items-center justify-between border-b border-dash-border-lt">
           <div>
-            <h3 class="text-sm font-semibold text-dash-text">{{ t('dashboard.recentOrders') }}</h3>
-            <p class="text-2xs text-dash-muted mt-0.5">{{ t('dashboard.latestActivity') }}</p>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Recent orders</p>
+            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">Latest activity</h3>
           </div>
           <RouterLink
             to="/orders"
-            class="text-xs font-medium text-dash-primary hover:text-dash-primary-dk transition-colors"
+            class="text-[12px] font-medium text-dash-primary hover:underline whitespace-nowrap"
           >
-            {{ t('dashboard.viewAll') }}
+            {{ t('dashboard.viewAll') }} →
           </RouterLink>
         </div>
 
-        <div v-if="loading" class="space-y-3 py-2">
+        <!-- Skeleton -->
+        <div v-if="loading" class="p-6 space-y-3">
           <div v-for="i in 5" :key="i" class="flex items-center gap-4">
             <div class="h-3 rounded-full bg-dash-border animate-pulse w-16" />
             <div class="h-3 rounded-full bg-dash-border animate-pulse flex-1" />
@@ -134,28 +192,44 @@
           </div>
         </div>
 
-        <table v-else class="w-full text-xs">
+        <table v-else class="w-full text-[12.5px]">
           <thead>
-            <tr class="border-b border-dash-border">
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.order') }}</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.customer') }}</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.total') }}</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.status') }}</th>
-              <th class="pb-3 text-left text-2xs font-semibold text-dash-faint uppercase tracking-wider">{{ t('dashboard.columns.date') }}</th>
+            <tr class="text-[10.5px] uppercase tracking-wider text-dash-faint">
+              <th class="text-start font-semibold py-2.5 px-6 border-b border-dash-border-lt">{{ t('dashboard.columns.order') }}</th>
+              <th class="text-start font-semibold py-2.5 px-6 border-b border-dash-border-lt">{{ t('dashboard.columns.customer') }}</th>
+              <th class="text-start font-semibold py-2.5 px-6 border-b border-dash-border-lt">{{ t('dashboard.columns.total') }}</th>
+              <th class="text-start font-semibold py-2.5 px-6 border-b border-dash-border-lt">{{ t('dashboard.columns.status') }}</th>
+              <th class="text-start font-semibold py-2.5 px-6 border-b border-dash-border-lt">{{ t('dashboard.columns.date') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="order in stats?.recentOrders"
               :key="(order as RecentOrderRow).id"
-              class="border-b border-dash-border-lt last:border-0 hover:bg-dash-bg transition-colors cursor-pointer"
+              class="hover:bg-dash-bg cursor-pointer transition-colors"
               @click="router.push({ name: 'order-detail', params: { id: (order as RecentOrderRow).id } })"
             >
-              <td class="py-3 font-medium text-dash-text">#{{ (order as RecentOrderRow).id }}</td>
-              <td class="py-3 text-dash-muted">{{ (order as RecentOrderRow).user }}</td>
-              <td class="py-3 font-medium text-dash-text">{{ Number((order as RecentOrderRow).total).toFixed(0) }} LYD</td>
-              <td class="py-3"><ABadge :status="(order as RecentOrderRow).status" /></td>
-              <td class="py-3 text-dash-faint">{{ (order as RecentOrderRow).date }}</td>
+              <td class="py-3.5 px-6 border-b border-dash-border-lt font-semibold text-dash-text tabular-nums">
+                #{{ (order as RecentOrderRow).id }}
+              </td>
+              <td class="py-3.5 px-6 border-b border-dash-border-lt">
+                <div class="flex items-center gap-2.5">
+                  <div class="h-7 w-7 rounded-full grid place-items-center text-[10.5px] font-semibold text-white bg-dash-text shrink-0">
+                    {{ initials((order as RecentOrderRow).user) }}
+                  </div>
+                  <span class="font-medium text-dash-text">{{ (order as RecentOrderRow).user }}</span>
+                </div>
+              </td>
+              <td class="py-3.5 px-6 border-b border-dash-border-lt font-semibold tabular-nums whitespace-nowrap text-dash-text">
+                {{ Number((order as RecentOrderRow).total).toLocaleString('en', { maximumFractionDigits: 0 }) }}
+                <span class="font-normal text-dash-muted">LYD</span>
+              </td>
+              <td class="py-3.5 px-6 border-b border-dash-border-lt">
+                <ABadge :status="(order as RecentOrderRow).status" />
+              </td>
+              <td class="py-3.5 px-6 border-b border-dash-border-lt text-dash-muted">
+                {{ (order as RecentOrderRow).date }}
+              </td>
             </tr>
             <tr v-if="!stats?.recentOrders?.length && !loading">
               <td colspan="5" class="py-14 text-center">
@@ -166,12 +240,57 @@
         </table>
       </div>
 
-      <!-- Channel comparison -->
-      <ComparisonChart
-        :online="stats?.weeklyOnline ?? zeros7"
-        :labels="stats?.weeklyLabels ?? weekLabels"
-      />
+      <!-- Top Products -->
+      <div class="bg-dash-paper border border-dash-border rounded-card shadow-card p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">Top products</p>
+            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">By category</h3>
+          </div>
+          <span class="text-[11px] text-dash-muted shrink-0">last 30 days</span>
+        </div>
+
+        <div v-if="stats?.categoryBreakdown?.length" class="mt-4 -mx-1">
+          <div
+            v-for="(cat, i) in stats.categoryBreakdown.slice(0, 5)"
+            :key="cat.category"
+            class="flex items-center gap-3 px-1 py-3 border-b last:border-0 border-dash-border-lt"
+          >
+            <div class="h-8 w-8 rounded-xl shrink-0 grid place-items-center text-[11px] font-bold text-dash-muted bg-dash-bg border border-dash-border">
+              {{ i + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[12.5px] font-semibold text-dash-text truncate">{{ cat.category }}</p>
+              <p class="text-[10.5px] text-dash-muted tabular-nums">
+                {{ cat.revenue.toLocaleString('en', { maximumFractionDigits: 0 }) }} LYD revenue
+              </p>
+            </div>
+            <div class="text-end whitespace-nowrap">
+              <p class="text-[12px] font-semibold tabular-nums text-dash-text">
+                {{ cat.profit.toLocaleString('en', { maximumFractionDigits: 0 }) }}
+                <span class="font-normal text-dash-muted">LYD</span>
+              </p>
+              <p
+                class="text-[10.5px] tabular-nums font-medium"
+                :class="cat.margin >= 0 ? 'text-dash-success-dk' : 'text-dash-danger'"
+              >
+                {{ cat.margin }}% margin
+              </p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="mt-6 text-center">
+          <AEmptyState :icon="Package" heading="No data yet" />
+        </div>
+      </div>
     </div>
+
+    <!-- Footer strip -->
+    <div class="pt-2 flex items-center justify-between text-[11px] text-dash-faint">
+      <span>Aroma Admin</span>
+      <span>Benghazi · Libya</span>
+    </div>
+
   </div>
 </template>
 
@@ -180,45 +299,38 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLocale } from '../composables/useLocale'
-import { TrendingUp, ShoppingBag, Package } from 'lucide-vue-next'
+import { ShoppingBag, Package } from 'lucide-vue-next'
 import { apiGetStats } from '../api/admin'
 import type { DashboardStats, RecentOrderRow } from '../types'
-import { useAuthStore } from '../stores/auth'
 import AStatCard       from '../components/ui/AStatCard.vue'
 import ABadge          from '../components/ui/ABadge.vue'
 import AEmptyState     from '../components/ui/AEmptyState.vue'
 import AreaChart       from '../components/charts/AreaChart.vue'
 import BarChart        from '../components/charts/BarChart.vue'
-import ComparisonChart from '../components/charts/ComparisonChart.vue'
 
 const { t }      = useI18n()
 const { locale } = useLocale()
 const router     = useRouter()
-const auth       = useAuthStore()
 const stats      = ref<DashboardStats | null>(null)
-
-const greeting = computed(() => {
-  const h = new Date().getHours()
-  if (h < 12) return 'morning'
-  if (h < 18) return 'afternoon'
-  return 'evening'
-})
-const loading = ref(true)
-const error   = ref<string | null>(null)
+const loading    = ref(true)
+const error      = ref<string | null>(null)
 
 // Zero fallbacks shown while loading or when API has no data yet
 const zeros12 = Array(12).fill(0)
-const zeros7  = Array(7).fill(0)
 
 const monthLabels = computed(() => {
   const fmt = new Intl.DateTimeFormat(locale.value === 'ar' ? 'ar-LY' : 'en', { month: 'short' })
   return Array.from({ length: 12 }, (_, i) => fmt.format(new Date(2024, i, 1)))
 })
-const weekLabels = computed(() => {
-  const fmt = new Intl.DateTimeFormat(locale.value === 'ar' ? 'ar-LY' : 'en', { weekday: 'short' })
-  // Mon=0 offset: Jan 1 2024 is Monday
-  return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2024, 0, i + 1)))
+
+const maxCategoryRevenue = computed(() => {
+  if (!stats.value?.categoryBreakdown?.length) return 1
+  return Math.max(...stats.value.categoryBreakdown.map(c => c.revenue))
 })
+
+function initials(name: string): string {
+  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+}
 
 onMounted(async () => {
   try {
