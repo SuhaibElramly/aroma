@@ -211,7 +211,7 @@
                       : 'text-dash-faint'"
                   >{{ step.label }}</p>
                   <p v-if="step.date" class="text-[10.5px] tabular-nums mt-0.5 text-dash-faint">{{ step.date }}</p>
-                  <p v-else-if="!step.done" class="text-[10.5px] mt-0.5 text-dash-faint">Pending</p>
+                  <p v-else-if="!step.done" class="text-[10.5px] mt-0.5 text-dash-faint">{{ t('orders.filterPending') }}</p>
                 </div>
               </div>
             </div>
@@ -270,7 +270,7 @@
 
         <!-- Customer card -->
         <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-5">
-          <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">Customer</p>
+          <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('orderDetail.customer') }}</p>
           <div class="flex items-center gap-3 mt-3">
             <div class="h-11 w-11 rounded-full grid place-items-center text-[13px] font-semibold text-white shrink-0 bg-dash-text select-none">
               {{ initials }}
@@ -296,10 +296,10 @@
         <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-5">
           <div class="flex items-center justify-between">
             <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">
-              {{ order.isPickup ? 'Pickup' : 'Ship to' }}
+              {{ order.isPickup ? t('orderDetail.pickup') : t('orderDetail.homeDelivery') }}
             </p>
             <span v-if="order.isPickup" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-dash-fig-lt text-dash-fig">
-              Pickup
+              {{ t('orderDetail.pickup') }}
             </span>
           </div>
           <div class="mt-3 text-[12.5px] leading-relaxed text-dash-text-2">
@@ -318,7 +318,7 @@
 
         <!-- Payment card -->
         <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-5">
-          <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">Payment</p>
+          <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('orderDetail.paymentLabel') }}</p>
           <div class="mt-3 flex items-center gap-3">
             <div
               class="h-10 w-14 rounded-md grid place-items-center text-[10.5px] font-bold border border-dash-border-lt"
@@ -331,7 +331,7 @@
             <ABadge status="paid" class="ml-auto" />
           </div>
           <div class="mt-3 pt-3 border-t border-dash-border-lt flex items-center justify-between text-[12.5px]">
-            <span class="text-dash-muted">Amount charged</span>
+            <span class="text-dash-muted">{{ t('orderDetail.amountCharged') }}</span>
             <span class="tabular-nums font-semibold text-dash-text">{{ Number(order.total).toFixed(2) }} LYD</span>
           </div>
         </div>
@@ -419,11 +419,11 @@ const customerSince = computed(() => {
 // Build timeline steps from the order's timeline or synthesise from status
 const timelineSteps = computed(() => {
   const steps = [
-    { key: 'placed',    label: 'Placed' },
-    { key: 'confirmed', label: 'Confirmed' },
-    { key: 'preparing', label: 'Preparing' },
-    { key: 'ready',     label: 'Ready' },
-    { key: 'delivered', label: 'Delivered' },
+    { key: 'placed',    label: t('orders.filterPlaced') },
+    { key: 'confirmed', label: t('orders.filterConfirmed') },
+    { key: 'preparing', label: t('orders.filterPreparing') },
+    { key: 'ready',     label: t('orders.filterReady') },
+    { key: 'delivered', label: t('orders.filterDelivered') },
   ]
   const statusOrder = ['placed', 'confirmed', 'preparing', 'ready', 'delivered']
   const currentIdx = statusOrder.indexOf(order.value?.status ?? '')

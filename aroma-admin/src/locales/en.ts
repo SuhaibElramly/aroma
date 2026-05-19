@@ -211,6 +211,8 @@ const en = {
     itemPlural: 'items',
     freeShipping: 'Free',
     orderJourney: 'Order journey',
+    paymentLabel: 'Payment',
+    amountCharged: 'Amount charged',
   },
   products: {
     title: 'Products',

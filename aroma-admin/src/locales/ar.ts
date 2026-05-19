@@ -213,6 +213,8 @@ const ar = {
     itemPlural: 'منتجات',
     freeShipping: 'مجاني',
     orderJourney: 'مسار الطلب',
+    paymentLabel: 'الدفع',
+    amountCharged: 'المبلغ المحصّل',
   },
   products: {
     title: 'المنتجات',
