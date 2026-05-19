@@ -74,7 +74,7 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="label-field">{{ t('newProductDrawer.namEn') }}</label>
-                    <AInput v-model="form.nameEn" placeholder="Oud Royale" :error="errors.nameEn" @input="syncSlug" />
+                    <AInput v-model="form.nameEn" placeholder="Oud Royale" :error="errors.nameEn" />
                     <p v-if="slug" class="mt-1 text-2xs text-dash-faint font-mono">
                       <span class="text-dash-muted">{{ t('newProductDrawer.slugPreview') }}:</span> /p/{{ slug }}
                     </p>
@@ -379,12 +379,12 @@
                   <template v-else>
                     <div v-for="i in 3" :key="i"
                       class="aspect-square rounded-xl border border-dashed border-dash-border bg-dash-bg flex items-center justify-center">
-                      <span class="text-[10px] text-dash-faint">Slot {{ i }}</span>
+                      <span class="text-[10px] text-dash-faint">{{ t('newProductDrawer.imageSlot') }} {{ i }}</span>
                     </div>
                   </template>
                 </div>
                 <p v-if="selectedFiles.length > 3" class="text-2xs text-dash-muted mt-2">
-                  +{{ selectedFiles.length - 3 }} more file{{ selectedFiles.length - 3 > 1 ? 's' : '' }} selected
+                  +{{ selectedFiles.length - 3 }} {{ t('newProductDrawer.moreFiles') }}
                 </p>
               </section>
 
@@ -426,7 +426,7 @@ import { useNewProductDrawer } from '../../composables/useNewProductDrawer'
 import {
   apiGetBrands, apiGetCategories, apiGetSpecTypes,
   apiCreateProduct, apiSaveProductSpecs, apiGenerateVariants,
-  apiBulkUpdateVariants, apiUploadImages, apiGetVariants,
+  apiBulkUpdateVariants, apiUploadImages, apiGetVariants, apiSetDefaultVariant,
 } from '../../api/admin'
 import type { AdminBrand, AdminCategory, SpecType } from '../../types'
 import AInput    from '../ui/AInput.vue'
@@ -485,7 +485,6 @@ function toSlug(s: string): string {
     .slice(0, 48)
 }
 const slug = computed(() => toSlug(form.value.nameEn))
-function syncSlug() { /* slug is computed */ }
 
 // ── Computed helpers ──────────────────────────────────────────────────────────
 const selectedBrand    = computed(() => brands.value.find(b => b.id === form.value.brandId))
@@ -569,7 +568,7 @@ function generateVariants() {
 }
 
 function variantLabel(row: PriceRow): string {
-  return row.specs.map(s => `${s.value}${s.unit || ''}`).join(' / ') || 'Default'
+  return row.specs.map(s => `${s.value}${s.unit || ''}`).join(' / ') || t('newProductDrawer.defaultMark')
 }
 
 function rowMargin(row: PriceRow): number | null {
@@ -584,7 +583,7 @@ const previewPrice = computed(() => {
 })
 
 const previewSpecsLabel = computed(() => {
-  if (productType.value === 'single') return 'Single variant'
+  if (productType.value === 'single') return t('newProductDrawer.singleVariantLabel')
   if (!priceRows.value.length) return t('newProductDrawer.noVariantsYet')
   const n = priceRows.value.length
   return `${n} ${n === 1 ? t('newProductDrawer.variant') : t('newProductDrawer.variants2')}`
@@ -654,16 +653,18 @@ async function handlePublish() {
   saving.value = true
   try {
     const { data: product } = await apiCreateProduct({
-      name:          form.value.nameAr,
-      name_en:       form.value.nameEn,
-      slug:          slug.value,
-      brand_id:      form.value.brandId,
-      category_id:   form.value.categoryId,
-      type:          form.value.type,
-      description:   form.value.description || undefined,
-      is_new:        form.value.isNew,
-      is_bestseller: form.value.isBestseller,
-      is_offer:      form.value.isOffer,
+      name:            form.value.nameAr,
+      name_en:         form.value.nameEn,
+      slug:            slug.value,
+      brand_id:        form.value.brandId,
+      category_id:     form.value.categoryId,
+      type:            form.value.type,
+      description:     form.value.description || undefined,
+      is_new:          form.value.isNew,
+      is_bestseller:   form.value.isBestseller,
+      is_offer:        form.value.isOffer,
+      placeholder_bg:  selectedCategory.value?.bg || '#F2E8E5',
+      placeholder_dot: '#C9A0A0',
     })
     const productId: number = product.id
 
@@ -682,6 +683,12 @@ async function handlePublish() {
           quantity:            Number(priceRows.value[i]?.quantity) || 0,
           low_stock_threshold: Number(priceRows.value[i]?.lowStockThreshold) || 0,
         })))
+        if (defaultRowId.value !== null) {
+          const defaultIdx = priceRows.value.findIndex(r => r.id === defaultRowId.value)
+          if (defaultIdx !== -1 && variants[defaultIdx]) {
+            await apiSetDefaultVariant(productId, variants[defaultIdx].id)
+          }
+        }
       }
     } else {
       await apiGenerateVariants(productId, false)
@@ -727,27 +734,27 @@ function resetForm() {
 }
 
 // Body scroll lock + Esc to close
-const escHandler = ref<((e: KeyboardEvent) => void) | null>(null)
+let escHandler: ((e: KeyboardEvent) => void) | null = null
 
 watch(isOpen, (val) => {
   if (val) {
     document.body.style.overflow = 'hidden'
-    escHandler.value = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
-    document.addEventListener('keydown', escHandler.value)
+    escHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    document.addEventListener('keydown', escHandler)
   } else {
     document.body.style.overflow = ''
-    if (escHandler.value) {
-      document.removeEventListener('keydown', escHandler.value)
-      escHandler.value = null
+    if (escHandler) {
+      document.removeEventListener('keydown', escHandler)
+      escHandler = null
     }
   }
 })
 
 onUnmounted(() => {
   document.body.style.overflow = ''
-  if (escHandler.value) {
-    document.removeEventListener('keydown', escHandler.value)
-    escHandler.value = null
+  if (escHandler) {
+    document.removeEventListener('keydown', escHandler)
+    escHandler = null
   }
 })
 
