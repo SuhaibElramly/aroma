@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLocale } from '../../composables/useLocale'
+import { useNewProductDrawer } from '../../composables/useNewProductDrawer'
 import {
   CalendarDays,
   Bell,
@@ -16,7 +17,7 @@ import {
 const { t, locale } = useI18n()
 const { applyLocale } = useLocale()
 const route  = useRoute()
-const router = useRouter()
+const { open: openNewProductDrawer } = useNewProductDrawer()
 
 // Map route names → eyebrow + heading (reactive i18n)
 const meta = computed(() => {
@@ -222,7 +223,7 @@ const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
 
       <!-- New product button -->
       <button
-        @click="router.push('/products/new')"
+        @click="openNewProductDrawer"
         class="h-9 px-3.5 rounded-lg text-[12.5px] font-medium bg-dash-text text-white inline-flex items-center gap-1.5 whitespace-nowrap hover:bg-dash-text-2 transition-colors"
       >
         <Plus :size="14" :stroke-width="2.5" />

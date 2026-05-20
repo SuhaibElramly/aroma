@@ -9,11 +9,13 @@
         </div>
       </main>
     </div>
+    <NewProductDrawer />
   </div>
 </template>
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import Sidebar from './Sidebar.vue'
-import Topbar from './Topbar.vue'
+import Sidebar          from './Sidebar.vue'
+import Topbar           from './Topbar.vue'
+import NewProductDrawer from '../product/NewProductDrawer.vue'
 </script>

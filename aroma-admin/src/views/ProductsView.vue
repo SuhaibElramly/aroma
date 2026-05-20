@@ -5,24 +5,24 @@
     <!-- Stat strip -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-dash-paper border border-dash-border rounded-card p-5">
-        <p class="text-[12px] font-medium text-dash-muted">{{ t('products.columns.name') }} — All</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('products.kpiAll') }}</p>
         <p class="font-display text-[28px] leading-none mt-2 text-dash-text tabular-nums">{{ meta?.total ?? '—' }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">total products</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('products.kpiTotalProducts') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5">
-        <p class="text-[12px] font-medium text-dash-muted">In stock</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('products.kpiInStock') }}</p>
         <p class="font-display text-[28px] leading-none mt-2 text-dash-success tabular-nums">{{ inStockCount }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">available now</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('products.kpiAvailableNow') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5">
-        <p class="text-[12px] font-medium text-dash-muted">Low stock</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('products.kpiLowStock') }}</p>
         <p class="font-display text-[28px] leading-none mt-2 text-dash-fig tabular-nums">{{ lowStockCount }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">reorder soon</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('products.kpiReorderSoon') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5">
-        <p class="text-[12px] font-medium text-dash-muted">Out of stock</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('products.kpiOutOfStock') }}</p>
         <p class="font-display text-[28px] leading-none mt-2 text-dash-danger tabular-nums">{{ outOfStockCount }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">action needed</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('products.kpiActionNeeded') }}</p>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
         ]"
       >
         <SlidersHorizontal :size="13" />
-        Filters
+        {{ t('products.filtersBtn') }}
       </button>
 
       <!-- View toggle -->
@@ -76,11 +76,11 @@
       </div>
 
       <!-- Add product -->
-      <RouterLink to="/products/new">
+      <button type="button" @click="openNewProductDrawer">
         <AButton size="sm" class="shrink-0">
           <Plus :size="14" /> {{ t('products.addProduct') }}
         </AButton>
-      </RouterLink>
+      </button>
     </div>
 
     <!-- Expanded filters -->
@@ -178,7 +178,7 @@
                 <span v-if="p.price">{{ Number(p.price).toFixed(0) }} <span class="text-[11px] text-dash-muted font-sans">LYD</span></span>
                 <span v-else class="text-[13px] text-dash-faint">{{ t('products.noVariants') }}</span>
               </span>
-              <span class="text-[11px] text-dash-faint">{{ p.variantCount }} {{ p.variantCount === 1 ? 'variant' : 'variants' }}</span>
+              <span class="text-[11px] text-dash-faint">{{ t('products.variantCount', { n: p.variantCount }, p.variantCount) }}</span>
             </div>
 
             <!-- Action row -->
@@ -194,9 +194,9 @@
       <div v-else class="col-span-full py-16">
         <AEmptyState :icon="Package" :heading="t('products.noProducts')" :sub="t('products.noProductsSub')">
           <template #action>
-            <RouterLink to="/products/new">
+            <button type="button" @click="openNewProductDrawer">
               <AButton size="sm"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
-            </RouterLink>
+            </button>
           </template>
         </AEmptyState>
       </div>
@@ -252,9 +252,9 @@
         <template #empty>
           <AEmptyState :icon="Package" :heading="t('products.noProducts')" :sub="t('products.noProductsSub')">
             <template #action>
-              <RouterLink to="/products/new">
+              <button type="button" @click="openNewProductDrawer">
                 <AButton size="sm"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
-              </RouterLink>
+              </button>
             </template>
           </AEmptyState>
         </template>
@@ -279,6 +279,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRouter } from 'vue-router'
+import { useNewProductDrawer } from '../composables/useNewProductDrawer'
 import { Plus, Package, Search, LayoutGrid, List, SlidersHorizontal } from 'lucide-vue-next'
 import { usePagination } from '../composables/usePagination'
 import {
@@ -296,6 +297,7 @@ import AConfirmDialog  from '../components/ui/AConfirmDialog.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const { open: openNewProductDrawer } = useNewProductDrawer()
 
 // View state
 const view        = ref<'grid' | 'list'>('grid')
