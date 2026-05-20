@@ -76,11 +76,9 @@
       </div>
 
       <!-- Add product -->
-      <button type="button" @click="openNewProductDrawer">
-        <AButton size="sm" class="shrink-0">
-          <Plus :size="14" /> {{ t('products.addProduct') }}
-        </AButton>
-      </button>
+      <AButton size="sm" class="shrink-0" @click="openNewProductDrawer">
+        <Plus :size="14" /> {{ t('products.addProduct') }}
+      </AButton>
     </div>
 
     <!-- Expanded filters -->
@@ -194,9 +192,7 @@
       <div v-else class="col-span-full py-16">
         <AEmptyState :icon="Package" :heading="t('products.noProducts')" :sub="t('products.noProductsSub')">
           <template #action>
-            <button type="button" @click="openNewProductDrawer">
-              <AButton size="sm"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
-            </button>
+            <AButton size="sm" @click="openNewProductDrawer"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
           </template>
         </AEmptyState>
       </div>
@@ -252,9 +248,7 @@
         <template #empty>
           <AEmptyState :icon="Package" :heading="t('products.noProducts')" :sub="t('products.noProductsSub')">
             <template #action>
-              <button type="button" @click="openNewProductDrawer">
-                <AButton size="sm"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
-              </button>
+              <AButton size="sm" @click="openNewProductDrawer"><Plus :size="14" /> {{ t('products.addProduct') }}</AButton>
             </template>
           </AEmptyState>
         </template>

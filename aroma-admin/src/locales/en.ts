@@ -412,6 +412,7 @@ const en = {
     variant:            'variant',
     variants2:          'variants',
     saveFailed:         'Failed to save product.',
+    slugTaken:          'A product with this name already exists — try a different English name.',
     singleVariantLabel: 'Single variant',
     imageSlot:          'Slot',
     moreFiles:          'more files selected',

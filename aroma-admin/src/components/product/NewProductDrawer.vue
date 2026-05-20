@@ -713,7 +713,12 @@ async function handlePublish() {
     close()
     router.push(`/products/${productId}`)
   } catch (e: unknown) {
-    generalError.value = (e as any)?.response?.data?.message ?? t('newProductDrawer.saveFailed')
+    const resp = (e as any)?.response
+    if (resp?.status === 422 && resp?.data?.errors?.slug) {
+      errors.value.nameEn = t('newProductDrawer.slugTaken')
+    } else {
+      generalError.value = resp?.data?.message ?? t('newProductDrawer.saveFailed')
+    }
   } finally {
     saving.value = false
   }
@@ -747,6 +752,7 @@ watch(isOpen, (val) => {
       document.removeEventListener('keydown', escHandler)
       escHandler = null
     }
+    resetForm()
   }
 })
 

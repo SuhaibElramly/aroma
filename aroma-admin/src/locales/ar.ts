@@ -414,6 +414,7 @@ const ar = {
     variant:            'صنف',
     variants2:          'أصناف',
     saveFailed:         'فشل حفظ المنتج.',
+    slugTaken:          'منتج بهذا الاسم موجود بالفعل — جرّب اسماً إنجليزياً مختلفاً.',
     singleVariantLabel: 'صنف واحد',
     imageSlot:          'مكان',
     moreFiles:          'ملفات محددة أخرى',
