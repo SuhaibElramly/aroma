@@ -50,6 +50,7 @@ async function createAdmin() {
 }
 
 async function toggleStatus(a: AdminMember) {
+  error.value = null
   try {
     const res = await apiToggleAdminStatus(a.id)
     const idx = admins.value.findIndex(x => x.id === a.id)
@@ -60,6 +61,7 @@ async function toggleStatus(a: AdminMember) {
 }
 
 async function resetPassword(a: AdminMember) {
+  error.value = null
   const pw = prompt('New temporary password (min 8 chars):')
   if (!pw || pw.length < 8) return
   try {
@@ -102,7 +104,7 @@ const rolesData = computed<RoleDefinition[]>(() => [
   { id: 'catalog', name: t('admins.roles.catalogManager'), desc: t('admins.roleDescs.catalog'),  color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
   { id: 'sales',   name: t('admins.roles.sales'),          desc: t('admins.roleDescs.sales'),    color: 'oklch(58% 0.10 32)',   members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
   { id: 'support', name: t('admins.roles.support'),        desc: t('admins.roleDescs.support'),  color: 'oklch(52% 0.045 145)', members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-  { id: 'readonly',name: t('admins.roles.readOnly'),       desc: t('admins.roleDescs.readOnly'), color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
+  { id: 'read_only', name: t('admins.roles.readOnly'),      desc: t('admins.roleDescs.readOnly'), color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
 ])
 
 const rolesWithCounts = computed(() => rolesData.value.map(r => ({
@@ -152,17 +154,19 @@ const stats = computed(() => ({
 }))
 
 // ── Visual helpers ────────────────────────────────────────────────────
-const ROLE_LABELS = computed<Record<string, string>>(() => ({
-  owner: t('admins.roles.owner'),
-  admin: t('admins.roles.admin'),
-  catalog_manager: t('admins.roles.catalogManager'),
-  sales: t('admins.roles.sales'),
-  support: t('admins.roles.support'),
-  read_only: t('admins.roles.readOnly'),
-}))
+function roleLabel(role: string): string {
+  return ({
+    owner:           t('admins.roles.owner'),
+    admin:           t('admins.roles.admin'),
+    catalog_manager: t('admins.roles.catalogManager'),
+    sales:           t('admins.roles.sales'),
+    support:         t('admins.roles.support'),
+    read_only:       t('admins.roles.readOnly'),
+  } as Record<string, string>)[role] ?? role
+}
 
 const ROLE_HUE: Record<string, number> = {
-  owner: 250, admin: 210, catalog_manager: 340, sales: 32, support: 140, read_only: 230, readonly: 230,
+  owner: 250, admin: 210, catalog_manager: 340, sales: 32, support: 140, read_only: 230,
 }
 
 function roleColor(role: string): string {
@@ -361,7 +365,7 @@ onMounted(load)
               <td class="py-3.5 px-6 border-b border-dash-border-lt">
                 <span class="inline-flex items-center gap-1.5">
                   <span class="h-2 w-2 rounded-full" :style="{ background: roleColor(a.role) }" />
-                  <span class="font-medium text-dash-text-2">{{ ROLE_LABELS[a.role] ?? a.role }}</span>
+                  <span class="font-medium text-dash-text-2">{{ roleLabel(a.role) }}</span>
                 </span>
               </td>
               <!-- Status chip -->
