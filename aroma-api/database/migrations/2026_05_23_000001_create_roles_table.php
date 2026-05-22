@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        DB::table('roles')->insert([
+        DB::table('roles')->insertOrIgnore([
             [
                 'name'        => 'Owner',
                 'slug'        => 'owner',
