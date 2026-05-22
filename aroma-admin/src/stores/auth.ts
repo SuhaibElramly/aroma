@@ -44,16 +44,27 @@ export const useAuthStore = defineStore('auth', () => {
     const needsUser  = !user.value
     const needsRoles = roles.value.length === 0
     if (!needsUser && !needsRoles) return
-    try {
-      await Promise.all([
-        needsUser  ? apiGetMe().then(res => { user.value = res.data })    : Promise.resolve(),
-        needsRoles ? apiGetRoles().then(res => { roles.value = res.data }) : Promise.resolve(),
-      ])
-    } catch {
-      token.value = null
-      user.value  = null
-      roles.value = []
-      localStorage.removeItem('admin_token')
+
+    if (needsUser) {
+      try {
+        const res = await apiGetMe()
+        user.value = res.data
+      } catch {
+        token.value = null
+        user.value  = null
+        roles.value = []
+        localStorage.removeItem('admin_token')
+        return
+      }
+    }
+
+    if (needsRoles) {
+      try {
+        const res = await apiGetRoles()
+        roles.value = res.data
+      } catch {
+        // roles remain empty; can() will return false for all resources
+      }
     }
   }
 
