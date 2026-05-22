@@ -12,7 +12,7 @@ import {
 import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
-const isOwner = computed(() => auth.user?.role === 'owner')
+const isOwner = auth.isOwner
 
 // ── API state ─────────────────────────────────────────────────────────
 const admins   = ref<AdminMember[]>([])

@@ -24,32 +24,35 @@ const auth   = useAuthStore()
 
 const isActive = (path: string) => route.path.startsWith('/' + path)
 
-const groups = computed(() => [
-  {
-    label: t('nav.workspace'),
-    items: [
-      { key: 'dashboard',  label: t('nav.dashboard'),  icon: LayoutDashboard, path: 'dashboard',  badge: null },
-      { key: 'orders',     label: t('nav.orders'),     icon: ShoppingBag,     path: 'orders',     badge: '12' },
-      { key: 'users',      label: t('nav.customers'),  icon: Users,           path: 'users',      badge: null },
-    ],
-  },
-  {
-    label: t('nav.catalog'),
-    items: [
-      { key: 'products',   label: t('nav.products'),   icon: Package,           path: 'products',   badge: null },
-      { key: 'spec-types', label: t('nav.specTypes'),  icon: SlidersHorizontal, path: 'spec-types', badge: null },
-      { key: 'brands',     label: t('nav.brands'),     icon: Tag,               path: 'brands',     badge: null },
-      { key: 'categories', label: t('nav.categories'), icon: Grid3X3,           path: 'categories', badge: null },
-      { key: 'coupons',    label: t('nav.coupons'),    icon: Ticket,            path: 'coupons',    badge: null },
-    ],
-  },
-  {
-    label: t('nav.settings'),
-    items: [
-      { key: 'admins', label: t('nav.admins'), icon: ShieldCheck, path: 'admins', badge: null },
-    ],
-  },
-])
+const groups = computed(() => {
+  const c = (resource: string) => auth.can(resource, 'view')
+  return [
+    {
+      label: t('nav.workspace'),
+      items: [
+        { key: 'dashboard',  label: t('nav.dashboard'),  icon: LayoutDashboard, path: 'dashboard',  badge: null },
+        c('orders')    && { key: 'orders',     label: t('nav.orders'),    icon: ShoppingBag, path: 'orders',     badge: null },
+        c('customers') && { key: 'users',      label: t('nav.customers'), icon: Users,       path: 'users',      badge: null },
+      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
+    },
+    {
+      label: t('nav.catalog'),
+      items: [
+        c('products') && { key: 'products',   label: t('nav.products'),  icon: Package,           path: 'products',   badge: null },
+        c('specs')    && { key: 'spec-types', label: t('nav.specTypes'), icon: SlidersHorizontal, path: 'spec-types', badge: null },
+        c('brands')   && { key: 'brands',     label: t('nav.brands'),    icon: Tag,               path: 'brands',     badge: null },
+        c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null },
+        c('coupons')  && { key: 'coupons',    label: t('nav.coupons'),   icon: Ticket,            path: 'coupons',    badge: null },
+      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
+    },
+    auth.can('admins', 'view') ? {
+      label: t('nav.settings'),
+      items: [
+        { key: 'admins', label: t('nav.admins'), icon: ShieldCheck, path: 'admins', badge: null },
+      ],
+    } : null,
+  ].filter((g): g is { label: string; items: { key: string; label: string; icon: any; path: string; badge: string | null }[] } => Boolean(g))
+})
 
 const userInitials = computed(() => {
   const name = auth.user?.name ?? ''
