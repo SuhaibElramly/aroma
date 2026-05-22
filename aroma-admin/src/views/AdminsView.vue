@@ -105,7 +105,7 @@ interface RoleDefinition {
 const rolesData = computed<RoleDefinition[]>(() => [
   { id: 'owner',   name: t('admins.roles.owner'),          desc: t('admins.roleDescs.owner'),    color: 'oklch(26% 0.04 250)',  members: 1, perms: 'all' },
   { id: 'admin',   name: t('admins.roles.admin'),          desc: t('admins.roleDescs.admin'),    color: 'oklch(46% 0.075 210)', members: 0, perms: { products:[1,1,1], orders:[1,1,1], coupons:[1,1,1], customers:[1,1,0], brands:[1,1,1], specs:[1,1,1], admins:[1,0,0] } },
-  { id: 'catalog', name: t('admins.roles.catalogManager'), desc: t('admins.roleDescs.catalog'),  color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
+  { id: 'catalog_manager', name: t('admins.roles.catalogManager'), desc: t('admins.roleDescs.catalog'),  color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
   { id: 'sales',   name: t('admins.roles.sales'),          desc: t('admins.roleDescs.sales'),    color: 'oklch(58% 0.10 32)',   members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
   { id: 'support', name: t('admins.roles.support'),        desc: t('admins.roleDescs.support'),  color: 'oklch(52% 0.045 145)', members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
   { id: 'read_only', name: t('admins.roles.readOnly'),      desc: t('admins.roleDescs.readOnly'), color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
@@ -113,7 +113,7 @@ const rolesData = computed<RoleDefinition[]>(() => [
 
 const rolesWithCounts = computed(() => rolesData.value.map(r => ({
   ...r,
-  members: admins.value.filter(a => a.role === r.id || a.role === r.name.toLowerCase().replace(/ /g, '_')).length,
+  members: admins.value.filter(a => a.role === r.id).length,
 })))
 
 const selectedRoleId = ref('admin')
