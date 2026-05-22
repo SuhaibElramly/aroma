@@ -56,7 +56,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminProductVariantController, AdminProductImageController,
     AdminUserDetailController, AdminCouponController, AdminSpecTypeController,
     AdminProductSpecController, AdminProductVariantGenerateController,
-    AdminProductDiscountController, AdminAdminsController,
+    AdminProductDiscountController, AdminAdminsController, AdminRolesController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -129,4 +129,9 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::put('/admins/{id}',                    [AdminAdminsController::class, 'update']);
     Route::patch('/admins/{id}/reset-password',   [AdminAdminsController::class, 'resetPassword']);
     Route::patch('/admins/{id}/toggle-status',    [AdminAdminsController::class, 'toggleStatus']);
+
+    Route::get('/roles',           [AdminRolesController::class, 'index']);
+    Route::post('/roles',          [AdminRolesController::class, 'store']);
+    Route::put('/roles/{slug}',    [AdminRolesController::class, 'update']);
+    Route::delete('/roles/{slug}', [AdminRolesController::class, 'destroy']);
 });
