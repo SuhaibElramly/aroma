@@ -23,6 +23,16 @@ export interface AdminUser {
   is_admin: boolean
 }
 
+export interface AdminMember {
+  id:          number
+  name:        string
+  phone:       string
+  email:       string
+  role:        string
+  adminStatus: 'active' | 'suspended'
+  createdAt:   string
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalOrders:   number
