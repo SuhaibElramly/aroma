@@ -28,6 +28,11 @@ class AuthService
             return false;
         }
 
+        // Suspended admin accounts cannot log in
+        if ($user->is_admin && $user->admin_status !== 'active') {
+            return false;
+        }
+
         Auth::login($user);
         return true;
     }
