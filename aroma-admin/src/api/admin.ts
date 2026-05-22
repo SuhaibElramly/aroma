@@ -3,7 +3,7 @@ import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
-  SpecType, ProductSpec, AdminUserOrder, AdminMember,
+  SpecType, ProductSpec, AdminUserOrder, AdminMember, AdminRole,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -263,3 +263,24 @@ export const apiToggleAdminStatus = (id: number) =>
 
 export const apiResetAdminPassword = (id: number, password: string) =>
   client.patch<{ message: string }>(`/admin/admins/${id}/reset-password`, { password })
+
+// ── Roles ─────────────────────────────────────────────────────────────
+export const apiGetRoles = () =>
+  client.get<AdminRole[]>('/admin/roles')
+
+export const apiCreateRole = (data: {
+  name:        string
+  color:       string
+  permissions: Record<string, number[]>
+}) =>
+  client.post<AdminRole>('/admin/roles', data)
+
+export const apiUpdateRole = (slug: string, data: Partial<{
+  name:        string
+  color:       string
+  permissions: Record<string, number[]>
+}>) =>
+  client.put<AdminRole>(`/admin/roles/${slug}`, data)
+
+export const apiDeleteRole = (slug: string) =>
+  client.delete(`/admin/roles/${slug}`)

@@ -34,6 +34,14 @@ export interface AdminMember {
   createdAt:   string
 }
 
+export interface AdminRole {
+  id:          number
+  name:        string
+  slug:        string
+  color:       string
+  permissions: Record<string, number[]>
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalOrders:   number
