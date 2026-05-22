@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
 import type { AdminMember } from '../types'
 import {
   apiGetAdmins,
@@ -12,7 +13,7 @@ import {
 import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
-const isOwner = auth.isOwner
+const { isOwner } = storeToRefs(auth)
 
 // ── API state ─────────────────────────────────────────────────────────
 const admins   = ref<AdminMember[]>([])

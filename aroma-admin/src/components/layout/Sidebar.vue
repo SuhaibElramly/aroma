@@ -41,7 +41,7 @@ const groups = computed(() => {
         c('products') && { key: 'products',   label: t('nav.products'),  icon: Package,           path: 'products',   badge: null },
         c('specs')    && { key: 'spec-types', label: t('nav.specTypes'), icon: SlidersHorizontal, path: 'spec-types', badge: null },
         c('brands')   && { key: 'brands',     label: t('nav.brands'),    icon: Tag,               path: 'brands',     badge: null },
-        c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null },
+        c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null }, // shares brands permission — no separate ROLE_PERMS key
         c('coupons')  && { key: 'coupons',    label: t('nav.coupons'),   icon: Ticket,            path: 'coupons',    badge: null },
       ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
     },
