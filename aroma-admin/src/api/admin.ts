@@ -3,7 +3,7 @@ import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
-  SpecType, ProductSpec, AdminUserOrder,
+  SpecType, ProductSpec, AdminUserOrder, AdminMember,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -242,3 +242,21 @@ export const apiGenerateVariants = (productId: number, force = false) =>
   client.post<ProductVariant[]>(
     `/admin/products/${productId}/variants/generate${force ? '?force=true' : ''}`
   )
+
+// ── Admin Team Management ─────────────────────────────────────────────
+export const apiGetAdmins = () =>
+  client.get<AdminMember[]>('/admin/admins')
+
+export const apiCreateAdmin = (data: {
+  name:     string
+  phone:    string
+  role:     string
+  password: string
+}) =>
+  client.post<AdminMember>('/admin/admins', data)
+
+export const apiToggleAdminStatus = (id: number) =>
+  client.patch<AdminMember>(`/admin/admins/${id}/toggle-status`)
+
+export const apiResetAdminPassword = (id: number, password: string) =>
+  client.patch<{ message: string }>(`/admin/admins/${id}/reset-password`, { password })
