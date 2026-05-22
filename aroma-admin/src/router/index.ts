@@ -56,7 +56,7 @@ router.beforeEach(async (to) => {
 
   // Ensure user object is loaded before permission check
   if (auth.isAuthenticated && !auth.user) {
-    await auth.init()
+    await auth.init().catch(() => {})
   }
 
   if (to.meta.requiredResource) {
