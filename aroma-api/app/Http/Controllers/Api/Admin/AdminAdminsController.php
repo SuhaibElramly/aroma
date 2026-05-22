@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -35,10 +36,11 @@ class AdminAdminsController extends Controller
         $data = $request->validate([
             'name'     => 'required|string|max:100',
             'phone'    => 'required|string|max:20|unique:users,phone',
-            'role'     => ['required', Rule::in(array_merge(
-                ['admin', 'catalog_manager', 'sales', 'support', 'read_only'],
-                $isOwner ? ['owner'] : []
-            ))],
+            'role'     => ['required', Rule::in(
+                $isOwner
+                    ? Role::pluck('slug')->toArray()
+                    : Role::where('slug', '!=', 'owner')->pluck('slug')->toArray()
+            )],
             'password' => 'required|string|min:8',
         ]);
 
@@ -59,7 +61,7 @@ class AdminAdminsController extends Controller
     {
         $user = User::where('is_admin', true)->findOrFail($id);
         $data = $request->validate([
-            'role' => ['sometimes', Rule::in(['admin', 'catalog_manager', 'sales', 'support', 'read_only'])],
+            'role' => ['sometimes', Rule::in(Role::where('slug', '!=', 'owner')->pluck('slug')->toArray())],
             'name' => 'sometimes|string|max:100',
         ]);
         $user->update($data);
