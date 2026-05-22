@@ -1,40 +1,32 @@
 <!-- aroma-admin/src/views/AdminsView.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-
-interface AdminUser {
-  id: number
-  name: string
-  phone: string
-  role: string
-  adminStatus: 'active' | 'suspended'
-  createdAt: string
-}
+import { useI18n } from 'vue-i18n'
+import type { AdminMember } from '../types'
+import {
+  apiGetAdmins,
+  apiCreateAdmin,
+  apiToggleAdminStatus,
+  apiResetAdminPassword,
+} from '../api/admin'
 
 // ── API state ─────────────────────────────────────────────────────────
-const admins   = ref<AdminUser[]>([])
+const admins   = ref<AdminMember[]>([])
 const loading  = ref(true)
 const showForm = ref(false)
 const error    = ref<string | null>(null)
 const form     = ref({ name: '', phone: '+218 ', role: 'admin', password: '', showPw: false })
 
-const BASE    = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
-const token   = () => localStorage.getItem('auth_token') ?? ''
-const headers = () => ({
-  'Authorization': `Bearer ${token()}`,
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-})
+const { t } = useI18n()
 
 async function load() {
   error.value = null
   try {
     loading.value = true
-    const res = await fetch(`${BASE}/admin/admins`, { headers: headers() })
-    if (!res.ok) throw new Error(`Failed to load admins: ${res.status}`)
-    admins.value = await res.json()
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to load admins'
+    const res = await apiGetAdmins()
+    admins.value = res.data
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Failed to load admins'
   } finally {
     loading.value = false
   }
@@ -42,44 +34,40 @@ async function load() {
 
 async function createAdmin() {
   error.value = null
-  const res = await fetch(`${BASE}/admin/admins`, {
-    method: 'POST',
-    headers: headers(),
-    body: JSON.stringify({
-      name: form.value.name,
-      phone: form.value.phone,
-      role: form.value.role,
+  try {
+    const res = await apiCreateAdmin({
+      name:     form.value.name,
+      phone:    form.value.phone,
+      role:     form.value.role,
       password: form.value.password,
-    }),
-  })
-  if (res.ok) {
-    admins.value.push(await res.json())
+    })
+    admins.value.push(res.data)
     showForm.value = false
     form.value = { name: '', phone: '+218 ', role: 'admin', password: '', showPw: false }
-  } else {
-    const body = await res.json().catch(() => ({}))
-    error.value = body.message ?? `Failed to create admin: ${res.status}`
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Failed to create admin'
   }
 }
 
-async function toggleStatus(a: AdminUser) {
-  const res = await fetch(`${BASE}/admin/admins/${a.id}/toggle-status`, {
-    method: 'PATCH', headers: headers(),
-  })
-  if (res.ok) {
-    const updated = await res.json()
+async function toggleStatus(a: AdminMember) {
+  try {
+    const res = await apiToggleAdminStatus(a.id)
     const idx = admins.value.findIndex(x => x.id === a.id)
-    if (idx !== -1) admins.value[idx] = { ...admins.value[idx], ...updated }
+    if (idx !== -1) admins.value[idx] = { ...admins.value[idx], ...res.data }
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Failed to update status'
   }
 }
 
-async function resetPassword(a: AdminUser) {
+async function resetPassword(a: AdminMember) {
   const pw = prompt('New temporary password (min 8 chars):')
   if (!pw || pw.length < 8) return
-  const res = await fetch(`${BASE}/admin/admins/${a.id}/reset-password`, {
-    method: 'PATCH', headers: headers(), body: JSON.stringify({ password: pw }),
-  })
-  if (res.ok) alert('Password reset successfully.')
+  try {
+    await apiResetAdminPassword(a.id, pw)
+    alert('Password reset successfully.')
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Failed to reset password'
+  }
 }
 
 function generatePassword() {
@@ -108,17 +96,16 @@ interface RoleDefinition {
   perms: 'all' | Record<string, number[]>
 }
 
-const rolesData: RoleDefinition[] = [
-  { id: 'owner',   name: 'Owner',           desc: 'Full access, including billing & destructive ops.',    color: 'oklch(26% 0.04 250)',  members: 1, perms: 'all' },
-  { id: 'admin',   name: 'Admin',            desc: 'Manages catalog, orders, customers, and team.',       color: 'oklch(46% 0.075 210)', members: 0, perms: { products:[1,1,1], orders:[1,1,1], coupons:[1,1,1], customers:[1,1,0], brands:[1,1,1], specs:[1,1,1], admins:[1,0,0] } },
-  { id: 'catalog', name: 'Catalog manager', desc: 'Builds the catalog: products, brands, specs, coupons.', color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
-  { id: 'sales',   name: 'Sales',            desc: 'Day-to-day order ops and customer support.',          color: 'oklch(58% 0.10 32)',   members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-  { id: 'support', name: 'Support',          desc: 'Handles customer inquiries and refunds only.',        color: 'oklch(52% 0.045 145)', members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-  { id: 'readonly',name: 'Read-only',        desc: 'Can view everything but change nothing.',             color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-]
+const rolesData = computed<RoleDefinition[]>(() => [
+  { id: 'owner',   name: t('admins.roles.owner'),          desc: t('admins.roleDescs.owner'),    color: 'oklch(26% 0.04 250)',  members: 1, perms: 'all' },
+  { id: 'admin',   name: t('admins.roles.admin'),          desc: t('admins.roleDescs.admin'),    color: 'oklch(46% 0.075 210)', members: 0, perms: { products:[1,1,1], orders:[1,1,1], coupons:[1,1,1], customers:[1,1,0], brands:[1,1,1], specs:[1,1,1], admins:[1,0,0] } },
+  { id: 'catalog', name: t('admins.roles.catalogManager'), desc: t('admins.roleDescs.catalog'),  color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
+  { id: 'sales',   name: t('admins.roles.sales'),          desc: t('admins.roleDescs.sales'),    color: 'oklch(58% 0.10 32)',   members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
+  { id: 'support', name: t('admins.roles.support'),        desc: t('admins.roleDescs.support'),  color: 'oklch(52% 0.045 145)', members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
+  { id: 'readonly',name: t('admins.roles.readOnly'),       desc: t('admins.roleDescs.readOnly'), color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
+])
 
-// Populate member counts from live data
-const rolesWithCounts = computed(() => rolesData.map(r => ({
+const rolesWithCounts = computed(() => rolesData.value.map(r => ({
   ...r,
   members: admins.value.filter(a => a.role === r.id || a.role === r.name.toLowerCase().replace(/ /g, '_')).length,
 })))
@@ -132,23 +119,23 @@ interface PermGroup {
   rows: { id: string; name: string }[]
 }
 
-const permGroups: PermGroup[] = [
-  { id: 'catalog', label: 'Catalog', rows: [
-    { id: 'products', name: 'Products' },
-    { id: 'brands',   name: 'Brands' },
-    { id: 'specs',    name: 'Spec types' },
+const permGroups = computed<PermGroup[]>(() => [
+  { id: 'catalog', label: t('admins.permGroups.catalog'), rows: [
+    { id: 'products', name: t('admins.permGroups.products') },
+    { id: 'brands',   name: t('admins.permGroups.brands') },
+    { id: 'specs',    name: t('admins.permGroups.specs') },
   ]},
-  { id: 'sales', label: 'Sales', rows: [
-    { id: 'orders',  name: 'Orders' },
-    { id: 'coupons', name: 'Coupons' },
+  { id: 'sales', label: t('admins.permGroups.sales'), rows: [
+    { id: 'orders',  name: t('admins.permGroups.orders') },
+    { id: 'coupons', name: t('admins.permGroups.coupons') },
   ]},
-  { id: 'people', label: 'People', rows: [
-    { id: 'customers', name: 'Customers' },
+  { id: 'people', label: t('admins.permGroups.people'), rows: [
+    { id: 'customers', name: t('admins.permGroups.customers') },
   ]},
-  { id: 'system', label: 'System', rows: [
-    { id: 'admins', name: 'Admin team' },
+  { id: 'system', label: t('admins.permGroups.system'), rows: [
+    { id: 'admins', name: t('admins.permGroups.adminTeam') },
   ]},
-]
+])
 
 function getPerm(resource: string, idx: number): boolean {
   const role = selectedRole.value
@@ -160,15 +147,19 @@ function getPerm(resource: string, idx: number): boolean {
 const stats = computed(() => ({
   total:     admins.value.length,
   active:    admins.value.filter(a => a.adminStatus === 'active').length,
-  roles:     rolesData.length,
+  roles:     rolesData.value.length,
   suspended: admins.value.filter(a => a.adminStatus === 'suspended').length,
 }))
 
 // ── Visual helpers ────────────────────────────────────────────────────
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner', admin: 'Admin', catalog_manager: 'Catalog Manager',
-  sales: 'Sales', support: 'Support', read_only: 'Read-only',
-}
+const ROLE_LABELS = computed<Record<string, string>>(() => ({
+  owner: t('admins.roles.owner'),
+  admin: t('admins.roles.admin'),
+  catalog_manager: t('admins.roles.catalogManager'),
+  sales: t('admins.roles.sales'),
+  support: t('admins.roles.support'),
+  read_only: t('admins.roles.readOnly'),
+}))
 
 const ROLE_HUE: Record<string, number> = {
   owner: 250, admin: 210, catalog_manager: 340, sales: 32, support: 140, read_only: 230, readonly: 230,
@@ -285,7 +276,7 @@ onMounted(load)
                 placeholder="+218..."
                 class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 font-mono focus:border-dash-primary transition-colors"
               />
-              <p class="text-[10px] mt-1 text-dash-faint">Used as login · must be unique</p>
+              <p class="text-[10px] mt-1 text-dash-faint">{{ $t('admins.phoneHint') }}</p>
             </div>
             <div class="col-span-3">
               <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1 block">{{ $t('admins.role') }}</label>
@@ -293,40 +284,40 @@ onMounted(load)
                 v-model="form.role"
                 class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 focus:border-dash-primary transition-colors"
               >
-                <option value="admin">Admin</option>
-                <option value="catalog_manager">Catalog Manager</option>
-                <option value="sales">Sales</option>
-                <option value="support">Support</option>
-                <option value="read_only">Read-only</option>
+                <option value="admin">{{ $t('admins.roles.admin') }}</option>
+                <option value="catalog_manager">{{ $t('admins.roles.catalogManager') }}</option>
+                <option value="sales">{{ $t('admins.roles.sales') }}</option>
+                <option value="support">{{ $t('admins.roles.support') }}</option>
+                <option value="read_only">{{ $t('admins.roles.readOnly') }}</option>
               </select>
             </div>
             <div class="col-span-12">
               <div class="flex items-center justify-between mb-1">
                 <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint">{{ $t('admins.tempPassword') }}</label>
-                <button type="button" class="text-[10.5px] font-medium text-dash-primary hover:opacity-80" @click="generatePassword">Generate</button>
+                <button type="button" class="text-[10.5px] font-medium text-dash-primary hover:opacity-80" @click="generatePassword">{{ $t('admins.generate') }}</button>
               </div>
               <div class="flex items-center gap-2 px-3 rounded-lg border border-dash-border bg-dash-paper-2 h-9">
                 <input
                   :type="form.showPw ? 'text' : 'password'"
                   v-model="form.password"
                   required
-                  placeholder="At least 8 characters"
+                  :placeholder="$t('admins.passwordPlaceholder')"
                   class="bg-transparent text-[12.5px] outline-none flex-1 font-mono text-dash-text-2"
                   :style="{ letterSpacing: form.showPw ? '0' : '0.18em' }"
                 />
                 <button type="button" class="text-[10.5px] font-medium text-dash-muted" @click="form.showPw = !form.showPw">
-                  {{ form.showPw ? 'Hide' : 'Show' }}
+                  {{ form.showPw ? $t('admins.hidePassword') : $t('admins.showPassword') }}
                 </button>
-                <button v-if="form.password" type="button" class="text-[10.5px] font-medium text-dash-primary" @click="copyPassword">Copy</button>
+                <button v-if="form.password" type="button" class="text-[10.5px] font-medium text-dash-primary" @click="copyPassword">{{ $t('admins.copyPassword') }}</button>
               </div>
               <p class="text-[10px] mt-1.5 text-dash-muted">
-                <span class="text-dash-text-2">→</span> Share with the admin — they'll be asked to change it on first sign-in.
+                <span class="text-dash-text-2">→</span> {{ $t('admins.passwordShareHint') }}
               </p>
             </div>
           </div>
           <div class="flex items-center justify-end gap-2 pt-3 border-t border-dash-border-lt">
-            <button type="button" @click="showForm = false" class="h-9 px-3.5 rounded-lg text-[12.5px] font-medium border border-dash-border bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors">Cancel</button>
-            <button type="submit" class="h-9 px-4 rounded-lg text-[12.5px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity">Create admin</button>
+            <button type="button" @click="showForm = false" class="h-9 px-3.5 rounded-lg text-[12.5px] font-medium border border-dash-border bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors">{{ $t('common.cancel') }}</button>
+            <button type="submit" class="h-9 px-4 rounded-lg text-[12.5px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity">{{ $t('admins.createAdmin') }}</button>
           </div>
         </form>
       </div>
@@ -460,23 +451,23 @@ onMounted(load)
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6z"/></svg>
               </div>
               <div class="min-w-0">
-                <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">Role</p>
+                <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ $t('admins.roleHeading') }}</p>
                 <h2 class="font-display text-[22px] leading-tight mt-0.5 text-dash-text">{{ selectedRole.name }}</h2>
                 <p class="text-[11.5px] text-dash-muted">{{ selectedRole.desc }}</p>
               </div>
             </div>
             <div v-if="selectedRole.id !== 'owner'" class="flex items-center gap-2 shrink-0">
-              <button class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 whitespace-nowrap transition-colors">Edit</button>
+              <button class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 whitespace-nowrap transition-colors">{{ $t('common.edit') }}</button>
             </div>
           </div>
 
           <table class="w-full text-[12.5px]">
             <thead>
               <tr class="text-[10.5px] uppercase tracking-wider text-dash-faint">
-                <th class="text-start font-semibold py-2 border-b border-dash-border-lt">Resource</th>
-                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">View</th>
-                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">Edit</th>
-                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">Delete</th>
+                <th class="text-start font-semibold py-2 border-b border-dash-border-lt">{{ $t('admins.colResource') }}</th>
+                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">{{ $t('admins.colView') }}</th>
+                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">{{ $t('admins.colEdit') }}</th>
+                <th class="font-semibold py-2 border-b border-dash-border-lt text-center w-20">{{ $t('admins.colDelete') }}</th>
               </tr>
             </thead>
             <tbody>
