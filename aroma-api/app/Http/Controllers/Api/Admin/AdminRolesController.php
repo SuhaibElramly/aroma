@@ -21,9 +21,11 @@ class AdminRolesController extends Controller
         }
 
         $data = $request->validate([
-            'name'        => 'required|string|max:60',
-            'color'       => 'required|string|max:100',
-            'permissions' => 'required|array',
+            'name'          => 'required|string|max:60',
+            'color'         => 'required|string|max:100',
+            'permissions'   => 'required|array',
+            'permissions.*' => 'array',
+            'permissions.*.*' => 'integer|min:0|max:1',
         ]);
 
         $slug = Str::slug($data['name']);
@@ -33,12 +35,16 @@ class AdminRolesController extends Controller
             $slug = $base . '-' . $i++;
         }
 
-        $role = Role::create([
-            'name'        => $data['name'],
-            'slug'        => $slug,
-            'color'       => $data['color'],
-            'permissions' => $data['permissions'],
-        ]);
+        try {
+            $role = Role::create([
+                'name'        => $data['name'],
+                'slug'        => $slug,
+                'color'       => $data['color'],
+                'permissions' => $data['permissions'],
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['message' => 'A role with a similar name already exists.'], 422);
+        }
 
         return response()->json($role, 201);
     }
@@ -52,9 +58,11 @@ class AdminRolesController extends Controller
         $role = Role::where('slug', $slug)->firstOrFail();
 
         $data = $request->validate([
-            'name'        => 'sometimes|string|max:60',
-            'color'       => 'sometimes|string|max:100',
-            'permissions' => 'sometimes|array',
+            'name'          => 'sometimes|string|max:60',
+            'color'         => 'sometimes|string|max:100',
+            'permissions'   => 'sometimes|array',
+            'permissions.*' => 'sometimes|array',
+            'permissions.*.*' => 'sometimes|integer|min:0|max:1',
         ]);
 
         $role->update($data);
