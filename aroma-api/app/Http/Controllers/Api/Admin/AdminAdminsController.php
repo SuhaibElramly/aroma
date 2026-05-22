@@ -30,10 +30,15 @@ class AdminAdminsController extends Controller
 
     public function store(Request $request)
     {
+        $isOwner = $request->user()->role === 'owner';
+
         $data = $request->validate([
             'name'     => 'required|string|max:100',
             'phone'    => 'required|string|max:20|unique:users,phone',
-            'role'     => ['required', Rule::in(['admin', 'catalog_manager', 'sales', 'support', 'read_only'])],
+            'role'     => ['required', Rule::in(array_merge(
+                ['admin', 'catalog_manager', 'sales', 'support', 'read_only'],
+                $isOwner ? ['owner'] : []
+            ))],
             'password' => 'required|string|min:8',
         ]);
 

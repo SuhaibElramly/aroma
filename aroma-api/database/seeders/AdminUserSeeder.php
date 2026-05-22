@@ -14,10 +14,12 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@aroma.ly'],
             [
-                'name' => 'Admin',
-                'phone' => '0910000000',
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
-                'is_admin' => true,
+                'name'         => 'Admin',
+                'phone'        => '0910000000',
+                'password'     => Hash::make(env('ADMIN_PASSWORD', 'password')),
+                'is_admin'     => true,
+                'role'         => 'owner',
+                'admin_status' => 'active',
             ]
         );
     }

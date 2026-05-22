@@ -9,6 +9,10 @@ import {
   apiToggleAdminStatus,
   apiResetAdminPassword,
 } from '../api/admin'
+import { useAuthStore } from '../stores/auth'
+
+const auth = useAuthStore()
+const isOwner = computed(() => auth.user?.role === 'owner')
 
 // ── API state ─────────────────────────────────────────────────────────
 const admins   = ref<AdminMember[]>([])
@@ -288,6 +292,7 @@ onMounted(load)
                 v-model="form.role"
                 class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 focus:border-dash-primary transition-colors"
               >
+                <option v-if="isOwner" value="owner">{{ $t('admins.roles.owner') }}</option>
                 <option value="admin">{{ $t('admins.roles.admin') }}</option>
                 <option value="catalog_manager">{{ $t('admins.roles.catalogManager') }}</option>
                 <option value="sales">{{ $t('admins.roles.sales') }}</option>

@@ -21,6 +21,7 @@ export interface AdminUser {
   name: string
   email: string
   is_admin: boolean
+  role: string | null
 }
 
 export interface AdminMember {
