@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiLogin } from '../api/admin'
+import { apiLogin, apiGetMe } from '../api/admin'
 import type { AdminUser } from '../types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -19,11 +19,22 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('admin_token', res.data.token)
   }
 
+  async function init() {
+    if (!token.value) return
+    try {
+      const res = await apiGetMe()
+      user.value = res.data
+    } catch {
+      token.value = null
+      localStorage.removeItem('admin_token')
+    }
+  }
+
   function logout() {
     token.value = null
     user.value  = null
     localStorage.removeItem('admin_token')
   }
 
-  return { token, user, isAuthenticated, login, logout }
+  return { token, user, isAuthenticated, login, logout, init }
 })

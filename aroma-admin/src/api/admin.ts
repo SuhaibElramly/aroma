@@ -10,6 +10,9 @@ import type {
 export const apiLogin = (email: string, password: string) =>
   client.post<{ user: AdminUser; token: string }>('/auth/login', { email, password })
 
+export const apiGetMe = () =>
+  client.get<AdminUser>('/user')
+
 // ── Dashboard ─────────────────────────────────────────────────────────
 export const apiGetStats = () =>
   client.get<DashboardStats>('/admin/stats')
