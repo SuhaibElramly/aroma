@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { formatPrice } from '@/lib/formatters'
+import { getProductPlaceholder } from '@/lib/product-placeholder'
 import { ProductPlaceholder } from './ProductPlaceholder'
 import { WishlistButton } from './WishlistButton'
 import type { Product } from '@/types'
@@ -26,7 +27,7 @@ export function ProductCard({ product, compact = false }: Props) {
         {/* Image area */}
         <div
           className="relative rounded overflow-hidden mb-3.5"
-          style={{ height: imgH, backgroundColor: product.placeholder.bg }}
+          style={{ height: imgH, backgroundColor: (product.placeholder ?? getProductPlaceholder(product)).bg }}
         >
           {product.thumbnailUrl ? (
             <Image

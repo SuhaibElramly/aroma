@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link            from 'next/link'
+import Image           from 'next/image'
 import { useRouter }   from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Minus, Plus, X, ShoppingBag } from 'lucide-react'
@@ -12,6 +13,7 @@ import { useAuthStore }       from '@/store/auth'
 import { useUIStore }         from '@/store/ui'
 import { useCart, useUpdateCartItem, useRemoveFromCart } from '@/lib/api/queries'
 import { formatPrice }        from '@/lib/formatters'
+import { getProductPlaceholder } from '@/lib/product-placeholder'
 
 export function CartPageClient() {
   const router     = useRouter()
@@ -80,7 +82,22 @@ export function CartPageClient() {
                     href={`/product/${item.product.slug}`}
                     className="w-[90px] h-[110px] rounded shrink-0 overflow-hidden"
                   >
-                    <ProductPlaceholder product={item.product} height={110} />
+                    {item.product.thumbnailUrl ? (
+                      <div
+                        className="relative w-full h-full"
+                        style={{ backgroundColor: (item.product.placeholder ?? getProductPlaceholder(item.product)).bg }}
+                      >
+                        <Image
+                          src={item.product.thumbnailUrl}
+                          alt={item.product.name}
+                          fill
+                          sizes="90px"
+                          className="object-contain p-2"
+                        />
+                      </div>
+                    ) : (
+                      <ProductPlaceholder product={item.product} height={110} />
+                    )}
                   </Link>
 
                   <div className="flex-1 min-w-0">

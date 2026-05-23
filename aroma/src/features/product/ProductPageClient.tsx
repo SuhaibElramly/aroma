@@ -16,6 +16,7 @@ import { useAuthStore }   from '@/store/auth'
 import { useUIStore }     from '@/store/ui'
 import { formatPrice }    from '@/lib/formatters'
 import { useProduct, useSimilarProducts, useAddToCart } from '@/lib/api/queries'
+import { getProductPlaceholder } from '@/lib/product-placeholder'
 
 export function ProductPageClient({ slug }: { slug: string }) {
   const router      = useRouter()
@@ -103,7 +104,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
           {/* Main image */}
           <div
             className="rounded-lg overflow-hidden mb-4 relative"
-            style={{ height: 480, backgroundColor: product.placeholder.bg }}
+            style={{ height: 480, backgroundColor: (product.placeholder ?? getProductPlaceholder(product)).bg }}
           >
             {displayImg ? (
               <Image
@@ -128,7 +129,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
                   className="flex-1 rounded overflow-hidden cursor-pointer relative"
                   style={{
                     height: 90,
-                    backgroundColor: product.placeholder.bg,
+                    backgroundColor: (product.placeholder ?? getProductPlaceholder(product)).bg,
                     border: displayImg === img.url
                       ? '2px solid #1C1917'
                       : '2px solid transparent',

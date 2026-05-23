@@ -85,7 +85,7 @@ export interface Product {
   new: boolean
   bestseller: boolean
   offer: boolean
-  placeholder: ProductPlaceholderStyle
+  placeholder?: ProductPlaceholderStyle
   thumbnailUrl?: string | null
   images?: ProductImage[]
   variants?: StorefrontVariant[]

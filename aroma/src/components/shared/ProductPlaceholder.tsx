@@ -1,12 +1,13 @@
+import { getProductPlaceholder } from '@/lib/product-placeholder'
 import type { Product } from '@/types'
 
 interface Props {
-  product: Pick<Product, 'placeholder' | 'type' | 'selectedVariant'>
+  product: Pick<Product, 'id' | 'placeholder' | 'type' | 'selectedVariant'>
   height?: number
 }
 
 export function ProductPlaceholder({ product, height = 280 }: Props) {
-  const { bg, dot } = product.placeholder
+  const { bg, dot } = product.placeholder ?? getProductPlaceholder(product)
   const bottleH = height * 0.65
   const bottleW = height * 0.45
 
