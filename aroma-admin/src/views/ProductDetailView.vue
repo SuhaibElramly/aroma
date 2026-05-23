@@ -76,44 +76,58 @@ async function uploadImages(event: Event) {
   const input = event.target as HTMLInputElement
   if (!input.files?.length) return
   uploadingImages.value = true
-  const formData = new FormData()
-  Array.from(input.files).forEach(f => formData.append('images[]', f))
-  const res = await fetch(`${BASE}/admin/products/${props.id}/images`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token()}`, 'Accept': 'application/json' },
-    body: formData,
-  })
-  if (res.ok) {
-    const newImgs = await res.json()
-    images.value.push(...newImgs)
+  try {
+    const formData = new FormData()
+    Array.from(input.files).forEach(f => formData.append('images[]', f))
+    const res = await fetch(`${BASE}/admin/products/${props.id}/images`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token()}`, 'Accept': 'application/json' },
+      body: formData,
+    })
+    if (res.ok) {
+      const newImgs = await res.json()
+      images.value.push(...newImgs)
+    }
+  } finally {
+    uploadingImages.value = false
+    input.value = ''
   }
-  uploadingImages.value = false
-  input.value = ''
 }
 
 async function setThumbnail(imageId: number) {
   settingThumbId.value = imageId
-  const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}/thumbnail`, {
-    method: 'PATCH',
-    headers: headers(),
-  })
-  if (res.ok) {
-    images.value.forEach(img => { img.isThumbnail = img.id === imageId })
+  try {
+    const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}/thumbnail`, {
+      method: 'PATCH',
+      headers: headers(),
+    })
+    if (res.ok) {
+      images.value.forEach(img => { img.isThumbnail = img.id === imageId })
+    }
+  } finally {
+    settingThumbId.value = null
   }
-  settingThumbId.value = null
 }
 
 async function deleteImage(imageId: number) {
   if (!confirm(t('productDetail.deleteImageConfirm'))) return
   deletingImageId.value = imageId
-  const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}`, {
-    method: 'DELETE',
-    headers: headers(),
-  })
-  if (res.ok) {
-    images.value = images.value.filter(img => img.id !== imageId)
+  try {
+    const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}`, {
+      method: 'DELETE',
+      headers: headers(),
+    })
+    if (res.ok) {
+      const wasThumbnail = images.value.find(img => img.id === imageId)?.isThumbnail
+      images.value = images.value.filter(img => img.id !== imageId)
+      if (wasThumbnail && images.value.length > 0) {
+        const next = [...images.value].sort((a, b) => a.sortOrder - b.sortOrder)[0]
+        next.isThumbnail = true
+      }
+    }
+  } finally {
+    deletingImageId.value = null
   }
-  deletingImageId.value = null
 }
 
 function openProductEdit() {
