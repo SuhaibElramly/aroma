@@ -13,15 +13,35 @@
       <!-- Form card -->
       <div class="rounded-card bg-dash-surface border border-dash-border p-7 shadow-card">
         <form @submit.prevent="handleLogin" class="space-y-4" novalidate>
-          <AInput
-            v-model="phone"
-            :label="t('login.phone')"
-            type="tel"
-            :placeholder="t('login.phonePlaceholder')"
-            autocomplete="tel"
-            dir="ltr"
-            :error="errors.phone"
-          />
+          <!-- Phone input with Libyan flag prefix -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-2xs font-semibold text-dash-muted uppercase tracking-wider">
+              {{ t('login.phone') }}
+            </label>
+            <div
+              class="flex rounded-btn border overflow-hidden transition-all duration-200"
+              :class="errors.phone
+                ? 'border-dash-danger bg-dash-danger-lt/40'
+                : 'border-dash-border hover:border-dash-muted/40 focus-within:border-dash-primary focus-within:ring-2 focus-within:ring-dash-primary/10'"
+            >
+              <!-- Flag + country code -->
+              <div class="flex items-center gap-1.5 px-3 bg-dash-paper-2 border-r border-dash-border shrink-0 select-none">
+                <span class="text-sm leading-none">🇱🇾</span>
+                <span class="text-xs font-semibold text-dash-text-2 tracking-wide">+218</span>
+              </div>
+              <!-- Local number -->
+              <input
+                v-model="phone"
+                type="tel"
+                inputmode="numeric"
+                :placeholder="t('login.phonePlaceholder')"
+                autocomplete="tel-national"
+                dir="ltr"
+                class="flex-1 px-3 py-2 text-xs text-dash-text placeholder:text-dash-faint bg-transparent outline-none"
+              />
+            </div>
+            <p v-if="errors.phone" class="text-2xs text-dash-danger">{{ errors.phone }}</p>
+          </div>
           <AInput
             v-model="password"
             :label="t('login.password')"
@@ -65,14 +85,26 @@ const password = ref('')
 const loading  = ref(false)
 const errors   = ref<Record<string, string>>({})
 
+// Normalise whatever the user types into +218XXXXXXXXX stored format
+function normalizePhone(raw: string): string {
+  // Strip spaces, dashes, parentheses
+  let digits = raw.replace(/[\s\-()]/g, '')
+  // Strip leading 0  (0919…  →  919…)
+  if (digits.startsWith('0')) digits = digits.slice(1)
+  // Strip +218 / 218 prefix if user accidentally included it
+  if (digits.startsWith('+218')) digits = digits.slice(4)
+  else if (digits.startsWith('218')) digits = digits.slice(3)
+  return '+218' + digits
+}
+
 async function handleLogin() {
   errors.value = {}
-  if (!phone.value)    { errors.value.phone    = t('login.phoneRequired');    return }
-  if (!password.value) { errors.value.password = t('login.passwordRequired'); return }
+  if (!phone.value.trim()) { errors.value.phone    = t('login.phoneRequired');    return }
+  if (!password.value)     { errors.value.password = t('login.passwordRequired'); return }
 
   loading.value = true
   try {
-    await auth.login(phone.value, password.value)
+    await auth.login(normalizePhone(phone.value), password.value)
     router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : t('login.loginFailed')

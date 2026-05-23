@@ -81,7 +81,7 @@ const ar = {
     title: 'مرحباً بعودتك',
     subtitle: 'تسجيل الدخول لإدارة متجر أرومة',
     phone: 'رقم الهاتف',
-    phonePlaceholder: '+218 91 234 5678',
+    phonePlaceholder: '91 234 5678',
     password: 'كلمة المرور',
     passwordPlaceholder: '••••••••',
     submit: 'تسجيل الدخول',

@@ -79,7 +79,7 @@ const en = {
     title: 'Welcome back',
     subtitle: 'Sign in to manage Aroma Shop',
     phone: 'Phone number',
-    phonePlaceholder: '+218 91 234 5678',
+    phonePlaceholder: '91 234 5678',
     password: 'Password',
     passwordPlaceholder: '••••••••',
     submit: 'Sign in',

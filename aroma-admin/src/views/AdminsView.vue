@@ -23,7 +23,7 @@ const admins   = ref<AdminMember[]>([])
 const loading  = ref(true)
 const showForm = ref(false)
 const error    = ref<string | null>(null)
-const form     = ref({ name: '', phone: '+218 ', role: 'admin', password: '', showPw: false })
+const form     = ref({ name: '', phone: '+218', role: 'admin', password: '', showPw: false })
 
 const { t } = useI18n()
 
@@ -45,13 +45,13 @@ async function createAdmin() {
   try {
     const res = await apiCreateAdmin({
       name:     form.value.name,
-      phone:    form.value.phone,
+      phone:    form.value.phone.replace(/\s/g, ''),
       role:     form.value.role,
       password: form.value.password,
     })
     admins.value.push(res.data)
     showForm.value = false
-    form.value = { name: '', phone: '+218 ', role: 'admin', password: '', showPw: false }
+    form.value = { name: '', phone: '+218', role: 'admin', password: '', showPw: false }
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'Failed to create admin'
   }

@@ -15,7 +15,8 @@ class AdminUserSeeder extends Seeder
             ['email' => 'admin@aroma.ly'],
             [
                 'name'         => 'Admin',
-                'phone'        => '0910000000',
+                'phone'        => '+218910000000',
+                'email'        => 'admin@aroma.ly',
                 'password'     => Hash::make(env('ADMIN_PASSWORD', 'password')),
                 'is_admin'     => true,
                 'role'         => 'owner',
