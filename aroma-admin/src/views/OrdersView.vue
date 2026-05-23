@@ -96,7 +96,8 @@
         <span class="text-dash-muted text-[11px] ml-1">LYD</span>
       </template>
       <template #cell-paymentStatus="{ value }">
-        <ABadge :status="value as string" />
+        <ABadge v-if="value" :status="value as string" />
+        <span v-else class="text-dash-faint text-[11px]">—</span>
       </template>
       <template #cell-isPickup="{ value }">
         <span :class="[
