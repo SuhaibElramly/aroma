@@ -118,6 +118,21 @@
                   <ATextarea v-model="form.description" :placeholder="t('newProductDrawer.descriptionPh')" rows="3" />
                 </div>
 
+                <!-- Card colour -->
+                <div>
+                  <label class="label-field">{{ t('newProductDrawer.cardColour') }}</label>
+                  <div class="flex items-center gap-2">
+                    <div class="relative w-8 h-8 rounded-btn overflow-hidden border border-dash-border shrink-0">
+                      <input type="color" v-model="form.placeholderBg"
+                             class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
+                      <div class="w-full h-full" :style="{ backgroundColor: form.placeholderBg }" />
+                    </div>
+                    <input type="text" v-model="form.placeholderBg" maxlength="7"
+                           class="w-28 rounded-btn border border-dash-border bg-dash-bg px-2.5 py-1.5
+                                  text-xs font-mono text-dash-text focus:outline-none focus:border-dash-primary" />
+                  </div>
+                </div>
+
                 <!-- Flag chips -->
                 <div>
                   <label class="label-field">{{ t('newProductDrawer.tags') }}</label>
@@ -471,6 +486,7 @@ const emptyForm = () => ({
   isNew:        false,
   isBestseller: false,
   isOffer:      false,
+  placeholderBg: '#F2E8E5',
 })
 
 const form         = ref(emptyForm())
@@ -489,6 +505,10 @@ const slug = computed(() => toSlug(form.value.nameEn))
 // ── Computed helpers ──────────────────────────────────────────────────────────
 const selectedBrand    = computed(() => brands.value.find(b => b.id === form.value.brandId))
 const selectedCategory = computed(() => categories.value.find(c => String(c.id) === form.value.categoryId))
+
+watch(selectedCategory, (cat) => {
+  if (cat?.bg) form.value.placeholderBg = cat.bg
+})
 
 const previewInitial = computed(() => {
   const n = form.value.nameEn || form.value.nameAr
@@ -663,7 +683,7 @@ async function handlePublish() {
       is_new:          form.value.isNew,
       is_bestseller:   form.value.isBestseller,
       is_offer:        form.value.isOffer,
-      placeholder_bg:  selectedCategory.value?.bg || '#F2E8E5',
+      placeholder_bg:  form.value.placeholderBg,
       placeholder_dot: '#C9A0A0',
     })
     const productId: number = product.id

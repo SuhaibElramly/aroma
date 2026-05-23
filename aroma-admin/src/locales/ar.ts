@@ -375,6 +375,7 @@ const ar = {
     category:       'الفئة',
     description:    'الوصف',
     descriptionPh:  'النوتات العليا والوسطى والقاعدة…',
+    cardColour:     'لون البطاقة',
     tags:           'الوسوم',
     flagNew:        'جديد',
     flagBest:       'الأكثر مبيعاً',

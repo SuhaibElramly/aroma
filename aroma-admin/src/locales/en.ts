@@ -373,6 +373,7 @@ const en = {
     category:       'Category',
     description:    'Description',
     descriptionPh:  'Top notes, heart, base…',
+    cardColour:     'Card Colour',
     tags:           'Tags',
     flagNew:        'New arrival',
     flagBest:       'Bestseller',
