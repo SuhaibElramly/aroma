@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Address;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
@@ -81,6 +82,7 @@ class OrderService
             'placeholder_dot'      => '#C9A0A0',
             'coupon_code'          => $couponCode,
             'discount_amount'      => $discountAmount > 0 ? $discountAmount : null,
+            'payment_status'       => PaymentStatus::NotPaid,
         ]);
 
         foreach ($data['items'] as $item) {
