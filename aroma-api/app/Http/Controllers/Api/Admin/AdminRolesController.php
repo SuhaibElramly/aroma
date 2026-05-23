@@ -57,6 +57,10 @@ class AdminRolesController extends Controller
 
         $role = Role::where('slug', $slug)->firstOrFail();
 
+        if ($role->slug === 'owner') {
+            return response()->json(['message' => 'The owner role cannot be modified.'], 422);
+        }
+
         $data = $request->validate([
             'name'          => 'sometimes|string|max:60',
             'color'         => 'sometimes|string|max:100',
@@ -77,6 +81,11 @@ class AdminRolesController extends Controller
         }
 
         $role  = Role::where('slug', $slug)->firstOrFail();
+
+        if ($role->slug === 'owner') {
+            return response()->json(['message' => 'The owner role cannot be deleted.'], 422);
+        }
+
         $count = User::where('is_admin', true)->where('role', $slug)->count();
 
         if ($count > 0) {
