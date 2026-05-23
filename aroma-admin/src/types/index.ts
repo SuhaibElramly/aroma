@@ -4,6 +4,8 @@ export type OrderStatus =
   | 'placed' | 'confirmed' | 'preparing'
   | 'ready'  | 'delivered' | 'cancelled'
 
+export type PaymentStatus = 'not_paid' | 'partially_paid' | 'paid'
+
 export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock'
 
 export type ProductType = 'EDP' | 'EDT' | 'Parfum' | 'EDC'
@@ -107,6 +109,7 @@ export interface AdminOrder {
   userEmail: string
   total: string
   status: OrderStatus
+  paymentStatus: PaymentStatus | null
   isPickup: boolean
   note: string
   adminNote: string | null
@@ -116,6 +119,20 @@ export interface AdminOrder {
   timeline?: AdminTimelineEntry[]
   couponCode?: string | null
   discountAmount?: number | null
+}
+
+export interface OrderPayment {
+  id: number
+  amount: number
+  note: string | null
+  createdAt: string
+}
+
+export interface OrderPaymentsResponse {
+  paymentStatus: PaymentStatus
+  total: number
+  paid: number
+  payments: OrderPayment[]
 }
 
 export interface AdminOrderItem {
