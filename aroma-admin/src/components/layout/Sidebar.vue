@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Search,
   LogOut,
+  Home,
 } from 'lucide-vue-next'
 
 const { t, locale } = useI18n()
@@ -44,6 +45,12 @@ const groups = computed(() => {
         c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null }, // shares brands permission — no separate ROLE_PERMS key
         c('coupons')  && { key: 'coupons',    label: t('nav.coupons'),   icon: Ticket,            path: 'coupons',    badge: null },
       ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
+    },
+    {
+      label: t('nav.storefront'),
+      items: [
+        { key: 'homepage', label: t('nav.homepage'), icon: Home, path: 'homepage', badge: null },
+      ],
     },
     auth.can('admins', 'view') ? {
       label: t('nav.settings'),

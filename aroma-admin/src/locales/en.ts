@@ -50,6 +50,8 @@ const en = {
     search: 'Search',
     settings: 'Settings',
     admins: 'Admins',
+    storefront: 'Storefront',
+    homepage: 'Homepage',
   },
   topbar: {
     signOut: 'Sign Out',
