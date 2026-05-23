@@ -34,5 +34,8 @@ class DatabaseSeeder extends Seeder
                 'email' => 'test@example.com',
             ]);
         }
+
+        // Seed homepage blocks and hero config
+        $this->call(HomepageBlockSeeder::class);
     }
 }
