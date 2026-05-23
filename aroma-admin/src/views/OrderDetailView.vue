@@ -317,23 +317,84 @@
         </div>
 
         <!-- Payment card -->
-        <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-5">
-          <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('orderDetail.paymentLabel') }}</p>
-          <div class="mt-3 flex items-center gap-3">
-            <div
-              class="h-10 w-14 rounded-md grid place-items-center text-[10.5px] font-bold border border-dash-border-lt"
-              style="background: linear-gradient(135deg, oklch(94% 0.04 240), oklch(90% 0.06 240)); color: var(--dash-text, oklch(26% 0.04 250))"
-            >VISA</div>
+        <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-5 space-y-4">
+
+          <!-- Header row: label + status badge -->
+          <div class="flex items-center justify-between">
             <div>
-              <p class="text-[12.5px] font-semibold tabular-nums text-dash-text">•••• 4218</p>
-              <p class="text-[10.5px] text-dash-muted">{{ t('orderDetail.paidLabel') }} · {{ order.date }}</p>
+              <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('orderDetail.paymentLabel') }}</p>
+              <p class="text-[11px] text-dash-muted mt-0.5">{{ t('paymentMethod') }}</p>
             </div>
-            <ABadge status="paid" class="ms-auto" />
+            <ABadge :status="payments?.paymentStatus ?? order.paymentStatus ?? 'not_paid'" />
           </div>
-          <div class="mt-3 pt-3 border-t border-dash-border-lt flex items-center justify-between text-[12.5px]">
-            <span class="text-dash-muted">{{ t('orderDetail.amountCharged') }}</span>
-            <span class="tabular-nums font-semibold text-dash-text">{{ Number(order.total).toFixed(2) }} LYD</span>
+
+          <!-- Financial summary rows -->
+          <div class="space-y-1.5 text-[12.5px]">
+            <div class="flex items-center justify-between">
+              <span class="text-dash-muted">{{ t('paymentTotal') }}</span>
+              <span class="tabular-nums text-dash-text-2">{{ Number(order.total).toFixed(2) }} LYD</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-dash-muted">{{ t('paymentPaid_amount') }}</span>
+              <span
+                class="tabular-nums font-semibold"
+                :class="(payments?.paid ?? 0) > 0 ? 'text-dash-success-dk' : 'text-dash-text-2'"
+              >{{ (payments?.paid ?? 0).toFixed(2) }} LYD</span>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 border-t border-dash-border-lt">
+              <span class="text-dash-muted">{{ t('paymentRemaining') }}</span>
+              <span
+                class="tabular-nums font-semibold"
+                :class="paymentRemaining > 0 ? 'text-dash-danger' : 'text-dash-text-2'"
+              >{{ paymentRemaining.toFixed(2) }} LYD</span>
+            </div>
           </div>
+
+          <!-- Payment history -->
+          <div class="pt-1">
+            <p class="text-[10.5px] tracking-[.14em] uppercase font-semibold text-dash-faint mb-2">{{ t('paymentHistory') }}</p>
+            <div v-if="payments && payments.payments.length > 0" class="space-y-2">
+              <div
+                v-for="payment in payments.payments"
+                :key="payment.id"
+                class="flex items-start justify-between gap-3 rounded-btn bg-dash-bg border border-dash-border-lt px-3 py-2"
+              >
+                <div class="min-w-0">
+                  <p class="text-[11.5px] tabular-nums text-dash-muted">{{ payment.createdAt }}</p>
+                  <p v-if="payment.note" class="text-[10.5px] text-dash-faint mt-0.5 truncate">{{ payment.note }}</p>
+                </div>
+                <span class="text-[12.5px] tabular-nums font-semibold text-dash-success-dk shrink-0">+{{ Number(payment.amount).toFixed(2) }} LYD</span>
+              </div>
+            </div>
+            <p v-else class="text-[11px] text-dash-faint italic">{{ t('paymentNoHistory') }}</p>
+          </div>
+
+          <!-- Add payment form -->
+          <div class="pt-1 border-t border-dash-border-lt space-y-2.5">
+            <p class="text-[10.5px] tracking-[.14em] uppercase font-semibold text-dash-faint">{{ t('paymentAddTitle') }}</p>
+            <AInput
+              v-model="paymentAmount"
+              :label="t('paymentAmount')"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+            <AInput
+              v-model="paymentNote"
+              :label="t('paymentNote')"
+              placeholder="…"
+            />
+            <AButton
+              class="w-full justify-center"
+              :loading="addingPayment"
+              :disabled="!paymentAmount || Number(paymentAmount) <= 0"
+              @click="handleAddPayment"
+            >
+              {{ t('paymentAddBtn') }}
+            </AButton>
+          </div>
+
         </div>
 
         <!-- Customer note card -->
@@ -355,12 +416,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { apiGetOrder, apiUpdateOrderStatus, apiAddAdminNote } from '../api/admin'
-import type { AdminOrder, AdminOrderItem } from '../types'
+import { apiGetOrder, apiUpdateOrderStatus, apiAddAdminNote, apiGetOrderPayments, apiAddOrderPayment } from '../api/admin'
+import type { AdminOrder, AdminOrderItem, OrderPaymentsResponse } from '../types'
 import ABadge    from '../components/ui/ABadge.vue'
 import ASelect   from '../components/ui/ASelect.vue'
 import ATextarea from '../components/ui/ATextarea.vue'
 import AButton   from '../components/ui/AButton.vue'
+import AInput    from '../components/ui/AInput.vue'
 
 const { t, locale } = useI18n()
 const props = defineProps<{ id: string }>()
@@ -373,6 +435,12 @@ const adminNote      = ref('')
 const updatingStatus = ref(false)
 const savingNote     = ref(false)
 const showStatusPanel = ref(false)
+
+// Payment panel
+const payments      = ref<OrderPaymentsResponse | null>(null)
+const paymentAmount = ref('')
+const paymentNote   = ref('')
+const addingPayment = ref(false)
 
 // Generate a stable hue from a product name string
 function itemHue(name: string): number {
@@ -398,6 +466,12 @@ const mergedItems = computed(() => {
 const subtotal = computed(() =>
   mergedItems.value.reduce((a, b) => a + Number(b.unitPrice) * b.qty, 0)
 )
+
+const paymentRemaining = computed(() => {
+  const total = Number(order.value?.total ?? 0)
+  const paid  = payments.value?.paid ?? 0
+  return Math.max(0, total - paid)
+})
 
 const initials = computed(() => {
   if (!order.value?.user) return '?'
@@ -465,17 +539,44 @@ const statusOptions = computed(() => [
   { value: 'cancelled', label: t('orders.filterCancelled') },
 ])
 
+async function loadPayments() {
+  if (!order.value) return
+  try {
+    const res = await apiGetOrderPayments(order.value.id)
+    payments.value = res.data
+  } catch {
+    // silent — show empty state
+  }
+}
+
 onMounted(async () => {
   try {
     const res   = await apiGetOrder(props.id)
     order.value = res.data
     adminNote.value = order.value.adminNote ?? ''
+    await loadPayments()
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Failed to load order.'
   } finally {
     loading.value = false
   }
 })
+
+async function handleAddPayment() {
+  if (!order.value || !paymentAmount.value || Number(paymentAmount.value) <= 0) return
+  addingPayment.value = true
+  try {
+    const res = await apiAddOrderPayment(order.value.id, {
+      amount: Number(paymentAmount.value),
+      note: paymentNote.value.trim() || undefined,
+    })
+    payments.value = res.data
+    paymentAmount.value = ''
+    paymentNote.value = ''
+  } finally {
+    addingPayment.value = false
+  }
+}
 
 async function handleStatusUpdate() {
   if (!newStatus.value || !order.value) return
