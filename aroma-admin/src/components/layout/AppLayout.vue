@@ -14,13 +14,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { RouterView } from 'vue-router'
 import Sidebar          from './Sidebar.vue'
 import Topbar           from './Topbar.vue'
 import NewProductDrawer from '../product/NewProductDrawer.vue'
 import { useAuthStore } from '../../stores/auth'
+import { useNotificationsStore } from '../../stores/notifications'
 
-const auth = useAuthStore()
-onMounted(() => auth.init())
+const auth  = useAuthStore()
+const notif = useNotificationsStore()
+
+onMounted(async () => {
+  await auth.init()
+  await notif.load()
+  notif.startPolling()
+})
+
+onUnmounted(() => notif.stopPolling())
 </script>

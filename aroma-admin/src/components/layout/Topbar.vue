@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLocale } from '../../composables/useLocale'
 import { useNewProductDrawer } from '../../composables/useNewProductDrawer'
+import { useNotificationsStore } from '../../stores/notifications'
 import {
   CalendarDays,
   Bell,
@@ -13,13 +14,15 @@ import {
   Star,
   Ticket,
 } from 'lucide-vue-next'
+import type { NotifKind } from '../../types'
 
 const { t, locale } = useI18n()
 const { applyLocale } = useLocale()
 const route  = useRoute()
+const router = useRouter()
 const { open: openNewProductDrawer } = useNewProductDrawer()
+const notif = useNotificationsStore()
 
-// Map route names → eyebrow + heading (reactive i18n)
 const meta = computed(() => {
   const routeName = route.name as string
   const eyebrowMap: Record<string, string> = {
@@ -38,6 +41,7 @@ const meta = computed(() => {
     coupons:          t('nav.catalog'),
     'spec-types':     t('nav.catalog'),
     admins:           t('nav.settings'),
+    notifications:    t('nav.workspace'),
   }
   const headingMap: Record<string, string> = {
     dashboard:        t('pageTitles.dashboard'),
@@ -55,6 +59,7 @@ const meta = computed(() => {
     coupons:          t('pageTitles.coupons'),
     'spec-types':     t('pageTitles.specTypes'),
     admins:           t('admins.title'),
+    notifications:    t('topbar.notifications'),
   }
   return {
     eyebrow: eyebrowMap[routeName] ?? '',
@@ -62,7 +67,6 @@ const meta = computed(() => {
   }
 })
 
-// Date
 const today = computed(() =>
   new Date().toLocaleDateString(locale.value === 'ar' ? 'ar-LY' : 'en-GB', {
     weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
@@ -73,36 +77,29 @@ function setLocale(l: string) {
   applyLocale(l as 'en' | 'ar')
 }
 
-// Notifications
 const notifOpen = ref(false)
-type NotifKind = 'order' | 'stock' | 'review' | 'coupon'
-const notifications = ref<Array<{
-  id: number
-  kind: NotifKind
-  read: boolean
-  title: string
-  sub: string
-  time: string
-  hue: number
-}>>([
-  { id: 1, kind: 'order',  read: false, title: 'New order #A-4821',        sub: 'Layla Ben Salem · 432 LYD',             time: '2m',   hue: 32  },
-  { id: 2, kind: 'stock',  read: false, title: 'Low stock: Jasmine Mist',  sub: 'Only 8 units left',                     time: '14m',  hue: 340 },
-  { id: 3, kind: 'review', read: false, title: '5-star review',             sub: 'Oud Royale · "Absolutely stunning."',   time: '1h',   hue: 48  },
-  { id: 4, kind: 'coupon', read: true,  title: 'FREESHIP redeemed 12×',    sub: 'Today, mostly Tripoli area',            time: '3h',   hue: 200 },
-  { id: 5, kind: 'order',  read: true,  title: 'Order #A-4818 shipped',    sub: 'Tracking handed to courier',            time: '6h',   hue: 140 },
-])
-const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
-function markAllRead() { notifications.value.forEach(n => (n.read = true)) }
+
 function closeNotif(e: MouseEvent) {
   if (!(e.target as Element).closest('[data-notif]')) notifOpen.value = false
 }
 
-// Notification kind → icon component mapping
+function viewAll() {
+  notifOpen.value = false
+  router.push('/notifications')
+}
+
 const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
   order:  ShoppingBag,
   stock:  Package,
   review: Star,
   coupon: Ticket,
+}
+
+const notifHueMap: Record<NotifKind, number> = {
+  order:  32,
+  stock:  340,
+  review: 48,
+  coupon: 200,
 }
 </script>
 
@@ -153,7 +150,7 @@ const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
         >
           <Bell :size="16" />
           <span
-            v-if="unreadCount > 0"
+            v-if="notif.unreadCount > 0"
             class="absolute top-1.5 end-1.5 h-1.5 w-1.5 rounded-full bg-dash-danger"
           />
         </button>
@@ -172,12 +169,12 @@ const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
                 {{ $t('topbar.notifications') }}
               </p>
               <p class="text-[11px] mt-1 text-dash-muted">
-                {{ unreadCount }} {{ $t('topbar.unreadLabel') }}
+                {{ notif.unreadCount }} {{ $t('topbar.unreadLabel') }}
               </p>
             </div>
             <button
-              v-if="unreadCount > 0"
-              @click="markAllRead"
+              v-if="notif.unreadCount > 0"
+              @click="notif.markAllRead()"
               class="text-[11.5px] font-medium text-dash-primary-dk hover:underline"
             >
               {{ $t('topbar.markAllRead') }}
@@ -187,15 +184,22 @@ const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
           <!-- Items -->
           <div class="max-h-[360px] overflow-y-auto divide-y divide-dash-border-lt">
             <div
-              v-for="n in notifications"
+              v-if="notif.notifications.length === 0"
+              class="px-4 py-6 text-center text-[12px] text-dash-muted"
+            >
+              No notifications yet
+            </div>
+            <div
+              v-for="n in notif.notifications"
               :key="n.id"
-              class="flex items-start gap-3 px-4 py-3"
+              class="flex items-start gap-3 px-4 py-3 cursor-pointer"
               :class="n.read ? '' : 'bg-dash-paper-2'"
+              @click="notif.markRead(n.id)"
             >
               <!-- Type icon -->
               <div
                 class="h-8 w-8 rounded-lg grid place-items-center shrink-0"
-                :style="`background: oklch(94% 0.04 ${n.hue}); color: oklch(34% 0.085 ${n.hue})`"
+                :style="`background: oklch(94% 0.04 ${notifHueMap[n.kind]}); color: oklch(34% 0.085 ${notifHueMap[n.kind]})`"
               >
                 <component :is="notifIconMap[n.kind]" :size="14" />
               </div>
@@ -214,7 +218,10 @@ const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
 
           <!-- Footer -->
           <div class="px-4 py-2.5 border-t border-dash-border-lt text-center bg-dash-paper-2">
-            <button class="text-[11.5px] font-medium text-dash-text-2">
+            <button
+              @click="viewAll"
+              class="text-[11.5px] font-medium text-dash-text-2 hover:underline"
+            >
               {{ $t('topbar.viewAll') }}
             </button>
           </div>

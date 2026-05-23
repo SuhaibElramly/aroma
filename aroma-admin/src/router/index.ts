@@ -42,6 +42,7 @@ export const router = createRouter({
         { path: 'coupons',    name: 'coupons',       component: () => import('../views/CouponsView.vue'),          meta: { requiredResource: 'coupons' } },
         { path: 'spec-types', name: 'spec-types',    component: () => import('../views/SpecTypesView.vue'),        meta: { requiredResource: 'specs' } },
         { path: 'admins',     name: 'admins',        component: () => import('../views/AdminsView.vue'),           meta: { requiredResource: 'admins' } },
+        { path: 'notifications', name: 'notifications', component: () => import('../views/NotificationsView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
