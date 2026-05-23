@@ -16,6 +16,7 @@ const loading      = ref(true)
 const loadError    = ref('')
 const heroSaving   = ref(false)
 const heroSuccess  = ref(false)
+const heroError    = ref('')
 const blockSaving  = ref(false)
 const blockError   = ref('')
 const editorOpen   = ref(false)
@@ -32,7 +33,7 @@ async function load() {
       apiGetBrands(),
     ])
     config.value = homepageRes.data
-    brands.value = brandsRes.data.map((b: any) => ({ id: b.id, name: b.name }))
+    brands.value = brandsRes.data.map((b) => ({ id: b.id, name: b.name }))
   } catch {
     loadError.value = 'Failed to load homepage config.'
   } finally {
@@ -46,6 +47,7 @@ async function saveHero() {
   if (!config.value) return
   heroSaving.value  = true
   heroSuccess.value = false
+  heroError.value   = ''
   try {
     const form = new FormData()
     const h = config.value.hero
@@ -63,7 +65,7 @@ async function saveHero() {
     heroSuccess.value = true
     setTimeout(() => { heroSuccess.value = false }, 3000)
   } catch {
-    // error shown inline by HeroEditor
+    heroError.value = 'Failed to save hero. Please try again.'
   } finally {
     heroSaving.value = false
   }
@@ -102,7 +104,7 @@ async function onSaveBlock(payload: Partial<HomepageBlock> | NewBlockPayload) {
   blockError.value  = ''
   try {
     if (editingBlock.value) {
-      const res = await apiUpdateBlock(editingBlock.value.id, payload as Partial<HomepageBlock>)
+      const res = await apiUpdateBlock(editingBlock.value.id, payload as Pick<HomepageBlock, 'config' | 'enabled'>)
       const idx = config.value.blocks.findIndex(b => b.id === editingBlock.value!.id)
       if (idx !== -1) config.value.blocks[idx] = res.data
     } else {
@@ -148,6 +150,7 @@ function onRemoveHeroImage() {
           @remove-image="onRemoveHeroImage"
         />
         <p v-if="heroSuccess" class="text-xs text-green-600 text-right">Hero saved ✓</p>
+        <p v-if="heroError" class="text-xs text-dash-danger text-right">{{ heroError }}</p>
       </div>
 
       <!-- Block list -->
@@ -157,6 +160,7 @@ function onRemoveHeroImage() {
         </p>
         <BlockList
           :blocks="config.blocks"
+          :brands="brands"
           @update:blocks="onReorder"
           @edit="openEditBlock"
           @delete="onDeleteBlock"

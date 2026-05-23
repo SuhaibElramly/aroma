@@ -10,6 +10,7 @@ import {
 
 const props = defineProps<{
   blocks: HomepageBlock[]
+  brands?: { id: string; name: string }[]
 }>()
 
 const emit = defineEmits<{
@@ -46,7 +47,8 @@ function blockMeta(block: HomepageBlock): string {
     return `Showing ${block.config.limit ?? '?'} products`
   }
   if (block.type === 'featured_brand') {
-    return block.config.brand_id ?? 'No brand selected'
+    const brand = props.brands?.find(b => b.id === block.config.brand_id)
+    return brand?.name ?? block.config.brand_id ?? 'No brand selected'
   }
   if (block.type === 'categories') return 'All categories'
   return ''

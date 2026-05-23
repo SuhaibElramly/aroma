@@ -5,7 +5,7 @@ import type { HeroConfig } from '../../types'
 import AInput from '../ui/AInput.vue'
 import AButton from '../ui/AButton.vue'
 
-const props = defineProps<{
+defineProps<{
   modelValue: HeroConfig
   saving: boolean
 }>()
@@ -24,7 +24,6 @@ function onFileChange(e: Event) {
   if (!file) return
   imageFile.value = file
   imagePreview.value = URL.createObjectURL(file)
-  emit('update:modelValue', { ...props.modelValue })
 }
 
 function removeImage() {
