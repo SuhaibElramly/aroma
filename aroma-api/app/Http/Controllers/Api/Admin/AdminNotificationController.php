@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
+use Carbon\Carbon;
 
 class AdminNotificationController extends Controller
 {
@@ -41,12 +42,13 @@ class AdminNotificationController extends Controller
         ];
     }
 
-    private function formatTime(\Carbon\Carbon $time): string
+    private function formatTime(?Carbon $time): string
     {
-        $mins = (int) $time->diffInMinutes(now());
+        if (! $time) return 'now';
+        $mins = (int) abs($time->diffInMinutes(now()));
         if ($mins < 60) return $mins . 'm';
-        $hours = (int) $time->diffInHours(now());
+        $hours = (int) abs($time->diffInHours(now()));
         if ($hours < 24) return $hours . 'h';
-        return ((int) $time->diffInDays(now())) . 'd';
+        return ((int) abs($time->diffInDays(now()))) . 'd';
     }
 }
