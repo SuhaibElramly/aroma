@@ -15,6 +15,7 @@ const variants  = ref<ProductVariant[]>([])
 const discounts = ref<ProductDiscount[]>([])
 const loading   = ref(true)
 const error     = ref('')
+const images    = ref<{ id: number; url: string; isThumbnail: boolean; sortOrder: number }[]>([])
 
 // Product edit
 const editingProduct  = ref(false)
@@ -56,6 +57,7 @@ async function load() {
       fetch(`${BASE}/admin/categories`, { headers: headers() }),
     ])
     product.value   = await pRes.json()
+    images.value    = product.value.images ?? []
     variants.value  = await vRes.json()
     discounts.value = await dRes.json()
     brands.value    = (await bRes.json()) ?? []
@@ -218,6 +220,10 @@ const productHue = computed(() => {
   return Math.abs(h)
 })
 
+const thumbnailUrl = computed(() =>
+  images.value.find(i => i.isThumbnail)?.url ?? images.value[0]?.url ?? null
+)
+
 const bottleGradient = computed(() => {
   const h = productHue.value
   return `radial-gradient(120% 80% at 30% 20%, oklch(94% 0.04 ${h}), oklch(86% 0.07 ${h}))`
@@ -279,32 +285,43 @@ onMounted(load)
 
     <!-- Hero card -->
     <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-6 grid grid-cols-12 gap-6">
-      <!-- Bottle visual -->
+      <!-- Real product image or placeholder -->
       <div class="col-span-4">
         <div
           class="relative w-full rounded-card overflow-hidden"
           style="height: 16rem;"
-          :style="{ background: bottleGradient }"
         >
-          <!-- hatching overlay -->
-          <div
-            class="absolute inset-0 opacity-[0.08]"
-            style="background-image: repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,.6) 8px 9px)"
+          <img
+            v-if="thumbnailUrl"
+            :src="thumbnailUrl"
+            alt=""
+            class="w-full h-full object-cover"
           />
-          <svg viewBox="0 0 80 80" class="absolute inset-0 m-auto" style="width:56%;height:56%">
-            <g
-              fill="none"
-              :stroke="`oklch(28% 0.06 ${productHue})`"
-              stroke-width="1.4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              opacity="0.85"
-            >
-              <path d="M32 10h16v8l3 5v6"/>
-              <rect x="24" y="29" width="32" height="38" rx="5"/>
-              <path d="M32 14h16"/>
-            </g>
-          </svg>
+          <div
+            v-else
+            class="w-full h-full flex items-center justify-center"
+            :style="{ background: bottleGradient }"
+          >
+            <!-- hatching overlay -->
+            <div
+              class="absolute inset-0 opacity-[0.08]"
+              style="background-image: repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,.6) 8px 9px)"
+            />
+            <svg viewBox="0 0 80 80" class="relative" style="width:56%;height:56%">
+              <g
+                fill="none"
+                :stroke="`oklch(28% 0.06 ${productHue})`"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.85"
+              >
+                <path d="M32 10h16v8l3 5v6"/>
+                <rect x="24" y="29" width="32" height="38" rx="5"/>
+                <path d="M32 14h16"/>
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
 
