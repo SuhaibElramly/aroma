@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomepageBlock;
@@ -60,11 +61,12 @@ class HomeService
 
     private function products(array $where, int $limit): array
     {
-        return Product::where($where)
-            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags'])
+        $products = Product::where($where)
+            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags', 'images'])
             ->limit($limit)
-            ->get()
-            ->toArray();
+            ->get();
+
+        return ProductResource::collection($products)->resolve();
     }
 
     private function hydrateFeaturedBrand(array $config): array
@@ -75,11 +77,13 @@ class HomeService
         if (!$brand) return ['brand' => null, 'products' => []];
 
         $products = Product::where('brand_id', $brand->id)
-            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags'])
+            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags', 'images'])
             ->limit($config['product_limit'] ?? 2)
-            ->get()
-            ->toArray();
+            ->get();
 
-        return ['brand' => $brand->toArray(), 'products' => $products];
+        return [
+            'brand'    => $brand->toArray(),
+            'products' => ProductResource::collection($products)->resolve(),
+        ];
     }
 }
