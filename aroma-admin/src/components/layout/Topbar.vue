@@ -14,7 +14,7 @@ import {
   Star,
   Ticket,
 } from 'lucide-vue-next'
-import type { NotifKind } from '../../types'
+import type { NotifKind, AdminNotification } from '../../types'
 
 const { t, locale } = useI18n()
 const { applyLocale } = useLocale()
@@ -86,6 +86,16 @@ function closeNotif(e: MouseEvent) {
 function viewAll() {
   notifOpen.value = false
   router.push('/notifications')
+}
+
+function handleNotifClick(n: AdminNotification) {
+  notif.markRead(n.id)
+  notifOpen.value = false
+  if (n.kind === 'order' && n.data?.order_id) {
+    router.push({ name: 'order-detail', params: { id: String(n.data.order_id) } })
+  } else if (n.kind === 'stock' && n.data?.product_id) {
+    router.push({ name: 'product-edit', params: { id: String(n.data.product_id) } })
+  }
 }
 
 const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
@@ -192,9 +202,9 @@ const notifHueMap: Record<NotifKind, number> = {
             <div
               v-for="n in notif.notifications"
               :key="n.id"
-              class="flex items-start gap-3 px-4 py-3 cursor-pointer"
+              class="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-dash-bg transition-colors"
               :class="n.read ? '' : 'bg-dash-paper-2'"
-              @click="notif.markRead(n.id)"
+              @click="handleNotifClick(n)"
             >
               <!-- Type icon -->
               <div

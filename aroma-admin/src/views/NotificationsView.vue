@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ShoppingBag, Package, Star, Ticket } from 'lucide-vue-next'
 import { useNotificationsStore } from '../stores/notifications'
-import type { NotifKind } from '../types'
+import type { NotifKind, AdminNotification } from '../types'
 
-const notif = useNotificationsStore()
+const notif  = useNotificationsStore()
+const router = useRouter()
 
 onMounted(() => notif.load())
+
+function handleNotifClick(n: AdminNotification) {
+  notif.markRead(n.id)
+  if (n.kind === 'order' && n.data?.order_id) {
+    router.push({ name: 'order-detail', params: { id: String(n.data.order_id) } })
+  } else if (n.kind === 'stock' && n.data?.product_id) {
+    router.push({ name: 'product-edit', params: { id: String(n.data.product_id) } })
+  }
+}
 
 const notifIconMap: Record<NotifKind, typeof ShoppingBag> = {
   order:  ShoppingBag,
@@ -43,9 +54,9 @@ const notifHueMap: Record<NotifKind, number> = {
     <div
       v-for="n in notif.notifications"
       :key="n.id"
-      class="flex items-start gap-3 p-4 rounded-card border border-dash-border bg-dash-paper cursor-pointer transition-colors"
+      class="flex items-start gap-3 p-4 rounded-card border border-dash-border bg-dash-paper cursor-pointer transition-colors hover:border-dash-primary/30"
       :class="n.read ? 'opacity-60' : 'bg-dash-paper-2'"
-      @click="notif.markRead(n.id)"
+      @click="handleNotifClick(n)"
     >
       <div
         class="h-9 w-9 rounded-lg grid place-items-center shrink-0"
