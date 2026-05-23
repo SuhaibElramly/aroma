@@ -911,7 +911,7 @@ const ar = {
     loadFailed: 'فشل تحميل المنتج',
     deleteDiscountConfirm: 'هل تريد حذف هذا الخصم؟',
     imagesSectionLabel: 'الصور',
-    imagesCount: '{n} صورة',
+    imagesCount: '{n} صورة | {n} صور',
     uploadImagesBtn: 'رفع صور',
     uploadingLabel: 'جارٍ الرفع…',
     thumbnailBadge: 'مصغّرة',
