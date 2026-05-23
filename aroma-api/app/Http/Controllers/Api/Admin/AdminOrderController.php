@@ -100,6 +100,7 @@ class AdminOrderController extends Controller
             'userEmail' => $order->user?->email,
             'total' => $order->total,
             'status' => $order->status?->value,
+            'paymentStatus' => $order->payment_status?->value,
             'isPickup' => $order->is_pickup,
             'note' => $order->note,
             'adminNote' => $order->admin_note,

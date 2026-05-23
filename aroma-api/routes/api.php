@@ -57,7 +57,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminUserDetailController, AdminCouponController, AdminSpecTypeController,
     AdminProductSpecController, AdminProductVariantGenerateController,
     AdminProductDiscountController, AdminAdminsController, AdminRolesController,
-    AdminNotificationController,
+    AdminNotificationController, AdminOrderPaymentController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -67,6 +67,8 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
     Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
     Route::patch('/orders/{id}/note', [AdminOrderController::class, 'addAdminNote']);
+    Route::get('orders/{id}/payments',  [AdminOrderPaymentController::class, 'index']);
+    Route::post('orders/{id}/payments', [AdminOrderPaymentController::class, 'store']);
 
     Route::get('/products', [AdminProductController::class, 'index']);
     Route::post('/products', [AdminProductController::class, 'store']);
