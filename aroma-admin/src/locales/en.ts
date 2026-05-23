@@ -904,6 +904,7 @@ const en = {
     brandLabel: 'Brand',
     categoryLabel: 'Category',
     descriptionLabel: 'Description',
+    cardColourLabel: 'Card Colour',
     flagNew: 'New',
     flagBestseller: 'Bestseller',
     flagOffer: 'Offer',

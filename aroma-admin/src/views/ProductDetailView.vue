@@ -23,7 +23,7 @@ const settingThumbId   = ref<number | null>(null)
 // Product edit
 const editingProduct  = ref(false)
 const savingProduct   = ref(false)
-const productForm     = ref({ name: '', name_en: '', type: '', description: '', brand_id: '', category_id: '', is_new: false, is_bestseller: false, is_offer: false })
+const productForm     = ref({ name: '', name_en: '', type: '', description: '', brand_id: '', category_id: '', is_new: false, is_bestseller: false, is_offer: false, placeholder_bg: '#F2E8E5' })
 const brands          = ref<{ id: string; name: string }[]>([])
 const categories      = ref<{ id: number; label: string }[]>([])
 
@@ -141,6 +141,7 @@ function openProductEdit() {
     is_new:       product.value.isNew ?? false,
     is_bestseller: product.value.isBestseller ?? false,
     is_offer:     product.value.isOffer ?? false,
+    placeholder_bg: product.value.placeholderBg || '#F2E8E5',
   }
   editingProduct.value = true
 }
@@ -159,6 +160,7 @@ async function saveProduct() {
       is_new:        productForm.value.is_new,
       is_bestseller: productForm.value.is_bestseller,
       is_offer:      productForm.value.is_offer,
+      placeholder_bg: productForm.value.placeholder_bg,
     }),
   })
   if (res.ok) { await load(); editingProduct.value = false }
@@ -871,6 +873,19 @@ onMounted(load)
       <div>
         <label class="block text-[11px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1.5">{{ t('productDetail.descriptionLabel') }}</label>
         <textarea v-model="productForm.description" rows="3" class="w-full px-3 py-2 rounded-btn border border-dash-border-lt text-[13px] outline-none bg-dash-bg text-dash-text focus:border-dash-primary transition-colors resize-none leading-relaxed" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1.5">{{ t('productDetail.cardColourLabel') }}</label>
+        <div class="flex items-center gap-2">
+          <div class="relative w-8 h-8 rounded-btn overflow-hidden border border-dash-border-lt shrink-0">
+            <input type="color" v-model="productForm.placeholder_bg"
+                   class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
+            <div class="w-full h-full" :style="{ backgroundColor: productForm.placeholder_bg }" />
+          </div>
+          <input type="text" v-model="productForm.placeholder_bg" maxlength="7"
+                 class="w-28 rounded-btn border border-dash-border-lt bg-dash-bg px-2.5 py-1.5
+                        text-[12.5px] font-mono text-dash-text focus:outline-none focus:border-dash-primary" />
+        </div>
       </div>
       <div class="flex items-center gap-5 pt-1">
         <label v-for="[key, lbl] in [['is_new', t('productDetail.flagNew')], ['is_bestseller', t('productDetail.flagBestseller')], ['is_offer', t('productDetail.flagOffer')]]" :key="key" class="flex items-center gap-2 cursor-pointer">

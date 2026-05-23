@@ -906,6 +906,7 @@ const ar = {
     brandLabel: 'العلامة التجارية',
     categoryLabel: 'التصنيف',
     descriptionLabel: 'الوصف',
+    cardColourLabel: 'لون البطاقة',
     flagNew: 'جديد',
     flagBestseller: 'الأكثر مبيعاً',
     flagOffer: 'عرض',
