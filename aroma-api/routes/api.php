@@ -58,6 +58,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminProductSpecController, AdminProductVariantGenerateController,
     AdminProductDiscountController, AdminAdminsController, AdminRolesController,
     AdminNotificationController, AdminOrderPaymentController,
+    AdminHomepageController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -142,4 +143,11 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::get('/notifications',              [AdminNotificationController::class, 'index']);
     Route::patch('/notifications/read-all',   [AdminNotificationController::class, 'markAllRead']);
     Route::patch('/notifications/{id}/read',  [AdminNotificationController::class, 'markRead']);
+
+    Route::get('/homepage',                   [AdminHomepageController::class, 'show']);
+    Route::put('/homepage/hero',              [AdminHomepageController::class, 'updateHero']);
+    Route::post('/homepage/blocks',           [AdminHomepageController::class, 'storeBlock']);
+    Route::put('/homepage/blocks/reorder',    [AdminHomepageController::class, 'reorder']);
+    Route::put('/homepage/blocks/{block}',    [AdminHomepageController::class, 'updateBlock']);
+    Route::delete('/homepage/blocks/{block}', [AdminHomepageController::class, 'destroyBlock']);
 });

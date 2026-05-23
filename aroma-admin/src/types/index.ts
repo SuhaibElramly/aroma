@@ -319,3 +319,51 @@ export interface ProductDiscount {
   is_active: boolean
   created_at: string
 }
+
+// ── Homepage ──────────────────────────────────────────────────────────
+export type HomepageBlockType =
+  | 'bestsellers'
+  | 'new_arrivals'
+  | 'offers'
+  | 'categories'
+  | 'featured_brand'
+
+export interface HeroConfig {
+  headline: string
+  subtext: string
+  cta_primary_label: string
+  cta_primary_url: string
+  cta_secondary_label: string
+  cta_secondary_url: string
+  bg_image_path: string | null
+}
+
+export interface HomepageBlock {
+  id: number
+  type: HomepageBlockType
+  position: number
+  enabled: boolean
+  config: {
+    label?: string
+    title?: string
+    limit?: number
+    product_limit?: number
+    brand_id?: string
+  }
+}
+
+export interface HomepageConfig {
+  hero: HeroConfig
+  blocks: HomepageBlock[]
+}
+
+export interface NewBlockPayload {
+  type: HomepageBlockType
+  config: HomepageBlock['config']
+  enabled: boolean
+}
+
+export interface ReorderItem {
+  id: number
+  position: number
+}

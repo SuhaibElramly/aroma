@@ -220,12 +220,34 @@ export interface PageMeta {
 
 // ── API Responses ─────────────────────────────────────────────────────
 
+export interface HeroConfig {
+  headline: string
+  subtext: string
+  cta_primary_label: string
+  cta_primary_url: string
+  cta_secondary_label: string
+  cta_secondary_url: string
+  bg_image_url: string | null
+}
+
+export interface HomeBlock {
+  id: number
+  type: 'bestsellers' | 'new_arrivals' | 'offers' | 'categories' | 'featured_brand'
+  config: {
+    label?: string
+    title?: string
+    limit?: number
+    product_limit?: number
+    brand_id?: string
+  }
+  data: {
+    products?: Product[]
+    categories?: Category[]
+    brand?: Brand
+  }
+}
+
 export interface HomePageData {
-  featuredBrand: Brand
-  featuredBrandProducts: Product[]
-  bestsellers: Product[]
-  newArrivals: Product[]
-  offers: Product[]
-  categories: Category[]
-  brands: Brand[]
+  hero: HeroConfig
+  blocks: HomeBlock[]
 }

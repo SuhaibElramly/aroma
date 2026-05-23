@@ -52,6 +52,8 @@ const ar = {
     search: 'بحث',
     settings: 'الإعدادات',
     admins: 'المشرفون',
+    storefront: 'الواجهة',
+    homepage: 'الصفحة الرئيسية',
   },
   topbar: {
     signOut: 'تسجيل الخروج',

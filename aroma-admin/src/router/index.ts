@@ -43,6 +43,7 @@ export const router = createRouter({
         { path: 'spec-types', name: 'spec-types',    component: () => import('../views/SpecTypesView.vue'),        meta: { requiredResource: 'specs' } },
         { path: 'admins',     name: 'admins',        component: () => import('../views/AdminsView.vue'),           meta: { requiredResource: 'admins' } },
         { path: 'notifications', name: 'notifications', component: () => import('../views/NotificationsView.vue') },
+        { path: 'homepage', name: 'homepage', component: () => import('../views/HomepageView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
