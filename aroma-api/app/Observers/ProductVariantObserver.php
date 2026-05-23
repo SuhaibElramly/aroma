@@ -30,7 +30,7 @@ class ProductVariantObserver
         AdminNotification::create([
             'kind'  => 'stock',
             'title' => $label . ': ' . $product->name,
-            'sub'   => 'Only ' . $variant->quantity . ' units left',
+            'sub'   => $newStock === 'out_of_stock' ? 'No units remaining' : 'Only ' . $variant->quantity . ' units left',
             'data'  => ['product_id' => $product->id, 'variant_id' => $variant->id],
         ]);
     }

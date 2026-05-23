@@ -106,6 +106,14 @@ class AdminNotificationTest extends TestCase
         $this->assertEquals(0, AdminNotification::where('kind', 'stock')->count());
     }
 
+    public function test_non_admin_cannot_access_notifications(): void
+    {
+        $customer = User::factory()->create(['is_admin' => false]);
+        $this->actingAs($customer, 'sanctum')
+             ->getJson('/api/admin/notifications')
+             ->assertForbidden();
+    }
+
     public function test_unauthenticated_cannot_access_notifications(): void
     {
         $this->getJson('/api/admin/notifications')->assertUnauthorized();
