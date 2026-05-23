@@ -91,7 +91,7 @@ export function CartPageClient() {
                       {item.product.name}
                     </p>
                     <p className="font-sans text-[12px] text-aroma-muted mb-4">
-                      {item.product.selectedSize} · {item.product.type}
+                      {[item.product.selectedVariant, item.product.type].filter(Boolean).join(' · ')}
                     </p>
 
                     <div className="flex items-center gap-4">

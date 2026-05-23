@@ -14,7 +14,7 @@ class HomeController extends Controller
         $data = $homeService->getHomeData();
 
         return response()->json([
-            'featuredBrand' => new BrandResource($data['featuredBrand']),
+            'featuredBrand' => $data['featuredBrand'] ? new BrandResource($data['featuredBrand']) : null,
             'featuredBrandProducts' => ProductResource::collection($data['featuredBrandProducts']),
             'bestsellers' => ProductResource::collection($data['bestsellers']),
             'newArrivals' => ProductResource::collection($data['newArrivals']),

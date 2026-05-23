@@ -28,7 +28,7 @@ function timelineLabel(status: string) {
 function groupItems(items: OrderItem[]) {
   const map = new Map<string, OrderItem & { qty: number }>()
   for (const item of items) {
-    const key = `${item.name}__${item.size}`
+    const key = `${item.name}__${item.label}`
     const existing = map.get(key)
     if (existing) {
       existing.qty += item.qty ?? 1
@@ -132,7 +132,7 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
                       {item.name}
                     </p>
                     <p className="font-sans text-[12px] text-aroma-faint">
-                      {item.brand} · {item.size}
+                      {[item.brand, item.label].filter(Boolean).join(' · ')}
                     </p>
                   </div>
                 </div>
@@ -141,23 +141,33 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
                 </p>
               </div>
             ))}
-            <div className="pt-4 mt-1 border-t border-aroma-border-lt space-y-2">
-              {order.discountAmount && (
-                <div className="flex justify-between font-sans text-[13px] text-aroma-muted">
-                  <span>المجموع الفرعي</span>
-                  <span>{formatPrice(order.total + order.discountAmount)}</span>
-                </div>
-              )}
-              {order.discountAmount && order.couponCode && (
-                <div className="flex justify-between font-sans text-[13px] text-green-600">
-                  <span>كوبون <span className="font-mono font-semibold">{order.couponCode}</span></span>
-                  <span>−{order.discountAmount.toFixed(2)} LYD</span>
-                </div>
-              )}
-              <div className="flex justify-between font-sans text-[14px] font-semibold text-aroma-text">
-                <span>الإجمالي</span>
-                <span>{formatPrice(order.total)}</span>
+          </div>
+
+          {/* Order summary */}
+          <div className="bg-white border border-aroma-border rounded-lg px-6 py-5 space-y-2.5">
+            <p className="font-sans text-[11px] tracking-widest text-aroma-faint uppercase mb-3">
+              ملخص الطلب
+            </p>
+            {order.discountAmount && (
+              <div className="flex justify-between font-sans text-[13px] text-aroma-muted">
+                <span>المجموع الفرعي</span>
+                <span>{formatPrice(Number(order.total) + Number(order.discountAmount))}</span>
               </div>
+            )}
+            {order.discountAmount && order.couponCode && (
+              <div className="flex justify-between font-sans text-[13px] text-green-600">
+                <span className="flex items-center gap-1.5">
+                  كوبون
+                  <span className="font-mono font-semibold text-[12px] bg-green-50 border border-green-200 px-1.5 py-0.5 rounded">
+                    {order.couponCode}
+                  </span>
+                </span>
+                <span>−{order.discountAmount.toFixed(2)} LYD</span>
+              </div>
+            )}
+            <div className={`flex justify-between font-sans text-[14px] font-semibold text-aroma-text ${order.discountAmount ? 'border-t border-aroma-border-lt pt-2.5' : ''}`}>
+              <span>الإجمالي</span>
+              <span>{formatPrice(order.total)}</span>
             </div>
           </div>
 

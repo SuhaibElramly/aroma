@@ -86,12 +86,13 @@ class OrderService
         ]);
 
         foreach ($data['items'] as $item) {
-            $variant = \App\Models\ProductVariant::find($item['product_variant_id']);
+            $variant = \App\Models\ProductVariant::with('specValues.specType')
+                ->find($item['product_variant_id']);
             $order->items()->create([
                 'product_variant_id' => $variant->id,
                 'product_name'       => $variant->product->name,
                 'brand'              => $variant->product->brand->name,
-                'size'               => $variant->size,
+                'size'               => $variant->specLabel(),
                 'qty'                => $item['quantity'],
                 'unit_price'         => $variant->price,
             ]);

@@ -83,6 +83,26 @@ class AdminCouponController extends Controller
         return response()->json($this->format($coupon->fresh()));
     }
 
+    public function orders(int $id)
+    {
+        $coupon = Coupon::findOrFail($id);
+
+        $orders = \App\Models\Order::with('user')
+            ->where('coupon_code', $coupon->code)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json($orders->map(fn($o) => [
+            'id'             => $o->id,
+            'user'           => $o->user?->name,
+            'userEmail'      => $o->user?->email,
+            'date'           => $o->created_at->format('Y-m-d H:i'),
+            'total'          => (float) $o->total,
+            'discountAmount' => $o->discount_amount ? (float) $o->discount_amount : null,
+            'status'         => $o->status?->value,
+        ]));
+    }
+
     public function destroy(int $id)
     {
         $coupon = Coupon::findOrFail($id);

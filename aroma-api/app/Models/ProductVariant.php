@@ -58,4 +58,14 @@ class ProductVariant extends Model
     {
         return $this->hasMany(VariantSpecValue::class, 'variant_id');
     }
+
+    /** Human-readable label derived from spec values (e.g. "30ml / Gold"). Empty for spec-less variants. */
+    public function specLabel(): string
+    {
+        $values = $this->relationLoaded('specValues') ? $this->specValues : collect();
+        if ($values->isEmpty()) return '';
+        return $values->map(fn($sv) =>
+            $sv->specType->unit ? "{$sv->value}{$sv->specType->unit}" : $sv->value
+        )->join(' / ');
+    }
 }

@@ -4,7 +4,7 @@ export type StockStatus = 'in-stock' | 'low-stock' | 'out-of-stock'
 
 export interface StorefrontVariant {
   id: number
-  size: string
+  label: string
   price: number
   originalPrice: number | null
   stock: StockStatus
@@ -73,8 +73,7 @@ export interface Product {
   brandLogoUrl?: string | null
   price: number
   originalPrice: number | null
-  sizes: string[]
-  selectedSize: string
+  selectedVariant: string
   type: ProductType
   category: ProductCategory
   notes: ProductNotes
@@ -87,7 +86,7 @@ export interface Product {
   bestseller: boolean
   offer: boolean
   placeholder: ProductPlaceholderStyle
-  thumbnailUrl: string | null
+  thumbnailUrl?: string | null
   images?: ProductImage[]
   variants?: StorefrontVariant[]
 }
@@ -113,7 +112,7 @@ export interface Banner {
 export interface OrderItem {
   name: string
   brand: string
-  size: string
+  label: string
   qty: number
   price: number
 }
@@ -146,9 +145,7 @@ export interface Order {
 
 // ── Cart ──────────────────────────────────────────────────────────────
 
-export interface CartProduct extends Product {
-  selectedSize: string
-}
+export type CartProduct = Product
 
 export interface CartItem {
   id: number           // cart_items.id — used for PATCH/DELETE

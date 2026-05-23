@@ -1,39 +1,93 @@
 <!-- aroma-admin/src/views/CategoriesView.vue -->
 <template>
-  <div class="space-y-4">
+  <div class="px-9 pb-12 pt-4 space-y-5 max-w-[1280px]">
     <div v-if="loadError" class="rounded-lg bg-dash-danger-lt border border-dash-danger/20 px-3 py-2 text-xs text-dash-danger">
       {{ loadError }}
     </div>
-    <div class="flex justify-end">
-      <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('categories.add') }}</AButton>
+
+    <!-- KPI strip -->
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('categories.title') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ categories.length }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('categories.kpiInCatalog') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('categories.kpiTaggedProducts') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ categories.reduce((s, c) => s + (c.productCount ?? 0), 0) }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('categories.kpiProductsTaggedSub') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('categories.kpiTopCategory') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text truncate">{{ topCategory?.label ?? '—' }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ topCategory ? `${topCategory.productCount} ${t('categories.productsUnit')}` : t('categories.kpiNoData') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('categories.kpiEmpty') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ categories.filter(c => (c.productCount ?? 0) === 0).length }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('categories.kpiNoProductsYet') }}</p>
+      </div>
     </div>
 
-    <!-- Filters -->
-    <div class="space-y-3">
-      <div class="grid grid-cols-1 gap-3">
-        <AInput v-model="filterLabel" :label="t('categories.filterLabel')" placeholder="Search label…" @input="debouncedLoad" />
+    <!-- Toolbar -->
+    <div class="bg-dash-paper border border-dash-border rounded-card p-4 flex items-center gap-3 flex-wrap shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+      <!-- Search -->
+      <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-dash-border-lt flex-1 min-w-[200px] bg-dash-paper-2">
+        <svg class="text-dash-faint shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input
+          v-model="filterLabel"
+          :placeholder="t('categories.searchPlaceholder')"
+          class="bg-transparent text-[12.5px] outline-none flex-1 text-dash-text-2"
+          @input="debouncedLoad"
+        />
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <AInput v-model="filterMinProducts" :label="t('categories.filterMinProducts')" type="number" placeholder="0"   @input="debouncedLoad" />
-        <AInput v-model="filterMaxProducts" :label="t('categories.filterMaxProducts')" type="number" placeholder="Any" @input="debouncedLoad" />
-      </div>
+      <button
+        class="h-9 px-3 rounded-lg text-[12px] font-medium text-white inline-flex items-center gap-1.5 whitespace-nowrap bg-dash-text hover:opacity-90 transition-opacity"
+        @click="openCreate"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        {{ t('categories.add') }}
+      </button>
     </div>
 
-    <ATable :columns="cols" :rows="categories" :loading="loading">
-      <template #cell-id="{ value }">
-        <span class="font-mono text-[10px] text-dash-faint">{{ value }}</span>
-      </template>
-      <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end rtl:justify-start">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCategory)">{{ t('common.edit') }}</AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCategory)">{{ t('common.delete') }}</AButton>
+    <!-- Categories grid -->
+    <div v-if="!loading" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+      <div
+        v-for="(cat, i) in filteredCategories"
+        :key="cat.id"
+        class="bg-dash-paper border border-dash-border rounded-card p-4 flex flex-col items-center gap-2 transition-shadow hover:shadow-md"
+      >
+        <!-- monogram circle -->
+        <div
+          class="h-12 w-12 rounded-full flex items-center justify-center text-[20px] font-display font-semibold text-white"
+          :style="{ background: `oklch(58% 0.07 ${catHue(i)})` }"
+        >
+          {{ cat.label[0]?.toUpperCase() ?? '?' }}
         </div>
-      </template>
-      <template #empty>
-        <AEmptyState :icon="Grid3X3" :heading="t('categories.noData')" />
-      </template>
-    </ATable>
+        <p class="text-[13px] font-medium text-dash-text text-center">{{ cat.label }}</p>
+        <p class="text-[11px] text-dash-faint">{{ cat.productCount ?? 0 }} {{ t('categories.productsUnit') }}</p>
+        <!-- Edit/Delete buttons -->
+        <div class="flex gap-1.5 mt-1">
+          <button
+            class="text-[11px] text-dash-muted hover:text-dash-text px-2 py-0.5 rounded-btn border border-dash-border-lt"
+            @click.stop="openEdit(cat)"
+          >{{ t('common.edit') }}</button>
+          <button
+            class="text-[11px] text-dash-danger px-2 py-0.5 rounded-btn border border-dash-danger-lt"
+            @click.stop="confirmDelete(cat)"
+          >{{ t('common.delete') }}</button>
+        </div>
+      </div>
+      <!-- Empty state -->
+      <div v-if="filteredCategories.length === 0" class="col-span-full py-12 text-center text-sm text-dash-muted">
+        {{ t('categories.noData') }}
+      </div>
+    </div>
 
+    <!-- Loading state -->
+    <div v-else class="py-12 text-center text-sm text-dash-muted">{{ t('common.loading') }}</div>
+
+    <!-- Create / Edit Modal -->
     <AModal :open="modalOpen" :title="editing ? t('categories.editTitle') : t('categories.createTitle')" @close="modalOpen = false">
       <form class="space-y-3" @submit.prevent>
         <AInput v-model="form.label" :label="t('categories.labelField')" :error="formErrors.label" />
@@ -63,14 +117,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Plus, Grid3X3 } from 'lucide-vue-next'
 import { apiGetCategories, apiCreateCategory, apiUpdateCategory, apiDeleteCategory } from '../api/admin'
 import type { AdminCategory } from '../types'
-import ATable         from '../components/ui/ATable.vue'
 import AButton        from '../components/ui/AButton.vue'
 import AInput         from '../components/ui/AInput.vue'
 import AModal         from '../components/ui/AModal.vue'
-import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 
 const { t } = useI18n()
@@ -93,12 +144,27 @@ const filterMaxProducts = ref('')
 const emptyForm = () => ({ label: '', bg: '' })
 const form = ref(emptyForm())
 
-const cols = computed(() => [
-  { key: 'id',           label: t('categories.columns.id') },
-  { key: 'label',        label: t('categories.columns.label') },
-  { key: 'productCount', label: t('categories.columns.products') },
-])
+// ── Computed ──────────────────────────────────────────────────────────
+const filteredCategories = computed(() => {
+  if (!filterLabel.value) return categories.value
+  const q = filterLabel.value.toLowerCase()
+  return categories.value.filter(c => c.label.toLowerCase().includes(q))
+})
 
+const topCategory = computed(() => {
+  if (!categories.value.length) return null
+  return categories.value.reduce((best, c) =>
+    (c.productCount ?? 0) > (best.productCount ?? 0) ? c : best
+  )
+})
+
+// ── Design helpers ────────────────────────────────────────────────────
+const HUE_PALETTE = [32, 200, 140, 96, 48, 280, 18, 340, 54, 160]
+function catHue(index: number): number {
+  return HUE_PALETTE[index % HUE_PALETTE.length]
+}
+
+// ── Data fetching ─────────────────────────────────────────────────────
 async function loadCats() {
   loading.value = true
   loadError.value = null

@@ -1,7 +1,7 @@
 import type { Product } from '@/types'
 
 interface Props {
-  product: Pick<Product, 'placeholder' | 'type' | 'sizes'>
+  product: Pick<Product, 'placeholder' | 'type' | 'selectedVariant'>
   height?: number
 }
 
@@ -31,7 +31,7 @@ export function ProductPlaceholder({ product, height = 280 }: Props) {
         className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] tracking-[0.15em]
                    font-sans uppercase whitespace-nowrap opacity-70"
       >
-        {product.type} · {product.sizes[0]}
+        {product.type}{product.selectedVariant ? ` · ${product.selectedVariant}` : ''}
       </div>
     </div>
   )

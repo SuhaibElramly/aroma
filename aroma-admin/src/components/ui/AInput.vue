@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { useId } from 'vue'
-defineProps<{ label?: string; modelValue?: string; error?: string }>()
+defineProps<{ label?: string; modelValue?: string | number | null; error?: string }>()
 defineEmits<{ 'update:modelValue': [v: string] }>()
 const uid = useId()
 </script>

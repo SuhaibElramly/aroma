@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { Check, Store } from 'lucide-react'
+import { Check, Store, Tag, X } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 import { useCreateOrder, useAddresses, useCart, useRemoveFromCart, useValidateCoupon } from '@/lib/api/queries'
 import type { CouponValidation } from '@/mocks/services'
@@ -104,7 +104,7 @@ export function CheckoutPageClient() {
         pickup:     data.pickup,
         addressId:  data.pickup ? undefined : selectedAddressId,
         items:      cartItems,
-        total:      finalTotal,
+        total:      subtotal,
         couponCode: appliedCoupon ? couponInput.trim().toUpperCase() : undefined,
       })
       // clear cart — remove each item from backend
@@ -249,56 +249,74 @@ export function CheckoutPageClient() {
                 ))}
               </div>
 
-              {/* Coupon input */}
-              {!appliedCoupon ? (
-                <div className="flex gap-2 mt-3">
-                  <input
-                    type="text"
-                    value={couponInput}
-                    onChange={e => setCouponInput(e.target.value.toUpperCase())}
-                    placeholder="كوبون الخصم"
-                    dir="rtl"
-                    className="flex-1 border border-aroma-border rounded px-3 py-2 font-sans text-[13px] bg-transparent focus:outline-none focus:border-aroma-text"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyCoupon}
-                    disabled={validateCoupon.isPending || !couponInput.trim()}
-                    className="border border-aroma-border rounded px-4 py-2 font-sans text-[13px] hover:border-aroma-text transition-colors disabled:opacity-40"
-                  >
-                    {validateCoupon.isPending ? '…' : 'تطبيق'}
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between mt-3 rounded bg-green-50 border border-green-200 px-3 py-2">
-                  <span className="font-sans text-[13px] text-green-700">
-                    كوبون <span className="font-mono font-bold">{couponInput}</span> — خصم {appliedCoupon.discountAmount} LYD
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleRemoveCoupon}
-                    className="text-[11px] text-green-600 hover:text-red-500 transition-colors ml-2"
-                  >✕</button>
-                </div>
-              )}
-              {couponError && (
-                <p className="mt-1 font-sans text-[12px] text-red-500" dir="rtl">{couponError}</p>
-              )}
+              {/* Coupon + Totals */}
+              <div className="border-t border-aroma-border pt-4 space-y-3">
 
-              <div className="border-t border-aroma-border pt-4">
+                {/* Input row — always visible until coupon applied */}
+                {!appliedCoupon && (
+                  <>
+                    <div className="flex items-stretch border border-aroma-border rounded overflow-hidden focus-within:border-aroma-text transition-colors">
+                      <span className="flex items-center px-3 text-aroma-faint shrink-0">
+                        <Tag size={13} />
+                      </span>
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                        placeholder="كوبون الخصم"
+                        dir="rtl"
+                        className="flex-1 px-3 py-2.5 font-sans text-[13px] bg-transparent focus:outline-none placeholder:text-aroma-faint"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={validateCoupon.isPending || !couponInput.trim()}
+                        className="px-4 font-sans text-[12px] font-medium text-white bg-aroma-text hover:opacity-90 disabled:bg-aroma-border disabled:text-aroma-faint disabled:cursor-not-allowed transition-opacity shrink-0"
+                      >
+                        {validateCoupon.isPending ? '…' : 'تطبيق'}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="font-sans text-[11px] text-red-500 text-right">{couponError}</p>
+                    )}
+                  </>
+                )}
+
+                {/* Applied coupon badge */}
                 {appliedCoupon && (
-                  <div className="flex justify-between font-sans text-[13px] text-aroma-muted mb-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="flex items-center gap-1 font-sans text-[11px] text-aroma-faint hover:text-red-400 transition-colors"
+                    >
+                      <X size={11} />
+                      إزالة
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600 font-sans text-[13px]">−{appliedCoupon.discountAmount} LYD</span>
+                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-aroma-text bg-white border border-aroma-border px-2 py-0.5 rounded tracking-wider">
+                        <Tag size={10} className="text-aroma-faint" />
+                        {couponInput}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Price breakdown */}
+                {appliedCoupon && (
+                  <div className="flex justify-between font-sans text-[13px] text-aroma-muted">
                     <span>المجموع الفرعي</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                 )}
                 {appliedCoupon && (
-                  <div className="flex justify-between font-sans text-[13px] text-green-600 mb-2">
-                    <span>كوبون {couponInput}</span>
+                  <div className="flex justify-between font-sans text-[13px] text-green-600">
+                    <span>الخصم</span>
                     <span>−{appliedCoupon.discountAmount} LYD</span>
                   </div>
                 )}
-                <div className="flex justify-between font-sans text-[15px] font-medium text-aroma-text">
+                <div className="flex justify-between font-sans text-[15px] font-medium text-aroma-text border-t border-aroma-border-lt pt-3">
                   <span>الإجمالي</span>
                   <span>{formatPrice(finalTotal)}</span>
                 </div>

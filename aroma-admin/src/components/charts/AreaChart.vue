@@ -73,7 +73,7 @@ const chartOptions = {
       cornerRadius: 8,
       displayColors: false,
       callbacks: {
-        label: (ctx: { parsed: { y: number } }) => ` ${ctx.parsed.y.toLocaleString()} LYD`,
+        label: (ctx: { parsed: { y: number | null } }) => ` ${(ctx.parsed.y ?? 0).toLocaleString()} LYD`,
       },
     },
   },

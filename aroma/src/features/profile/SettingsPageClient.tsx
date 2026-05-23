@@ -5,7 +5,7 @@ import { useRouter }   from 'next/navigation'
 import { useForm }     from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion }      from 'framer-motion'
-import { ChevronLeft, Eye, EyeOff, Check, LogOut } from 'lucide-react'
+import { ChevronRight, Eye, EyeOff, Check, LogOut } from 'lucide-react'
 import { useAuthStore }       from '@/store/auth'
 import { useUIStore }         from '@/store/ui'
 import { useUpdateProfile, useChangePassword } from '@/lib/api/queries'
@@ -192,12 +192,12 @@ function ChangePasswordSection() {
           type={show ? 'text' : 'password'}
           placeholder={placeholder}
           autoComplete="new-password"
-          className={`${inputBase} pr-11`}
+          className={`${inputBase} pl-11`}
         />
         <button
           type="button"
           onClick={onToggle}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-aroma-faint
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-aroma-faint
                      hover:text-aroma-muted transition-colors"
         >
           {show ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -265,61 +265,6 @@ function ChangePasswordSection() {
   )
 }
 
-// ── Notification Preferences Section ─────────────────────────────────
-
-const NOTIFICATION_PREFS = [
-  { id: 'order-updates', label: 'تحديثات الطلبات',    sub: 'تغييرات حالة طلباتك' },
-  { id: 'new-arrivals',  label: 'وصول جديد',           sub: 'كن أول من يعلم بالإصدارات الجديدة' },
-  { id: 'offers',        label: 'عروض حصرية',          sub: 'خصومات وعروض موسمية' },
-  { id: 'restock',       label: 'عودة المخزون',        sub: 'عندما تعود منتجات مفضلتك للتوفر' },
-]
-
-function NotificationSection() {
-  const [prefs, setPrefs] = useState<Record<string, boolean>>({
-    'order-updates': true,
-    'new-arrivals':  false,
-    'offers':        true,
-    'restock':       true,
-  })
-  const showToast = useUIStore(s => s.showToast)
-
-  const toggle = (id: string) => {
-    setPrefs(p => ({ ...p, [id]: !p[id] }))
-    showToast('تم تحديث التفضيلات')
-  }
-
-  return (
-    <SectionCard
-      title="الإشعارات"
-      subtitle="اختر ما تريد أن يتم إشعارك به"
-    >
-      <div className="space-y-0 divide-y divide-aroma-border-lt">
-        {NOTIFICATION_PREFS.map(pref => (
-          <div key={pref.id} className="flex items-center justify-between py-4 first:pt-0">
-            <div>
-              <p className="font-sans text-[14px] font-medium text-aroma-text">{pref.label}</p>
-              <p className="font-sans text-[12px] text-aroma-faint mt-0.5">{pref.sub}</p>
-            </div>
-            {/* Toggle switch */}
-            <button
-              role="switch"
-              aria-checked={prefs[pref.id]}
-              onClick={() => toggle(pref.id)}
-              className="relative w-11 h-6 rounded-full transition-colors shrink-0 ml-4"
-              style={{ background: prefs[pref.id] ? '#1C1917' : '#D0CCC8' }}
-            >
-              <span
-                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform"
-                style={{ left: prefs[pref.id] ? '1.375rem' : '0.25rem' }}
-              />
-            </button>
-          </div>
-        ))}
-      </div>
-    </SectionCard>
-  )
-}
-
 // ── Danger Zone ────────────────────────────────────────────────────────
 
 function DangerZone() {
@@ -358,7 +303,7 @@ export function SettingsPageClient() {
 
   if (!isLoggedIn) {
     return (
-      <div className="pt-24 pb-20 px-6 text-center">
+      <div dir="rtl" className="pt-24 pb-20 px-6 text-center">
         <p className="font-sans text-aroma-muted mb-4">سجّل دخولك لإدارة إعدادات حسابك.</p>
         <button
           onClick={() => router.push('/login')}
@@ -371,14 +316,14 @@ export function SettingsPageClient() {
   }
 
   return (
-    <div className="pt-24 pb-20 px-6 md:px-12 max-w-[700px] mx-auto">
+    <div dir="rtl" className="pt-24 pb-20 px-6 md:px-12 max-w-[700px] mx-auto">
       {/* Back */}
       <button
         onClick={() => router.push('/profile')}
         className="flex items-center gap-1.5 font-sans text-[13px] text-aroma-muted
                    hover:text-aroma-text transition-colors mb-6"
       >
-        <ChevronLeft size={16} /> الملف الشخصي
+        <ChevronRight size={16} /> الملف الشخصي
       </button>
 
       {/* Page header */}
@@ -395,7 +340,6 @@ export function SettingsPageClient() {
       <div className="space-y-5">
         <ProfileInfoSection />
         <ChangePasswordSection />
-        <NotificationSection />
         <DangerZone />
       </div>
     </div>

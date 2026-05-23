@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminProductController extends Controller
 {
@@ -32,18 +33,23 @@ class AdminProductController extends Controller
             $query->where('type', $request->type);
         }
 
-        if ($request->filled('price_min')) {
+        if ($request->filled('price_min') || $request->filled('price_max')) {
+            $conditions = [];
+            $bindings   = [];
+            if ($request->filled('price_min')) {
+                $conditions[] = 'MIN(price) >= ?';
+                $bindings[]   = (int) $request->price_min;
+            }
+            if ($request->filled('price_max')) {
+                $conditions[] = 'MIN(price) <= ?';
+                $bindings[]   = (int) $request->price_max;
+            }
+            $having = implode(' AND ', $conditions);
+            // Single whereRaw keeps all bindings in the WHERE array — avoids
+            // the Laravel binding-merge bug when using havingRaw inside a whereIn closure.
             $query->whereRaw(
-                '(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) >= ?',
-                [(float) $request->price_min]
-            );
-        }
-
-        if ($request->filled('price_max')) {
-            // MIN(price): show products where the cheapest variant is within budget
-            $query->whereRaw(
-                '(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) <= ?',
-                [(float) $request->price_max]
+                "id IN (SELECT product_id FROM product_variants GROUP BY product_id HAVING {$having})",
+                $bindings
             );
         }
 
@@ -60,19 +66,64 @@ class AdminProductController extends Controller
                 'category'     => $p->category?->label,
                 'categoryId'   => $p->category_id,
                 'type'         => $p->type?->value,
-                'isNew'        => $p->is_new,
-                'isBestseller' => $p->is_bestseller,
-                'isOffer'      => $p->is_offer,
-                'variantCount' => $p->variants->count(),
-                'price'        => $p->variants->min('price'),
-                'thumbnailUrl' => $p->images->firstWhere('is_thumbnail', true)?->url
-                               ?? $p->images->first()?->url,
+                'isNew'          => $p->is_new,
+                'isBestseller'  => $p->is_bestseller,
+                'isOffer'       => $p->is_offer,
+                'variantCount'  => $p->variants->count(),
+                'price'         => $p->variants->min('price'),
+                'thumbnailUrl'  => $p->images->firstWhere('is_thumbnail', true)?->url
+                                ?? $p->images->first()?->url,
+                'placeholderBg'  => $p->placeholder_bg,
+                'placeholderDot' => $p->placeholder_dot,
             ]),
             'meta' => [
                 'total'       => $products->total(),
                 'currentPage' => $products->currentPage(),
                 'lastPage'    => $products->lastPage(),
             ],
+        ]);
+    }
+
+    public function show(int $id)
+    {
+        $product = Product::with(['brand', 'category', 'variants', 'images'])->findOrFail($id);
+
+        $salesData = DB::table('order_items as oi')
+            ->join('orders as o', 'oi.order_id', '=', 'o.id')
+            ->join('product_variants as pv', 'oi.product_variant_id', '=', 'pv.id')
+            ->where('pv.product_id', $id)
+            ->where('o.status', 'delivered')
+            ->selectRaw('SUM(oi.qty) as units_sold, SUM(oi.unit_price * oi.qty) as revenue')
+            ->first();
+
+        return response()->json([
+            'id'             => $product->id,
+            'slug'           => $product->slug,
+            'name'           => $product->name,
+            'nameEn'         => $product->name_en,
+            'name_en'        => $product->name_en,
+            'brand'          => $product->brand?->name,
+            'brandId'        => $product->brand_id,
+            'category'       => $product->category?->label,
+            'categoryId'     => $product->category_id,
+            'type'           => $product->type?->value,
+            'description'    => $product->description,
+            'isNew'          => $product->is_new,
+            'isBestseller'   => $product->is_bestseller,
+            'isOffer'        => $product->is_offer,
+            'placeholderBg'  => $product->placeholder_bg,
+            'placeholderDot' => $product->placeholder_dot,
+            'is_active'      => true,
+            'revenue'        => $salesData->revenue ? round((float) $salesData->revenue / 1000, 1) : null,
+            'sales_count'    => (int) ($salesData->units_sold ?? 0),
+            'images'         => $product->images->map(fn($img) => [
+                'id'          => $img->id,
+                'url'         => $img->url,
+                'isThumbnail' => $img->is_thumbnail,
+                'sortOrder'   => $img->sort_order,
+            ])->values(),
+            'thumbnailUrl'   => $product->images->firstWhere('is_thumbnail', true)?->url
+                              ?? $product->images->first()?->url,
         ]);
     }
 

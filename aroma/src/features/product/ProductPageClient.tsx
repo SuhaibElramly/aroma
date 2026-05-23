@@ -26,7 +26,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
 
   const { data: product, isPending, isError } = useProduct(slug)
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
   const [qty,  setQty]  = useState(1)
   const [added, setAdded] = useState(false)
   const [activeImg, setActiveImg] = useState<string | null>(null)
@@ -42,8 +42,7 @@ export function ProductPageClient({ slug }: { slug: string }) {
   )
 
   const allVariants   = product.variants ?? []
-  const size          = selectedSize ?? product.selectedSize
-  const activeVariant = allVariants.find(v => String(v.size) === String(size))
+  const activeVariant = (selectedVariantId ? allVariants.find(v => v.id === selectedVariantId) : null)
                      ?? allVariants.find(v => v.isDefault)
                      ?? allVariants[0]
   const displayPrice    = activeVariant ? activeVariant.price    : Number(product.price)
@@ -204,28 +203,32 @@ export function ProductPageClient({ slug }: { slug: string }) {
             <StockBadge status={displayStock} />
           </div>
 
-          {/* Size selector */}
-          <div className="mb-8">
-            <p className="font-sans text-[12px] text-aroma-muted mb-2.5">
-              الحجم — {size}
-            </p>
-            <div className="flex gap-2.5">
-              {product.sizes.map(s => (
-                <button
-                  key={s}
-                  onClick={() => setSelectedSize(s)}
-                  className="px-4 py-2 rounded font-sans text-[13px] transition-all"
-                  style={{
-                    border:     s === size ? '1.5px solid #1C1917' : '1.5px solid #D0CCC8',
-                    background: s === size ? '#1C1917' : '#fff',
-                    color:      s === size ? '#fff' : '#4A4540',
-                  }}
-                >
-                  {s}
-                </button>
-              ))}
+          {/* Variant selector — only shown when variants have labels (i.e. product has specs) */}
+          {allVariants.some(v => v.label) && (
+            <div className="mb-8">
+              {activeVariant?.label && (
+                <p className="font-sans text-[12px] text-aroma-muted mb-2.5">
+                  {activeVariant.label}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2.5">
+                {allVariants.map(v => (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVariantId(v.id)}
+                    className="px-4 py-2 rounded font-sans text-[13px] transition-all"
+                    style={{
+                      border:     v.id === activeVariant?.id ? '1.5px solid #1C1917' : '1.5px solid #D0CCC8',
+                      background: v.id === activeVariant?.id ? '#1C1917' : '#fff',
+                      color:      v.id === activeVariant?.id ? '#fff' : '#4A4540',
+                    }}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Qty + Add */}
           <div className="flex gap-4 mb-5">

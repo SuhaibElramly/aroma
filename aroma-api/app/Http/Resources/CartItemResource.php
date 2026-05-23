@@ -28,8 +28,7 @@ class CartItemResource extends JsonResource
                 'brandId' => $product->brand_id,
                 'price' => $variant->price,
                 'originalPrice' => $variant->original_price,
-                'sizes' => $product->variants->pluck('size')->toArray(),
-                'selectedSize' => $variant->size,
+                'selectedVariant' => $variant->specLabel(),
                 'type' => $product->type?->value,
                 'category' => $product->category?->label,
                 'notes' => $product->notes->groupBy('type')->map(function ($group) {

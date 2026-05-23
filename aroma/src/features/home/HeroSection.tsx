@@ -13,12 +13,6 @@ const SCENT_WORDS = [
   { word: 'نيرولي',  top: '65%', left: '42%', delay: 2.5, size: 9  },
 ]
 
-const STATS = [
-  ['+٣٠٠', 'عطر'],
-  ['+٤٠',  'ماركة'],
-  ['٥★',   'متوسط التقييم'],
-]
-
 const fadeUp = (delay = 0) => ({
   initial:    { opacity: 0, y: 22 },
   animate:    { opacity: 1, y: 0 },
@@ -44,27 +38,16 @@ export function HeroSection() {
 
         <motion.div {...fadeUp(0.12)}>
           <h1
-            className="leading-[1.02] tracking-[-0.02em] mb-2.5"
-            style={{
-              fontFamily:  'Cormorant Garamond, Georgia, serif',
-              fontStyle:   'italic',
-              fontWeight:  300,
-              fontSize:    'clamp(52px, 5.5vw, 88px)',
-              color:       '#F4EFE8',
-            }}
-          >
-            ارتدِ<br />ذكرى.
-          </h1>
-          <h1
-            className="leading-[1.02] tracking-[-0.02em] mb-9"
+            className="leading-[1.12] mb-9"
             style={{
               fontFamily: 'Cormorant Garamond, Georgia, serif',
               fontWeight: 300,
-              fontSize:   'clamp(52px, 5.5vw, 88px)',
-              color:      '#B8966E',
+              fontSize:   'clamp(40px, 4.5vw, 72px)',
+              color:      '#F4EFE8',
             }}
           >
-            واترك أثرًا.
+            حيث تبدأ الحكايات<br />
+            <span style={{ color: '#B8966E', fontStyle: 'italic' }}>برائحة لا تُنسى</span>
           </h1>
         </motion.div>
 
@@ -90,18 +73,6 @@ export function HeroSection() {
           </button>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div
-          {...fadeUp(0.48)}
-          className="flex gap-10 mt-14 pt-8 border-t border-white/[0.07]"
-        >
-          {STATS.map(([n, l]) => (
-            <div key={l}>
-              <p className="font-display text-[22px] font-light text-[#F4EFE8] tracking-[0.02em]">{n}</p>
-              <p className="font-sans text-[11px] text-[rgba(244,239,232,0.38)] tracking-[0.08em] mt-0.5">{l}</p>
-            </div>
-          ))}
-        </motion.div>
       </div>
 
       {/* ── Right: CSS Bottle Art ─────────────────────────────── */}

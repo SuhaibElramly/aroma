@@ -22,7 +22,7 @@ class ProductController extends Controller
     public function show(string $slug)
     {
         $product = Product::where('slug', $slug)
-            ->with(['brand', 'category', 'variants', 'notes', 'tags', 'images'])
+            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags', 'images'])
             ->firstOrFail();
 
         return new ProductResource($product);

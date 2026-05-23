@@ -225,8 +225,7 @@ export async function addAddress(data: {
     }),
   })
   if (!res.ok) throw new Error('Failed to add address')
-  const json = await res.json()
-  return json.data
+  return res.json()
 }
 
 export async function updateAddress(
@@ -244,8 +243,7 @@ export async function updateAddress(
     }),
   })
   if (!res.ok) throw new Error('Failed to update address')
-  const json = await res.json()
-  return json.data
+  return res.json()
 }
 
 export async function deleteAddress(id: number): Promise<void> {
@@ -260,8 +258,7 @@ export async function deleteAddress(id: number): Promise<void> {
 export async function getCart(): Promise<CartItem[]> {
   const res = await fetch(`${API_URL}/api/cart`, { headers: authHeaders() })
   if (!res.ok) throw new Error('Failed to fetch cart')
-  const json = await res.json()
-  return json.data ?? []
+  return res.json()
 }
 
 export async function addToCart(data: {
@@ -277,8 +274,7 @@ export async function addToCart(data: {
     }),
   })
   if (!res.ok) throw new Error('Failed to add to cart')
-  const json = await res.json()
-  return json.data
+  return res.json()
 }
 
 export async function updateCartItem(id: number, quantity: number): Promise<CartItem> {
@@ -288,8 +284,7 @@ export async function updateCartItem(id: number, quantity: number): Promise<Cart
     body: JSON.stringify({ quantity }),
   })
   if (!res.ok) throw new Error('Failed to update cart item')
-  const json = await res.json()
-  return json.data
+  return res.json()
 }
 
 export async function removeFromCart(id: number): Promise<void> {

@@ -12,7 +12,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $cartItems = $request->user()->cart()
-            ->with(['variant.product.brand', 'variant.product.category', 'variant.product.variants', 'variant.product.notes', 'variant.product.tags'])
+            ->with(['variant.specValues.specType', 'variant.product.brand', 'variant.product.category', 'variant.product.notes', 'variant.product.tags'])
             ->get();
 
         return CartItemResource::collection($cartItems);
@@ -36,7 +36,7 @@ class CartController extends Controller
             $cartItem = $request->user()->cart()->create($request->only(['product_variant_id', 'quantity']));
         }
 
-        $cartItem = $cartItem->load(['variant.product.brand', 'variant.product.category', 'variant.product.variants', 'variant.product.notes', 'variant.product.tags']);
+        $cartItem = $cartItem->load(['variant.specValues.specType', 'variant.product.brand', 'variant.product.category', 'variant.product.notes', 'variant.product.tags']);
 
         return new CartItemResource($cartItem);
     }
@@ -48,7 +48,7 @@ class CartController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
         $cartItem->update(['quantity' => $request->quantity]);
 
-        return new CartItemResource($cartItem->load(['variant.product.brand', 'variant.product.category', 'variant.product.variants', 'variant.product.notes', 'variant.product.tags']));
+        return new CartItemResource($cartItem->load(['variant.specValues.specType', 'variant.product.brand', 'variant.product.category', 'variant.product.notes', 'variant.product.tags']));
     }
 
     public function destroy(Request $request, CartItem $cartItem)

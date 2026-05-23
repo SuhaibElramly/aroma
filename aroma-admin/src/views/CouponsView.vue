@@ -1,65 +1,150 @@
 <!-- aroma-admin/src/views/CouponsView.vue -->
 <template>
-  <div class="space-y-4">
+  <div class="px-9 pb-12 pt-4 space-y-5 max-w-[1280px]">
     <div v-if="loadError" class="rounded-lg bg-dash-danger-lt border border-dash-danger/20 px-3 py-2 text-xs text-dash-danger">
       {{ loadError }}
     </div>
 
-    <div class="flex items-center gap-3">
-      <AInput v-model="search" :placeholder="t('coupons.searchPlaceholder')" class="w-56" @input="debouncedLoad" />
-      <div class="ml-auto">
-        <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('coupons.add') }}</AButton>
+    <!-- KPI strip -->
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('coupons.kpiActiveCodes') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ coupons.filter(c => c.isActive).length }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('coupons.kpiRunningNow') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('coupons.kpiRedemptions') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ coupons.reduce((s, c) => s + (c.usesCount ?? 0), 0) }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('coupons.kpiTotalUses') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('coupons.kpiDiscountsGiven') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">—</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('coupons.kpiLydGiven') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('coupons.kpiExpiringSoon') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ expiringCount }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('coupons.kpiInNext30Days') }}</p>
       </div>
     </div>
 
-    <ATable :columns="cols" :rows="coupons" :loading="loading" :on-row-click="(row) => openOrders(row as AdminCoupon)">
-      <template #cell-code="{ value }">
-        <span class="font-mono text-xs font-semibold tracking-wider">{{ value }}</span>
-      </template>
-      <template #cell-type="{ row }">
-        <span class="text-xs">
-          {{ (row as AdminCoupon).type === 'percentage' ? t('coupons.typePercentage') : t('coupons.typeFixed') }}
-        </span>
-      </template>
-      <template #cell-value="{ row }">
-        <span class="text-xs">
-          {{ (row as AdminCoupon).type === 'percentage'
-            ? `${(row as AdminCoupon).value}%`
-            : `${(row as AdminCoupon).value} LYD` }}
-        </span>
-      </template>
-      <template #cell-minOrderAmount="{ value }">
-        <span class="text-xs text-dash-muted">{{ value ? `${value} LYD` : '—' }}</span>
-      </template>
-      <template #cell-uses="{ row }">
-        <span class="text-xs">
-          {{ (row as AdminCoupon).usesCount }} / {{ (row as AdminCoupon).maxUses ?? '∞' }}
-        </span>
-      </template>
-      <template #cell-expiresAt="{ value }">
-        <span class="text-xs text-dash-muted">{{ value ? value.slice(0, 10) : t('coupons.never') }}</span>
-      </template>
-      <template #cell-isActive="{ value }">
-        <span
-          :class="value
-            ? 'bg-dash-success-lt text-dash-success border-dash-success/20'
-            : 'bg-dash-danger-lt text-dash-danger border-dash-danger/20'"
-          class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold"
-        >{{ value ? t('coupons.statusActive') : t('coupons.statusInactive') }}</span>
-      </template>
-      <template #actions="{ row }">
-        <div class="flex gap-1.5 justify-end rtl:justify-start">
-          <AButton size="sm" variant="ghost" @click.stop="openEdit(row as AdminCoupon)">{{ t('common.edit') }}</AButton>
-          <AButton size="sm" variant="ghost" @click.stop="handleToggle(row as AdminCoupon)">
-            {{ (row as AdminCoupon).isActive ? t('coupons.disable') : t('coupons.enable') }}
-          </AButton>
-          <AButton size="sm" variant="danger" @click.stop="confirmDelete(row as AdminCoupon)">{{ t('common.delete') }}</AButton>
+    <!-- Toolbar: tabs + add button -->
+    <div class="bg-dash-paper border border-dash-border rounded-card p-4 flex items-center gap-3 flex-wrap shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+      <!-- Status filter tabs -->
+      <div class="flex items-center gap-1 p-1 rounded-lg border border-dash-border-lt bg-dash-paper-2 overflow-x-auto">
+        <button
+          v-for="[key, label] in statusTabs"
+          :key="key"
+          class="px-2.5 py-1.5 rounded-md text-[12px] font-medium whitespace-nowrap transition-all"
+          :style="{
+            background: statusFilter === key ? 'white' : 'transparent',
+            color: statusFilter === key ? 'var(--dash-text)' : 'var(--dash-muted)',
+            boxShadow: statusFilter === key ? '0 1px 2px rgba(0,0,0,.05)' : 'none'
+          }"
+          @click="statusFilter = key"
+        >{{ label }}</button>
+      </div>
+      <!-- Search -->
+      <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-dash-border-lt flex-1 min-w-[160px] bg-dash-paper-2">
+        <svg class="text-dash-faint shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input
+          v-model="search"
+          :placeholder="t('coupons.searchPlaceholder')"
+          class="bg-transparent text-[12.5px] outline-none flex-1 text-dash-text-2"
+          @input="debouncedLoad"
+        />
+      </div>
+      <button
+        class="h-9 px-3 rounded-lg text-[12px] font-medium text-white inline-flex items-center gap-1.5 whitespace-nowrap bg-dash-text hover:opacity-90 transition-opacity"
+        @click="openCreate"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        {{ t('coupons.add') }}
+      </button>
+    </div>
+
+    <!-- Coupon cards grid -->
+    <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div
+        v-for="(coupon, i) in filteredCoupons"
+        :key="coupon.id"
+        class="bg-dash-paper border border-dash-border rounded-card overflow-hidden flex"
+      >
+        <!-- Left: discount stub -->
+        <div
+          class="w-24 shrink-0 flex flex-col items-center justify-center text-white p-3"
+          :style="{ background: `oklch(52% 0.07 ${couponHue(i)})` }"
+        >
+          <p class="text-[22px] font-display font-semibold leading-none">{{ coupon.type === 'percentage' ? coupon.value : coupon.value }}</p>
+          <p class="text-[11px] mt-0.5 font-medium">{{ coupon.type === 'percentage' ? '%' : 'LYD' }}</p>
+          <p class="text-[9px] uppercase tracking-wider mt-1 opacity-80">OFF</p>
         </div>
-      </template>
-      <template #empty>
-        <AEmptyState :icon="Ticket" :heading="t('coupons.noData')" />
-      </template>
-    </ATable>
+        <!-- Perforated divider -->
+        <div class="w-px border-l-2 border-dashed border-dash-border self-stretch" />
+        <!-- Right: coupon details -->
+        <div class="flex-1 p-4 min-w-0">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="font-display text-[15px] text-dash-text font-medium tracking-wider">{{ coupon.code }}</p>
+              <p class="text-[11px] text-dash-muted mt-0.5">
+                {{ coupon.type === 'percentage' ? t('coupons.percentOff', { value: coupon.value }) : t('coupons.lydOff', { value: coupon.value }) }}
+                <span v-if="coupon.minOrderAmount"> · {{ t('coupons.minOrderAmount', { amount: coupon.minOrderAmount }) }}</span>
+              </p>
+            </div>
+            <!-- Status chip -->
+            <span
+              class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-semibold whitespace-nowrap"
+              :class="statusChipClass(coupon.isActive)"
+            >
+              <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(coupon.isActive)" />
+              {{ coupon.isActive ? t('coupons.statusActive') : t('coupons.statusInactive') }}
+            </span>
+          </div>
+          <!-- Redemption bar -->
+          <div class="mt-3">
+            <div class="flex items-center justify-between text-[10.5px] text-dash-faint mb-1">
+              <span>{{ coupon.usesCount ?? 0 }} {{ t('coupons.redeemed') }}</span>
+              <span v-if="coupon.expiresAt">{{ t('coupons.expires') }} {{ coupon.expiresAt.slice(0, 10) }}</span>
+              <span v-else>{{ t('coupons.noExpiry') }}</span>
+            </div>
+            <div class="h-1.5 rounded-full bg-dash-bg overflow-hidden">
+              <div
+                class="h-full rounded-full bg-dash-primary transition-all"
+                :style="{ width: redemptionPct(coupon) + '%' }"
+              />
+            </div>
+          </div>
+          <!-- Footer actions -->
+          <div class="mt-3 pt-3 border-t border-dash-border-lt flex items-center justify-end gap-1">
+            <button
+              class="h-7 px-2 rounded-md text-[11px] font-medium border border-dash-border bg-white text-dash-text-2"
+              @click.stop="openEdit(coupon)"
+            >{{ t('common.edit') }}</button>
+            <button
+              class="h-7 px-2 rounded-md text-[11px] font-medium border border-dash-border bg-white text-dash-text-2"
+              @click.stop="openOrders(coupon)"
+            >{{ t('coupons.ordersBtn') }}</button>
+            <button
+              class="h-7 px-2 rounded-md text-[11px] font-medium border border-dash-border bg-white text-dash-text-2"
+              @click.stop="handleToggle(coupon)"
+            >{{ coupon.isActive ? t('coupons.disable') : t('coupons.enable') }}</button>
+            <button
+              class="h-7 px-2 rounded-md text-[11px] font-medium text-dash-danger border border-dash-danger-lt"
+              @click.stop="confirmDelete(coupon)"
+            >{{ t('common.delete') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div v-if="filteredCoupons.length === 0" class="col-span-full py-12 text-center text-sm text-dash-muted">
+        {{ t('coupons.noData') }}
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div v-else class="py-12 text-center text-sm text-dash-muted">{{ t('common.loading') }}</div>
 
     <!-- Create / Edit Modal -->
     <AModal :open="modalOpen" :title="editing ? t('coupons.editTitle') : t('coupons.createTitle')" @close="closeModal">
@@ -125,12 +210,12 @@
     <!-- Coupon Orders Modal -->
     <AModal
       :open="!!ordersForCoupon"
-      :title="`Orders using ${ordersForCoupon?.code ?? ''}`"
+      :title="ordersForCoupon ? t('coupons.ordersModalTitle', { code: ordersForCoupon.code }) : ''"
       @close="ordersForCoupon = null"
     >
       <div v-if="ordersLoading" class="py-6 text-center text-xs text-dash-muted">{{ t('common.loading') }}</div>
       <div v-else-if="couponOrders.length === 0" class="py-6 text-center text-xs text-dash-muted">
-        No orders have used this coupon yet.
+        {{ t('coupons.noOrdersUsedCoupon') }}
       </div>
       <div v-else class="space-y-2">
         <div
@@ -171,36 +256,78 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { Plus, Ticket } from 'lucide-vue-next'
 import {
   apiGetCoupons, apiCreateCoupon, apiUpdateCoupon,
   apiDeleteCoupon, apiToggleCoupon, apiGetCouponOrders,
 } from '../api/admin'
 import type { AdminCoupon, CouponOrder } from '../types'
-import ATable from '../components/ui/ATable.vue'
 import AButton from '../components/ui/AButton.vue'
 import AInput from '../components/ui/AInput.vue'
 import AModal from '../components/ui/AModal.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
-import AEmptyState from '../components/ui/AEmptyState.vue'
 
 const { t } = useI18n()
 const router = useRouter()
 
-const cols = computed(() => [
-  { key: 'code',           label: t('coupons.columns.code') },
-  { key: 'type',           label: t('coupons.columns.type') },
-  { key: 'value',          label: t('coupons.columns.value') },
-  { key: 'minOrderAmount', label: t('coupons.columns.minOrder') },
-  { key: 'uses',           label: t('coupons.columns.uses') },
-  { key: 'expiresAt',      label: t('coupons.columns.expiry') },
-  { key: 'isActive',       label: t('coupons.columns.status') },
+// ── Filter state ──────────────────────────────────────────────────────
+const statusFilter = ref<string>('all')
+const search       = ref('')
+
+const statusTabs = computed<[string, string][]>(() => [
+  ['all',      t('coupons.filterAll')],
+  ['active',   t('coupons.filterActive')],
+  ['inactive', t('coupons.filterInactive')],
 ])
 
+// ── Design helpers ────────────────────────────────────────────────────
+const HUE_PALETTE = [32, 200, 140, 96]
+
+function couponHue(index: number): number {
+  return HUE_PALETTE[index % HUE_PALETTE.length]
+}
+
+function statusChipClass(isActive: boolean): string {
+  return isActive
+    ? 'bg-dash-success-lt text-dash-success-dk'
+    : 'bg-dash-danger-lt text-dash-danger'
+}
+
+function statusDotClass(isActive: boolean): string {
+  return isActive ? 'bg-dash-success' : 'bg-dash-danger'
+}
+
+function redemptionPct(coupon: AdminCoupon): number {
+  if (!coupon.maxUses) return 0
+  return Math.min(Math.round((coupon.usesCount / coupon.maxUses) * 100), 100)
+}
+
+// ── KPI helpers ───────────────────────────────────────────────────────
+const expiringCount = computed(() => {
+  const now = Date.now()
+  const in30 = now + 30 * 24 * 60 * 60 * 1000
+  return coupons.value.filter(c => {
+    if (!c.expiresAt || !c.isActive) return false
+    const exp = new Date(c.expiresAt).getTime()
+    return exp > now && exp < in30
+  }).length
+})
+
+// ── Filtered coupons ──────────────────────────────────────────────────
+const filteredCoupons = computed(() => {
+  let list = coupons.value
+  if (statusFilter.value === 'active') list = list.filter(c => c.isActive)
+  else if (statusFilter.value === 'inactive') list = list.filter(c => !c.isActive)
+  if (search.value.trim()) {
+    const q = search.value.toLowerCase()
+    list = list.filter(c => c.code.toLowerCase().includes(q))
+  }
+  return list
+})
+
+// ── Data state ────────────────────────────────────────────────────────
 const coupons      = ref<AdminCoupon[]>([])
 const loading      = ref(false)
 const loadError    = ref('')
-const search       = ref('')
 
 const modalOpen    = ref(false)
 const editing      = ref<AdminCoupon | null>(null)
@@ -254,7 +381,7 @@ async function load() {
     const res   = await apiGetCoupons({ search: search.value || undefined })
     coupons.value = res.data
   } catch {
-    loadError.value = 'Failed to load coupons.'
+    loadError.value = t('coupons.loadFailed')
   } finally {
     loading.value = false
   }
@@ -321,7 +448,7 @@ async function handleToggle(coupon: AdminCoupon) {
     const idx = coupons.value.findIndex(c => c.id === coupon.id)
     if (idx !== -1) coupons.value[idx] = res.data
   } catch {
-    loadError.value = 'Failed to toggle coupon.'
+    loadError.value = t('coupons.toggleFailed')
   }
 }
 

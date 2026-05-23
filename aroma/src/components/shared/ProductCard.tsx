@@ -101,9 +101,11 @@ export function ProductCard({ product, compact = false }: Props) {
                 {formatPrice(product.originalPrice)}
               </span>
             )}
-            <span className="font-sans text-[11px] text-aroma-faint">
-              {product.selectedSize}
-            </span>
+            {product.selectedVariant && (
+              <span className="font-sans text-[11px] text-aroma-faint">
+                {product.selectedVariant}
+              </span>
+            )}
           </div>
         </div>
       </Link>

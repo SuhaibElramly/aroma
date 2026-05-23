@@ -52,7 +52,7 @@ export function OrdersPageClient() {
                 {/* Thumbnail */}
                 <div className="w-[60px] h-[70px] rounded overflow-hidden shrink-0">
                   <ProductPlaceholder
-                    product={findProductForOrder(order.items[0].price)}
+                    product={findProductForOrder(order.items[0]?.price)}
                     height={70}
                   />
                 </div>

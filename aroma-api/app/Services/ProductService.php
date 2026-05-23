@@ -78,7 +78,7 @@ class ProductService
                 $q->where('brand_id', $product->brand_id)
                   ->orWhere('category_id', $product->category_id);
             })
-            ->with(['brand', 'category', 'variants', 'notes', 'tags', 'images'])
+            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags', 'images'])
             ->limit($limit)
             ->get();
     }

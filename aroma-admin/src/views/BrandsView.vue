@@ -1,35 +1,130 @@
 <!-- aroma-admin/src/views/BrandsView.vue -->
 <template>
-  <div class="space-y-4">
+  <div class="px-9 pb-12 pt-4 space-y-5 max-w-[1280px]">
     <div v-if="loadError" class="rounded-lg bg-dash-danger-lt border border-dash-danger/20 px-3 py-2 text-xs text-dash-danger">
       {{ loadError }}
     </div>
 
-    <div class="flex justify-end">
-      <AButton size="sm" @click="openCreate"><Plus :size="14" /> {{ t('brands.add') }}</AButton>
+    <!-- KPI strip -->
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('brands.kpiAllBrands') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ brands.length }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('brands.kpiInYourCatalog') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('brands.kpiActive') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ brands.filter(b => (b.productCount ?? 0) > 0).length }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('brands.kpiSellingNow') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('brands.kpiBrandProducts') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ brands.reduce((s, b) => s + (b.productCount ?? 0), 0) }}</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('brands.kpiAcrossCatalog') }}</p>
+      </div>
+      <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('brands.kpiRevenue') }}</p>
+        <p class="font-display text-[28px] mt-2 leading-none text-dash-text">—</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('brands.kpiLydThisMonth') }}</p>
+      </div>
     </div>
 
-    <!-- Filters -->
-    <div class="space-y-3">
-      <div class="grid grid-cols-3 gap-3">
-        <AInput v-model="filterName"    :label="t('brands.filterName')"    placeholder="Search AR / EN…"  @input="debouncedLoad" />
-        <AInput v-model="filterOrigin"  :label="t('brands.filterOrigin')"  placeholder="e.g. France"      @input="debouncedLoad" />
-        <AInput v-model="filterTagline" :label="t('brands.filterTagline')" placeholder="Keyword…"         @input="debouncedLoad" />
+    <!-- Toolbar: search + view toggle + add -->
+    <div class="bg-dash-paper border border-dash-border rounded-card p-4 flex items-center gap-3 flex-wrap shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+      <!-- Search -->
+      <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-dash-border-lt flex-1 min-w-[200px] bg-dash-paper-2">
+        <svg class="text-dash-faint shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input
+          v-model="filterName"
+          :placeholder="t('brands.searchPlaceholder')"
+          class="bg-transparent text-[12.5px] outline-none flex-1 text-dash-text-2"
+          @input="debouncedLoad"
+        />
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <AInput v-model="filterMinProducts" :label="t('brands.filterMinProducts')" type="number" placeholder="0"   @input="debouncedLoad" />
-        <AInput v-model="filterMaxProducts" :label="t('brands.filterMaxProducts')" type="number" placeholder="Any" @input="debouncedLoad" />
+      <!-- View toggle -->
+      <div class="flex items-center p-1 rounded-lg border border-dash-border-lt bg-dash-paper-2">
+        <button
+          v-for="[k, ico] in viewOptions"
+          :key="k"
+          class="h-7 w-8 grid place-items-center rounded-md transition-colors"
+          :style="{
+            background: view === k ? 'white' : 'transparent',
+            color: view === k ? 'var(--dash-text)' : 'var(--dash-muted)',
+            boxShadow: view === k ? '0 1px 2px rgba(0,0,0,.04)' : 'none'
+          }"
+          @click="view = k"
+          v-html="ico"
+        />
       </div>
+      <!-- Add button -->
+      <button
+        class="h-9 px-3 rounded-lg text-[12px] font-medium text-white inline-flex items-center gap-1.5 whitespace-nowrap bg-dash-text hover:opacity-90 transition-opacity"
+        @click="openCreate"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        {{ t('brands.add') }}
+      </button>
     </div>
 
-    <ATable :columns="cols" :rows="brands" :loading="loading">
-      <template #cell-name="{ row }">
-        <RouterLink
-          :to="`/brands/${(row as AdminBrand).id}`"
-          class="group block"
+    <!-- Grid view -->
+    <div v-if="view === 'grid'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div
+        v-for="(brand, i) in filteredBrands"
+        :key="brand.id"
+        class="bg-dash-paper border border-dash-border rounded-card overflow-hidden cursor-pointer transition-shadow hover:shadow-md"
+      >
+        <!-- Tinted header with monogram -->
+        <div
+          class="relative h-24"
+          :style="{ background: `radial-gradient(120% 80% at 30% 20%, oklch(94% 0.05 ${brandHue(brand, i)}), oklch(88% 0.07 ${brandHue(brand, i) + 20}))` }"
         >
-          <p class="font-medium text-xs group-hover:text-dash-primary transition-colors">{{ (row as AdminBrand).name }}</p>
-          <p v-if="(row as AdminBrand).nameEn" class="text-[10px] text-dash-faint">{{ (row as AdminBrand).nameEn }}</p>
+          <!-- diagonal texture -->
+          <div class="absolute inset-0 opacity-[0.05] overflow-hidden"
+            style="background-image: repeating-linear-gradient(135deg, transparent 0 8px, rgba(0,0,0,.6) 8px 9px)" />
+          <!-- monogram badge at bottom-left, overlapping -->
+          <div class="absolute -bottom-7 left-4 h-14 w-14 rounded-2xl bg-white grid place-items-center font-display text-[20px] border border-dash-border-lt"
+            :style="{ color: `oklch(34% 0.07 ${brandHue(brand, i)})`, boxShadow: '0 4px 14px oklch(26% 0.04 250 / .08)' }">
+            {{ monogram(brand.name || brand.nameEn || '') }}
+          </div>
+        </div>
+        <!-- Card body -->
+        <div class="px-4 pt-9 pb-4">
+          <p class="font-display text-[15px] text-dash-text leading-snug">{{ brand.name || brand.nameEn }}</p>
+          <p v-if="brand.nameEn && brand.name !== brand.nameEn" class="text-[11px] text-dash-faint mt-0.5">{{ brand.nameEn }}</p>
+          <p v-if="brand.tagline" class="text-[11px] text-dash-muted mt-1 line-clamp-2">{{ brand.tagline }}</p>
+          <div class="mt-3 flex items-center justify-between text-[11.5px]">
+            <span v-if="brand.origin" class="text-dash-faint inline-flex items-center gap-1">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="10" r="3"/><path d="M12 2c5 4 7 7 7 10 0 5-7 10-7 10S5 17 5 12c0-3 2-6 7-10z"/></svg>
+              {{ brand.origin }}
+            </span>
+            <span class="font-semibold text-dash-text">{{ brand.productCount ?? 0 }} <span class="font-normal text-dash-muted">{{ t('brands.productsUnit') }}</span></span>
+          </div>
+          <!-- actions -->
+          <div class="mt-3 pt-3 border-t border-dash-border-lt flex gap-1.5">
+            <button class="text-[11px] text-dash-muted hover:text-dash-text px-2 py-0.5 rounded-btn border border-dash-border-lt" @click.stop="openEdit(brand)">{{ t('common.edit') }}</button>
+            <button class="text-[11px] text-dash-danger px-2 py-0.5 rounded-btn border border-dash-danger-lt" @click.stop="confirmDelete(brand)">{{ t('common.delete') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List view -->
+    <ATable v-else :columns="cols" :rows="filteredBrands" :loading="loading">
+      <template #cell-name="{ row }">
+        <RouterLink :to="`/brands/${(row as AdminBrand).id}`" class="group block">
+          <div class="flex items-center gap-2.5">
+            <div class="h-9 w-9 rounded-lg grid place-items-center font-display text-[13px] border border-dash-border-lt"
+              :style="{
+                background: `oklch(94% 0.04 ${brandHue(row as AdminBrand, brands.indexOf(row as AdminBrand))})`,
+                color: `oklch(34% 0.07 ${brandHue(row as AdminBrand, brands.indexOf(row as AdminBrand))})`
+              }">
+              {{ monogram((row as AdminBrand).name || (row as AdminBrand).nameEn || '') }}
+            </div>
+            <div>
+              <p class="font-medium text-xs group-hover:text-dash-primary transition-colors">{{ (row as AdminBrand).name }}</p>
+              <p v-if="(row as AdminBrand).nameEn" class="text-[10px] text-dash-faint">{{ (row as AdminBrand).nameEn }}</p>
+            </div>
+          </div>
         </RouterLink>
       </template>
       <template #cell-id="{ value }">
@@ -46,6 +141,7 @@
       </template>
     </ATable>
 
+    <!-- Create / Edit Modal -->
     <AModal :open="modalOpen" :title="editing ? t('brands.editTitle') : t('brands.createTitle')" @close="closeModal">
       <form class="space-y-3" @submit.prevent>
         <div class="grid grid-cols-2 gap-3">
@@ -53,17 +149,13 @@
           <AInput v-model="form.name_en" :label="t('brands.nameEnglish')" :error="formErrors.name_en" />
         </div>
 
-        <!-- Slug preview — only shown when creating -->
         <div
           v-if="!editing"
           class="flex items-center gap-2 rounded-btn bg-dash-bg border border-dash-border px-3 py-2"
         >
           <Link2 :size="12" class="text-dash-faint shrink-0" />
           <span class="text-2xs text-dash-muted">{{ t('brands.brandIdLabel') }}</span>
-          <span
-            v-if="generatedSlug"
-            class="text-2xs font-medium text-dash-text font-mono"
-          >{{ generatedSlug }}</span>
+          <span v-if="generatedSlug" class="text-2xs font-medium text-dash-text font-mono">{{ generatedSlug }}</span>
           <span v-else class="text-2xs text-dash-faint italic">{{ t('brands.slugTypingHint') }}</span>
         </div>
 
@@ -71,7 +163,6 @@
         <AInput v-model="form.tagline" :label="t('brands.taglineLabel')" />
         <AInput v-model="form.bg"      :label="t('brands.bgLabel')" placeholder="#F4EFE8" :error="formErrors.bg" />
 
-        <!-- Logo -->
         <div>
           <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2">{{ t('brands.logoLabel') }}</p>
           <div v-if="logoPreview" class="flex items-center gap-3">
@@ -116,7 +207,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Plus, Tag, Link2, Image, X } from 'lucide-vue-next'
+import { Tag, Link2, Image, X } from 'lucide-vue-next'
 import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand, apiUploadBrandLogo, apiDeleteBrandLogo } from '../api/admin'
 import type { AdminBrand } from '../types'
 import ATable         from '../components/ui/ATable.vue'
@@ -127,6 +218,14 @@ import AEmptyState    from '../components/ui/AEmptyState.vue'
 import AConfirmDialog from '../components/ui/AConfirmDialog.vue'
 
 const { t } = useI18n()
+
+// ── View state ────────────────────────────────────────────────────────
+const view = ref<'grid' | 'list'>('grid')
+
+const viewOptions: ['grid' | 'list', string][] = [
+  ['grid', `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`],
+  ['list', `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>`],
+]
 
 // ── Filter state ──────────────────────────────────────────────────────
 const filterName        = ref('')
@@ -139,6 +238,17 @@ const filterMaxProducts = ref('')
 const brands      = ref<AdminBrand[]>([])
 const loading     = ref(true)
 const loadError   = ref<string | null>(null)
+
+// ── Filtered brands ───────────────────────────────────────────────────
+const filteredBrands = computed(() => {
+  if (!filterName.value) return brands.value
+  const q = filterName.value.toLowerCase()
+  return brands.value.filter(b =>
+    b.name?.toLowerCase().includes(q) ||
+    b.nameEn?.toLowerCase().includes(q) ||
+    b.origin?.toLowerCase().includes(q)
+  )
+})
 
 // ── Modal state ───────────────────────────────────────────────────────
 const modalOpen    = ref(false)
@@ -168,6 +278,19 @@ const cols = computed(() => [
   { key: 'tagline',      label: t('brands.columns.tagline') },
   { key: 'productCount', label: t('brands.columns.products') },
 ])
+
+// ── Design helpers ────────────────────────────────────────────────────
+const HUE_PALETTE = [32, 340, 200, 96, 48, 140, 280, 18, 54, 24, 8, 160]
+
+function brandHue(_brand: AdminBrand, index: number): number {
+  return HUE_PALETTE[index % HUE_PALETTE.length]
+}
+
+function monogram(name: string): string {
+  if (!name) return '?'
+  const words = name.trim().split(/\s+/)
+  return (words[0][0] + (words[1]?.[0] ?? words[0][1] ?? '')).toUpperCase()
+}
 
 // ── Data fetching ─────────────────────────────────────────────────────
 async function loadBrands() {

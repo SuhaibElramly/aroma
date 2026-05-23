@@ -29,8 +29,7 @@ class ProductResource extends JsonResource
                 : null,
             'price' => $defaultVariant?->price,
             'originalPrice' => $defaultVariant?->original_price,
-            'sizes' => $this->variants->pluck('size')->toArray(),
-            'selectedSize' => $defaultVariant?->size,
+            'selectedVariant' => $defaultVariant?->specLabel() ?? '',
             'type' => $this->type?->value,
             'category' => $this->category?->label,
             'notes' => $this->notes->groupBy('type')->map(function ($group) {
@@ -41,7 +40,7 @@ class ProductResource extends JsonResource
             'stock' => str_replace('_', '-', $defaultVariant?->stock?->value),
             'variants' => $this->variants->map(fn($v) => [
                 'id'            => $v->id,
-                'size'          => $v->size,
+                'label'         => $v->specLabel(),
                 'price'         => (float) $v->price,
                 'originalPrice' => $v->original_price ? (float) $v->original_price : null,
                 'stock'         => str_replace('_', '-', $v->stock?->value),

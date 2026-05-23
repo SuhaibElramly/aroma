@@ -1,7 +1,6 @@
 'use client'
 
 import { HeroSection }   from './HeroSection'
-import { TrustStrip }    from './TrustStrip'
 import { HomeSections }  from './HomeSection'
 import { SkeletonGrid }  from '@/components/feedback/SkeletonCard'
 import { useHomeData }   from '@/lib/api/queries'
@@ -12,7 +11,6 @@ export function HomePageClient() {
   return (
     <>
       <HeroSection />
-      <TrustStrip />
       {isPending && (
         <div className="px-12 py-16 space-y-16">
           <SkeletonGrid count={3} cols="grid-cols-3" />
