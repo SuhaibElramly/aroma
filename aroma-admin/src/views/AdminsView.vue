@@ -7,6 +7,7 @@ import type { AdminMember, AdminRole } from '../types'
 import {
   apiGetAdmins,
   apiCreateAdmin,
+  apiUpdateAdmin,
   apiToggleAdminStatus,
   apiResetAdminPassword,
   apiCreateRole,
@@ -23,7 +24,11 @@ const admins   = ref<AdminMember[]>([])
 const loading  = ref(true)
 const showForm = ref(false)
 const error    = ref<string | null>(null)
-const form     = ref({ name: '', phone: '', role: 'admin', password: '', showPw: false })
+const form        = ref({ name: '', phone: '', role: 'admin', password: '', showPw: false })
+const editingAdmin = ref<AdminMember | null>(null)
+const editForm     = ref({ name: '', phone: '', role: '' })
+const editError    = ref<string | null>(null)
+const editSaving   = ref(false)
 
 const { t } = useI18n()
 
@@ -92,6 +97,45 @@ function generatePassword() {
 function copyPassword() {
   if (navigator.clipboard && form.value.password) {
     navigator.clipboard.writeText(form.value.password)
+  }
+}
+
+function startEditAdmin(a: AdminMember) {
+  editingAdmin.value = a
+  // Strip +218 prefix so the user sees/edits just the local number
+  const local = (a.phone ?? '').replace(/^\+218/, '')
+  editForm.value = { name: a.name, phone: local, role: a.role }
+  editError.value = null
+  showForm.value  = false
+}
+
+function cancelEditAdmin() {
+  editingAdmin.value = null
+  editError.value    = null
+}
+
+async function saveEditAdmin() {
+  if (!editingAdmin.value) return
+  editError.value = null
+  editSaving.value = true
+  try {
+    const localNum = editForm.value.phone.replace(/[\s\-]/g, '').replace(/^0/, '')
+    const payload: Partial<{ name: string; phone: string; role: string }> = {
+      name:  editForm.value.name,
+      phone: '+218' + localNum,
+    }
+    // Don't send role for owner accounts (backend would reject it anyway)
+    if (editingAdmin.value.role !== 'owner') {
+      payload.role = editForm.value.role
+    }
+    const res = await apiUpdateAdmin(editingAdmin.value.id, payload)
+    const idx = admins.value.findIndex(x => x.id === editingAdmin.value!.id)
+    if (idx !== -1) admins.value[idx] = res.data
+    editingAdmin.value = null
+  } catch (e: any) {
+    editError.value = e?.response?.data?.message ?? 'Failed to save changes'
+  } finally {
+    editSaving.value = false
   }
 }
 
@@ -343,7 +387,7 @@ onMounted(load)
       <button
         v-if="activeTab === 'members'"
         class="h-9 px-3 rounded-lg text-[12px] font-medium text-white inline-flex items-center gap-1.5 whitespace-nowrap bg-dash-text hover:opacity-90 transition-opacity"
-        @click="showForm = !showForm"
+        @click="showForm = !showForm; if (showForm) cancelEditAdmin()"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
         {{ $t('admins.newAdmin') }}
@@ -442,6 +486,75 @@ onMounted(load)
         </form>
       </div>
 
+      <!-- Edit admin form -->
+      <div v-if="editingAdmin" class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ $t('admins.editAdmin') }}</p>
+            <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">{{ editingAdmin.name }}</h3>
+          </div>
+          <button
+            class="h-8 w-8 grid place-items-center rounded-lg border border-dash-border bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors"
+            @click="cancelEditAdmin"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div v-if="editError" class="mb-3 rounded-lg border border-dash-danger/30 bg-dash-danger-lt px-3 py-2 text-xs text-dash-danger">{{ editError }}</div>
+        <div class="grid grid-cols-12 gap-3">
+          <!-- Name -->
+          <div class="col-span-5">
+            <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1 block">{{ $t('admins.name') }}</label>
+            <input
+              v-model="editForm.name"
+              placeholder="Mohamed Said"
+              class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 focus:border-dash-primary transition-colors"
+            />
+          </div>
+          <!-- Phone -->
+          <div class="col-span-4">
+            <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1 block">{{ $t('admins.phone') }}</label>
+            <div class="flex rounded-lg border border-dash-border overflow-hidden focus-within:border-dash-primary transition-colors h-9">
+              <div class="flex items-center gap-1.5 px-2.5 bg-dash-paper border-r border-dash-border shrink-0 select-none">
+                <span class="text-sm leading-none">🇱🇾</span>
+                <span class="text-[11.5px] font-semibold text-dash-text-2">+218</span>
+              </div>
+              <input
+                v-model="editForm.phone"
+                type="tel"
+                inputmode="numeric"
+                dir="ltr"
+                placeholder="919 000 000"
+                class="flex-1 px-2.5 bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 font-mono"
+              />
+            </div>
+          </div>
+          <!-- Role -->
+          <div class="col-span-3">
+            <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1 block">{{ $t('admins.role') }}</label>
+            <select
+              v-model="editForm.role"
+              :disabled="editingAdmin.role === 'owner'"
+              class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 focus:border-dash-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option
+                v-for="r in auth.roles"
+                :key="r.slug"
+                :value="r.slug"
+                :disabled="r.slug === 'owner'"
+              >{{ r.name }}</option>
+            </select>
+            <p v-if="editingAdmin.role === 'owner'" class="text-[10px] mt-1 text-dash-faint">Owner role cannot be changed</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-4 mt-3 border-t border-dash-border-lt">
+          <button type="button" @click="cancelEditAdmin" class="h-9 px-3.5 rounded-lg text-[12.5px] font-medium border border-dash-border bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors">{{ $t('common.cancel') }}</button>
+          <button type="button" @click="saveEditAdmin" :disabled="editSaving || !editForm.name.trim()" class="h-9 px-4 rounded-lg text-[12.5px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity disabled:opacity-50">
+            {{ editSaving ? $t('common.saving') : $t('common.save') }}
+          </button>
+        </div>
+      </div>
+
       <!-- Error banner -->
       <div v-if="error" class="rounded-card border border-dash-danger/30 bg-dash-danger-lt px-4 py-3 text-xs text-dash-danger">
         {{ error }}
@@ -506,6 +619,10 @@ onMounted(load)
                 <!-- Non-owner admins: full action set -->
                 <div v-if="a.role !== 'owner'" class="inline-flex items-center gap-1">
                   <button
+                    class="text-[11px] font-medium px-2 py-1 text-dash-muted hover:text-dash-text transition-colors"
+                    @click="startEditAdmin(a)"
+                  >{{ $t('common.edit') }}</button>
+                  <button
                     v-if="a.adminStatus === 'active'"
                     class="text-[11px] font-medium px-2 py-1 text-dash-muted hover:text-dash-text transition-colors"
                     @click="resetPassword(a)"
@@ -518,8 +635,12 @@ onMounted(load)
                     {{ a.adminStatus === 'active' ? $t('admins.suspend') : $t('admins.activate') }}
                   </button>
                 </div>
-                <!-- Owner admins: only owner can reset their password; suspend is not allowed -->
+                <!-- Owner admins: owner can edit name/phone and reset password; suspend is not allowed -->
                 <div v-else-if="isOwner" class="inline-flex items-center gap-1">
+                  <button
+                    class="text-[11px] font-medium px-2 py-1 text-dash-muted hover:text-dash-text transition-colors"
+                    @click="startEditAdmin(a)"
+                  >{{ $t('common.edit') }}</button>
                   <button
                     class="text-[11px] font-medium px-2 py-1 text-dash-muted hover:text-dash-text transition-colors"
                     @click="resetPassword(a)"

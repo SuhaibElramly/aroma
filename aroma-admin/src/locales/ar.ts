@@ -3,6 +3,7 @@ import type { MessageSchema } from './en'
 const ar = {
   common: {
     save: 'حفظ',
+    saving: 'جارٍ الحفظ…',
     cancel: 'إلغاء',
     delete: 'حذف',
     edit: 'تعديل',
@@ -802,6 +803,7 @@ const ar = {
     tabTeam: 'أعضاء الفريق',
     tabRoles: 'الأدوار والصلاحيات',
     phoneHint: 'يُستخدم لتسجيل الدخول · يجب أن يكون فريداً',
+    editAdmin: 'تعديل المشرف',
     passwordPlaceholder: '8 أحرف على الأقل',
     showPassword: 'إظهار',
     hidePassword: 'إخفاء',

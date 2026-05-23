@@ -258,6 +258,9 @@ export const apiCreateAdmin = (data: {
 }) =>
   client.post<AdminMember>('/admin/admins', data)
 
+export const apiUpdateAdmin = (id: number, data: Partial<{ name: string; phone: string; role: string }>) =>
+  client.put<AdminMember>(`/admin/admins/${id}`, data)
+
 export const apiToggleAdminStatus = (id: number) =>
   client.patch<AdminMember>(`/admin/admins/${id}/toggle-status`)
 

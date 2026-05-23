@@ -1,6 +1,7 @@
 const en = {
   common: {
     save: 'Save',
+    saving: 'Saving…',
     cancel: 'Cancel',
     delete: 'Delete',
     edit: 'Edit',
@@ -800,6 +801,7 @@ const en = {
     tabTeam: 'Team members',
     tabRoles: 'Roles & permissions',
     phoneHint: 'Used as login · must be unique',
+    editAdmin: 'Edit admin',
     passwordPlaceholder: 'At least 8 characters',
     showPassword: 'Show',
     hidePassword: 'Hide',

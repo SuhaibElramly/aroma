@@ -60,10 +60,18 @@ class AdminAdminsController extends Controller
     public function update(Request $request, int $id)
     {
         $user = User::where('is_admin', true)->findOrFail($id);
+
         $data = $request->validate([
-            'role' => ['sometimes', Rule::in(Role::where('slug', '!=', 'owner')->pluck('slug')->toArray())],
-            'name' => 'sometimes|string|max:100',
+            'name'  => 'sometimes|string|max:100',
+            'phone' => ['sometimes', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
+            'role'  => ['sometimes', Rule::in(Role::where('slug', '!=', 'owner')->pluck('slug')->toArray())],
         ]);
+
+        // Prevent changing another owner's role (only the owner themselves can relinquish ownership)
+        if (isset($data['role']) && $user->role === 'owner') {
+            return response()->json(['message' => 'Cannot change the role of an owner account.'], 422);
+        }
+
         $user->update($data);
         return response()->json($this->fmt($user));
     }
