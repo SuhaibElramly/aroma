@@ -23,7 +23,7 @@ const admins   = ref<AdminMember[]>([])
 const loading  = ref(true)
 const showForm = ref(false)
 const error    = ref<string | null>(null)
-const form     = ref({ name: '', phone: '+218', role: 'admin', password: '', showPw: false })
+const form     = ref({ name: '', phone: '', role: 'admin', password: '', showPw: false })
 
 const { t } = useI18n()
 
@@ -43,15 +43,17 @@ async function load() {
 async function createAdmin() {
   error.value = null
   try {
+    // Normalise: strip spaces/dashes, strip leading 0, prepend +218
+    const localNum = form.value.phone.replace(/[\s\-]/g, '').replace(/^0/, '')
     const res = await apiCreateAdmin({
       name:     form.value.name,
-      phone:    form.value.phone.replace(/\s/g, ''),
+      phone:    '+218' + localNum,
       role:     form.value.role,
       password: form.value.password,
     })
     admins.value.push(res.data)
     showForm.value = false
-    form.value = { name: '', phone: '+218', role: 'admin', password: '', showPw: false }
+    form.value = { name: '', phone: '', role: 'admin', password: '', showPw: false }
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'Failed to create admin'
   }
@@ -378,13 +380,21 @@ onMounted(load)
             </div>
             <div class="col-span-4">
               <label class="text-[10.5px] font-semibold uppercase tracking-[.14em] text-dash-faint mb-1 block">{{ $t('admins.phone') }}</label>
-              <input
-                v-model="form.phone"
-                required
-                dir="ltr"
-                placeholder="+218..."
-                class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 font-mono focus:border-dash-primary transition-colors"
-              />
+              <div class="flex rounded-lg border border-dash-border overflow-hidden focus-within:border-dash-primary transition-colors h-9">
+                <div class="flex items-center gap-1.5 px-2.5 bg-dash-paper border-r border-dash-border shrink-0 select-none">
+                  <span class="text-sm leading-none">🇱🇾</span>
+                  <span class="text-[11.5px] font-semibold text-dash-text-2">+218</span>
+                </div>
+                <input
+                  v-model="form.phone"
+                  required
+                  type="tel"
+                  inputmode="numeric"
+                  dir="ltr"
+                  placeholder="919 000 000"
+                  class="flex-1 px-2.5 bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 font-mono"
+                />
+              </div>
               <p class="text-[10px] mt-1 text-dash-faint">{{ $t('admins.phoneHint') }}</p>
             </div>
             <div class="col-span-3">
@@ -493,6 +503,7 @@ onMounted(load)
               <td class="py-3.5 px-6 border-b border-dash-border-lt text-dash-muted">{{ a.createdAt ? a.createdAt.slice(0, 10) : '—' }}</td>
               <!-- Actions -->
               <td class="py-3.5 px-4 border-b border-dash-border-lt text-end">
+                <!-- Non-owner admins: full action set -->
                 <div v-if="a.role !== 'owner'" class="inline-flex items-center gap-1">
                   <button
                     v-if="a.adminStatus === 'active'"
@@ -506,6 +517,14 @@ onMounted(load)
                   >
                     {{ a.adminStatus === 'active' ? $t('admins.suspend') : $t('admins.activate') }}
                   </button>
+                </div>
+                <!-- Owner admins: only owner can reset their password; suspend is not allowed -->
+                <div v-else-if="isOwner" class="inline-flex items-center gap-1">
+                  <button
+                    class="text-[11px] font-medium px-2 py-1 text-dash-muted hover:text-dash-text transition-colors"
+                    @click="resetPassword(a)"
+                  >{{ $t('admins.resetPassword') }}</button>
+                  <span class="text-[11px] text-dash-faint px-1">{{ $t('admins.ownerLabel') }}</span>
                 </div>
                 <span v-else class="text-[11px] text-dash-faint">{{ $t('admins.ownerLabel') }}</span>
               </td>
