@@ -3,7 +3,7 @@ import type {
   AdminUser, DashboardStats, AdminOrder, AdminProduct,
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
-  SpecType, ProductSpec, AdminUserOrder, AdminMember, AdminRole,
+  SpecType, ProductSpec, AdminUserOrder, AdminMember, AdminRole, AdminNotification,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -287,3 +287,13 @@ export const apiUpdateRole = (slug: string, data: Partial<{
 
 export const apiDeleteRole = (slug: string) =>
   client.delete(`/admin/roles/${slug}`)
+
+// ── Notifications ─────────────────────────────────────────────────────
+export const apiGetNotifications = () =>
+  client.get<{ data: AdminNotification[]; unreadCount: number }>('/admin/notifications')
+
+export const apiMarkNotificationRead = (id: number) =>
+  client.patch<{ ok: boolean }>(`/admin/notifications/${id}/read`)
+
+export const apiMarkAllNotificationsRead = () =>
+  client.patch<{ ok: boolean }>('/admin/notifications/read-all')

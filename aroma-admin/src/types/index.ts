@@ -15,6 +15,19 @@ export interface PageMeta {
   lastPage: number
 }
 
+// ── Notifications ─────────────────────────────────────────────────────
+export type NotifKind = 'order' | 'stock'
+
+export interface AdminNotification {
+  id:    number
+  kind:  NotifKind
+  title: string
+  sub:   string
+  time:  string
+  read:  boolean
+  data:  Record<string, unknown> | null
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────
 export interface AdminUser {
   id: number
