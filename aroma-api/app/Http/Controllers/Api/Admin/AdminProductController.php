@@ -117,10 +117,11 @@ class AdminProductController extends Controller
             'revenue'        => $salesData->revenue ? round((float) $salesData->revenue / 1000, 1) : null,
             'sales_count'    => (int) ($salesData->units_sold ?? 0),
             'images'         => $product->images->map(fn($img) => [
-                'id'          => $img->id,
-                'url'         => $img->url,
-                'isThumbnail' => $img->is_thumbnail,
-                'sortOrder'   => $img->sort_order,
+                'id'           => $img->id,
+                'url'          => $img->url,
+                'isThumbnail'  => $img->is_thumbnail,
+                'sortOrder'    => $img->sort_order,
+                'originalName' => $img->original_name,
             ])->values(),
             'thumbnailUrl'   => $product->images->firstWhere('is_thumbnail', true)?->url
                               ?? $product->images->first()?->url,
