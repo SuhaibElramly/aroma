@@ -4,6 +4,7 @@ import type {
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
   SpecType, ProductSpec, AdminUserOrder, AdminMember, AdminRole, AdminNotification,
+  OrderPaymentsResponse,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -297,3 +298,10 @@ export const apiMarkNotificationRead = (id: number) =>
 
 export const apiMarkAllNotificationsRead = () =>
   client.patch<{ ok: boolean }>('/admin/notifications/read-all')
+
+// ── Order Payments ────────────────────────────────────────────────────
+export const apiGetOrderPayments = (orderId: string) =>
+  client.get<OrderPaymentsResponse>(`/admin/orders/${orderId}/payments`)
+
+export const apiAddOrderPayment = (orderId: string, payload: { amount: number; note?: string }) =>
+  client.post<OrderPaymentsResponse>(`/admin/orders/${orderId}/payments`, payload)
