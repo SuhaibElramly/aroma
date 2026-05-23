@@ -54,8 +54,8 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresGuest && auth.isAuthenticated) return { name: 'dashboard' }
   if (to.meta.requiresAuth  && !auth.isAuthenticated) return { name: 'login' }
 
-  // Ensure user object is loaded before permission check
-  if (auth.isAuthenticated && !auth.user) {
+  // Ensure user and roles are loaded before permission check
+  if (auth.isAuthenticated && (!auth.user || auth.roles.length === 0)) {
     await auth.init().catch(() => {})
   }
 
