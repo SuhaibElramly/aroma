@@ -507,7 +507,9 @@ const selectedBrand    = computed(() => brands.value.find(b => b.id === form.val
 const selectedCategory = computed(() => categories.value.find(c => String(c.id) === form.value.categoryId))
 
 watch(selectedCategory, (cat) => {
-  if (cat?.bg) form.value.placeholderBg = cat.bg
+  if (cat?.bg && form.value.placeholderBg === '#F2E8E5') {
+    form.value.placeholderBg = cat.bg
+  }
 })
 
 const previewInitial = computed(() => {
