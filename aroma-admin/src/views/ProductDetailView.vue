@@ -16,6 +16,9 @@ const discounts = ref<ProductDiscount[]>([])
 const loading   = ref(true)
 const error     = ref('')
 const images    = ref<{ id: number; url: string; isThumbnail: boolean; sortOrder: number }[]>([])
+const uploadingImages  = ref(false)
+const deletingImageId  = ref<number | null>(null)
+const settingThumbId   = ref<number | null>(null)
 
 // Product edit
 const editingProduct  = ref(false)
@@ -67,6 +70,50 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+async function uploadImages(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (!input.files?.length) return
+  uploadingImages.value = true
+  const formData = new FormData()
+  Array.from(input.files).forEach(f => formData.append('images[]', f))
+  const res = await fetch(`${BASE}/admin/products/${props.id}/images`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token()}`, 'Accept': 'application/json' },
+    body: formData,
+  })
+  if (res.ok) {
+    const newImgs = await res.json()
+    images.value.push(...newImgs)
+  }
+  uploadingImages.value = false
+  input.value = ''
+}
+
+async function setThumbnail(imageId: number) {
+  settingThumbId.value = imageId
+  const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}/thumbnail`, {
+    method: 'PATCH',
+    headers: headers(),
+  })
+  if (res.ok) {
+    images.value.forEach(img => { img.isThumbnail = img.id === imageId })
+  }
+  settingThumbId.value = null
+}
+
+async function deleteImage(imageId: number) {
+  if (!confirm(t('productDetail.deleteImageConfirm'))) return
+  deletingImageId.value = imageId
+  const res = await fetch(`${BASE}/admin/products/${props.id}/images/${imageId}`, {
+    method: 'DELETE',
+    headers: headers(),
+  })
+  if (res.ok) {
+    images.value = images.value.filter(img => img.id !== imageId)
+  }
+  deletingImageId.value = null
 }
 
 function openProductEdit() {
@@ -294,7 +341,7 @@ onMounted(load)
           <img
             v-if="thumbnailUrl"
             :src="thumbnailUrl"
-            alt=""
+            :alt="product?.name_en ?? product?.name ?? ''"
             class="w-full h-full object-cover"
           />
           <div
@@ -365,6 +412,70 @@ onMounted(load)
             <p class="text-[10.5px] mt-0.5 text-dash-muted">{{ kpi.s }}</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Images panel -->
+    <div class="bg-dash-paper border border-dash-border rounded-card shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('productDetail.imagesSectionLabel') }}</p>
+          <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">
+            {{ t('productDetail.imagesCount', { n: images.length }, images.length) }}
+          </h3>
+        </div>
+        <label
+          class="h-8 px-3 rounded-btn text-[12px] font-medium border border-dash-border-lt inline-flex items-center gap-1.5 text-dash-text-2 bg-dash-paper hover:bg-dash-bg transition-colors cursor-pointer"
+          :class="uploadingImages ? 'opacity-50 pointer-events-none' : ''"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          {{ uploadingImages ? t('productDetail.uploadingLabel') : t('productDetail.uploadImagesBtn') }}
+          <input type="file" multiple accept="image/*" class="sr-only" @change="uploadImages" />
+        </label>
+      </div>
+
+      <!-- Image grid -->
+      <div v-if="images.length" class="grid grid-cols-4 gap-3">
+        <div
+          v-for="img in [...images].sort((a, b) => a.sortOrder - b.sortOrder)"
+          :key="img.id"
+          class="group relative rounded-xl overflow-hidden border aspect-square"
+          :class="img.isThumbnail ? 'border-dash-primary ring-1 ring-dash-primary' : 'border-dash-border'"
+        >
+          <img :src="img.url" :alt="img.isThumbnail ? t('productDetail.thumbnailBadge') : ''" class="w-full h-full object-cover" />
+
+          <!-- Thumbnail badge -->
+          <span
+            v-if="img.isThumbnail"
+            class="absolute top-1.5 start-1.5 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-dash-primary text-white"
+          >{{ t('productDetail.thumbnailBadge') }}</span>
+
+          <!-- Hover actions -->
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-2 gap-1">
+            <button
+              v-if="!img.isThumbnail"
+              @click="setThumbnail(img.id)"
+              :disabled="settingThumbId === img.id"
+              class="text-[10.5px] font-semibold px-2 py-1 rounded-md bg-white/90 text-dash-text hover:bg-white disabled:opacity-50 transition-colors"
+            >{{ t('productDetail.setThumbnailBtn') }}</button>
+            <span v-else class="flex-1" />
+            <button
+              @click="deleteImage(img.id)"
+              :disabled="deletingImageId === img.id"
+              class="text-[10.5px] font-semibold px-2 py-1 rounded-md bg-dash-danger text-white hover:opacity-90 disabled:opacity-50 transition-opacity ms-auto"
+            >{{ t('common.delete') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="text-center py-10 rounded-xl border border-dashed border-dash-border text-dash-muted">
+        <p class="text-[12.5px]">{{ t('productDetail.noImages') }}</p>
+        <p class="text-[11px] mt-1 text-dash-faint">{{ t('productDetail.noImagesHint') }}</p>
       </div>
     </div>
 
