@@ -911,6 +911,21 @@ const ar = {
     loadFailed: 'فشل تحميل المنتج',
     deleteDiscountConfirm: 'هل تريد حذف هذا الخصم؟',
   },
+  // Payment tracking
+  paymentStatus: 'حالة الدفع',
+  paymentNotPaid: 'غير مدفوع',
+  paymentPartiallyPaid: 'مدفوع جزئياً',
+  paymentPaid: 'مدفوع',
+  paymentTotal: 'إجمالي الطلب',
+  paymentPaid_amount: 'المدفوع',
+  paymentRemaining: 'المتبقي',
+  paymentHistory: 'سجل المدفوعات',
+  paymentAddTitle: 'تسجيل دفعة',
+  paymentAmount: 'المبلغ (د.ل)',
+  paymentNote: 'ملاحظة (اختياري)',
+  paymentAddBtn: 'إضافة دفعة',
+  paymentNoHistory: 'لا توجد مدفوعات مسجلة بعد.',
+  paymentMethod: 'الدفع عند الاستلام',
 } satisfies MessageSchema
 
 export default ar

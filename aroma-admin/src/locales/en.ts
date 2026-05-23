@@ -909,6 +909,21 @@ const en = {
     loadFailed: 'Failed to load product',
     deleteDiscountConfirm: 'Delete this discount?',
   },
+  // Payment tracking
+  paymentStatus: 'Payment Status',
+  paymentNotPaid: 'Not Paid',
+  paymentPartiallyPaid: 'Partially Paid',
+  paymentPaid: 'Paid',
+  paymentTotal: 'Order Total',
+  paymentPaid_amount: 'Paid',
+  paymentRemaining: 'Remaining',
+  paymentHistory: 'Payment History',
+  paymentAddTitle: 'Record Payment',
+  paymentAmount: 'Amount (LYD)',
+  paymentNote: 'Note (optional)',
+  paymentAddBtn: 'Add Payment',
+  paymentNoHistory: 'No payments recorded yet.',
+  paymentMethod: 'Pay on Receive',
 } as const
 
 export type Messages = typeof en
