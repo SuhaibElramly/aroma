@@ -7,7 +7,7 @@ import { SectionHeader }  from '@/components/shared/SectionHeader'
 import { ProductCard }    from '@/components/shared/ProductCard'
 import { ProductPlaceholder } from '@/components/shared/ProductPlaceholder'
 import { formatPrice }    from '@/lib/formatters'
-import type { Product, Category, Brand, HomePageData } from '@/types'
+import type { Product, Category, Brand, HomeBlock } from '@/types'
 
 // ── Reusable reveal wrapper ───────────────────────────────────────────
 function RevealSection({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -27,13 +27,13 @@ function RevealSection({ children, className }: { children: React.ReactNode; cla
 }
 
 // ── Bestsellers ───────────────────────────────────────────────────────
-export function BestsellersSection({ products }: { products: Product[] }) {
+export function BestsellersSection({ products, config }: { products: Product[]; config?: { label?: string; title?: string } }) {
   const router = useRouter()
   return (
     <RevealSection className="px-6 md:px-12 py-16 md:py-[72px]">
       <SectionHeader
-        label="أكثر العطور طلبًا"
-        title="الأكثر مبيعًا"
+        label={config?.label ?? 'أكثر العطور طلبًا'}
+        title={config?.title ?? 'الأكثر مبيعًا'}
         action="عرض الكل"
         onAction={() => router.push('/search?filter=bestseller')}
       />
@@ -45,11 +45,11 @@ export function BestsellersSection({ products }: { products: Product[] }) {
 }
 
 // ── Categories Strip ──────────────────────────────────────────────────
-export function CategoriesStrip({ categories }: { categories: Category[] }) {
+export function CategoriesStrip({ categories, config }: { categories: Category[]; config?: { label?: string; title?: string } }) {
   const router = useRouter()
   return (
     <RevealSection className="bg-aroma-accent-lt px-6 md:px-12 py-14 md:py-16">
-      <SectionHeader label="تسوق حسب" title="الفئة" />
+      <SectionHeader label={config?.label ?? 'تسوق حسب'} title={config?.title ?? 'الفئة'} />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5">
         {categories.map(cat => (
           <motion.div
@@ -70,13 +70,13 @@ export function CategoriesStrip({ categories }: { categories: Category[] }) {
 }
 
 // ── New Arrivals ──────────────────────────────────────────────────────
-export function NewArrivalsSection({ products }: { products: Product[] }) {
+export function NewArrivalsSection({ products, config }: { products: Product[]; config?: { label?: string; title?: string } }) {
   const router = useRouter()
   return (
     <RevealSection className="px-6 md:px-12 py-16 md:py-[72px]">
       <SectionHeader
-        label="وصل حديثًا"
-        title="كل ماهو جديد"
+        label={config?.label ?? 'وصل حديثًا'}
+        title={config?.title ?? 'كل ماهو جديد'}
         action="عرض الكل"
         onAction={() => router.push('/search?filter=new')}
       />
@@ -91,9 +91,11 @@ export function NewArrivalsSection({ products }: { products: Product[] }) {
 export function FeaturedBrandBanner({
   brand,
   products,
+  config,
 }: {
   brand: Brand
   products: Product[]
+  config?: { label?: string; title?: string }
 }) {
   const router = useRouter()
   return (
@@ -105,7 +107,7 @@ export function FeaturedBrandBanner({
       >
         <div className="max-w-[480px]">
           <p className="font-sans text-[11px] tracking-[0.2em] text-aroma-accent uppercase mb-4">
-            دار مميزة
+            {config?.label ?? 'دار مميزة'}
           </p>
           <h2 className="font-display font-light italic text-[44px] text-[#F9F8F4] mb-4 leading-[1.1]">
             {brand.name}
@@ -146,13 +148,13 @@ export function FeaturedBrandBanner({
 }
 
 // ── Offers ────────────────────────────────────────────────────────────
-export function OffersSection({ products }: { products: Product[] }) {
+export function OffersSection({ products, config }: { products: Product[]; config?: { label?: string; title?: string } }) {
   const router = useRouter()
   return (
     <RevealSection className="px-6 md:px-12 pb-16 md:pb-20">
       <SectionHeader
-        label="وقت محدود"
-        title="العروض الحالية"
+        label={config?.label ?? 'وقت محدود'}
+        title={config?.title ?? 'العروض الحالية'}
         action="كل العروض"
         onAction={() => router.push('/search?filter=offer')}
       />
@@ -164,14 +166,27 @@ export function OffersSection({ products }: { products: Product[] }) {
 }
 
 // ── Home Page Client root ─────────────────────────────────────────────
-export function HomeSections({ data }: { data: HomePageData }) {
+export function HomeSections({ blocks }: { blocks: HomeBlock[] }) {
   return (
     <>
-      <BestsellersSection   products={data.bestsellers} />
-      <CategoriesStrip      categories={data.categories} />
-      <NewArrivalsSection   products={data.newArrivals} />
-      <FeaturedBrandBanner  brand={data.featuredBrand} products={data.featuredBrandProducts} />
-      <OffersSection        products={data.offers} />
+      {blocks.map((block) => {
+        switch (block.type) {
+          case 'bestsellers':
+            return <BestsellersSection key={block.id} products={block.data.products ?? []} config={block.config} />
+          case 'new_arrivals':
+            return <NewArrivalsSection key={block.id} products={block.data.products ?? []} config={block.config} />
+          case 'offers':
+            return <OffersSection key={block.id} products={block.data.products ?? []} config={block.config} />
+          case 'categories':
+            return <CategoriesStrip key={block.id} categories={block.data.categories ?? []} config={block.config} />
+          case 'featured_brand':
+            return block.data.brand
+              ? <FeaturedBrandBanner key={block.id} brand={block.data.brand} products={block.data.products ?? []} config={block.config} />
+              : null
+          default:
+            return null
+        }
+      })}
     </>
   )
 }
