@@ -57,6 +57,7 @@ use App\Http\Controllers\Api\Admin\{
     AdminUserDetailController, AdminCouponController, AdminSpecTypeController,
     AdminProductSpecController, AdminProductVariantGenerateController,
     AdminProductDiscountController, AdminAdminsController, AdminRolesController,
+    AdminNotificationController,
 };
 
 Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function () {
@@ -69,6 +70,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
 
     Route::get('/products', [AdminProductController::class, 'index']);
     Route::post('/products', [AdminProductController::class, 'store']);
+    Route::get('/products/{id}', [AdminProductController::class, 'show']);
     Route::put('/products/{id}', [AdminProductController::class, 'update']);
     Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
 
@@ -134,4 +136,8 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
     Route::post('/roles',          [AdminRolesController::class, 'store']);
     Route::put('/roles/{slug}',    [AdminRolesController::class, 'update']);
     Route::delete('/roles/{slug}', [AdminRolesController::class, 'destroy']);
+
+    Route::get('/notifications',              [AdminNotificationController::class, 'index']);
+    Route::patch('/notifications/read-all',   [AdminNotificationController::class, 'markAllRead']);
+    Route::patch('/notifications/{id}/read',  [AdminNotificationController::class, 'markRead']);
 });
