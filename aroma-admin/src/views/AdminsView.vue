@@ -3,12 +3,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import type { AdminMember } from '../types'
+import type { AdminMember, AdminRole } from '../types'
 import {
   apiGetAdmins,
   apiCreateAdmin,
   apiToggleAdminStatus,
   apiResetAdminPassword,
+  apiCreateRole,
+  apiUpdateRole,
+  apiDeleteRole,
 } from '../api/admin'
 import { useAuthStore } from '../stores/auth'
 
@@ -93,32 +96,18 @@ function copyPassword() {
 // ── Tabs ──────────────────────────────────────────────────────────────
 const activeTab = ref<'members' | 'roles'>('members')
 
-// ── Roles & permissions data ─────────────────────────────────────────
-interface RoleDefinition {
-  id: string
-  name: string
-  desc: string
-  color: string
-  members: number
-  perms: 'all' | Record<string, number[]>
-}
+// ── Roles & permissions ───────────────────────────────────────────────
+const rolesWithCounts = computed(() =>
+  auth.roles.map(r => ({
+    ...r,
+    members: admins.value.filter(a => a.role === r.slug).length,
+  }))
+)
 
-const rolesData = computed<RoleDefinition[]>(() => [
-  { id: 'owner',   name: t('admins.roles.owner'),          desc: t('admins.roleDescs.owner'),    color: 'oklch(26% 0.04 250)',  members: 1, perms: 'all' },
-  { id: 'admin',   name: t('admins.roles.admin'),          desc: t('admins.roleDescs.admin'),    color: 'oklch(46% 0.075 210)', members: 0, perms: { products:[1,1,1], orders:[1,1,1], coupons:[1,1,1], customers:[1,1,0], brands:[1,1,1], specs:[1,1,1], admins:[1,0,0] } },
-  { id: 'catalog_manager', name: t('admins.roles.catalogManager'), desc: t('admins.roleDescs.catalog'),  color: 'oklch(56% 0.10 340)', members: 0, perms: { products:[1,1,1], orders:[1,0,0], coupons:[1,1,0], customers:[1,0,0], brands:[1,1,1], specs:[1,1,1], admins:[0,0,0] } },
-  { id: 'sales',   name: t('admins.roles.sales'),          desc: t('admins.roleDescs.sales'),    color: 'oklch(58% 0.10 32)',   members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-  { id: 'support', name: t('admins.roles.support'),        desc: t('admins.roleDescs.support'),  color: 'oklch(52% 0.045 145)', members: 0, perms: { products:[1,0,0], orders:[1,1,0], coupons:[1,0,0], customers:[1,1,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-  { id: 'read_only', name: t('admins.roles.readOnly'),      desc: t('admins.roleDescs.readOnly'), color: 'oklch(56% 0.035 240)', members: 0, perms: { products:[1,0,0], orders:[1,0,0], coupons:[1,0,0], customers:[1,0,0], brands:[1,0,0], specs:[1,0,0], admins:[0,0,0] } },
-])
-
-const rolesWithCounts = computed(() => rolesData.value.map(r => ({
-  ...r,
-  members: admins.value.filter(a => a.role === r.id).length,
-})))
-
-const selectedRoleId = ref('admin')
-const selectedRole = computed(() => rolesWithCounts.value.find(r => r.id === selectedRoleId.value) ?? rolesWithCounts.value[1])
+const selectedRoleSlug = ref('admin')
+const selectedRole = computed(() =>
+  rolesWithCounts.value.find(r => r.slug === selectedRoleSlug.value) ?? rolesWithCounts.value[0]
+)
 
 interface PermGroup {
   id: string
@@ -144,39 +133,146 @@ const permGroups = computed<PermGroup[]>(() => [
   ]},
 ])
 
+// ── Edit / create / delete state ──────────────────────────────────────
+const editingRoleSlug = ref<string | null>(null)
+const isCreating      = ref(false)
+const editDraft       = ref<{ name: string; color: string; permissions: Record<string, number[]> }>({
+  name: '', color: '', permissions: {},
+})
+const deleteConfirm = ref<string | null>(null)
+const editError     = ref<string | null>(null)
+const saving        = ref(false)
+
+const isEditing = computed(() => editingRoleSlug.value !== null || isCreating.value)
+
+const COLOR_PALETTE = [
+  'oklch(26% 0.04 250)',
+  'oklch(46% 0.075 210)',
+  'oklch(56% 0.10 340)',
+  'oklch(58% 0.10 32)',
+  'oklch(52% 0.045 145)',
+  'oklch(56% 0.035 240)',
+  'oklch(52% 0.08 280)',
+  'oklch(54% 0.09 60)',
+]
+
+const EMPTY_PERMISSIONS: Record<string, number[]> = {
+  products:  [0,0,0],
+  orders:    [0,0,0],
+  coupons:   [0,0,0],
+  customers: [0,0,0],
+  brands:    [0,0,0],
+  specs:     [0,0,0],
+  admins:    [0,0,0],
+}
+
+function startEdit(slug: string) {
+  const role = auth.roles.find(r => r.slug === slug)
+  if (!role) return
+  editDraft.value = {
+    name:        role.name,
+    color:       role.color,
+    permissions: JSON.parse(JSON.stringify(role.permissions)),
+  }
+  editingRoleSlug.value = slug
+  isCreating.value      = false
+  editError.value       = null
+}
+
+function startCreate() {
+  editDraft.value = {
+    name:        '',
+    color:       COLOR_PALETTE[1],
+    permissions: JSON.parse(JSON.stringify(EMPTY_PERMISSIONS)),
+  }
+  editingRoleSlug.value = null
+  isCreating.value      = true
+  editError.value       = null
+  auth.roles.push({ id: -1, name: '', slug: '__new__', color: COLOR_PALETTE[1], permissions: { ...EMPTY_PERMISSIONS } })
+  selectedRoleSlug.value = '__new__'
+}
+
+function cancelEdit() {
+  if (isCreating.value) {
+    const idx = auth.roles.findIndex(r => r.slug === '__new__')
+    if (idx !== -1) auth.roles.splice(idx, 1)
+    selectedRoleSlug.value = auth.roles[0]?.slug ?? 'admin'
+  }
+  editingRoleSlug.value = null
+  isCreating.value      = false
+  editDraft.value       = { name: '', color: '', permissions: {} }
+  editError.value       = null
+}
+
+function togglePerm(resource: string, idx: number) {
+  if (!editDraft.value.permissions[resource]) {
+    editDraft.value.permissions[resource] = [0, 0, 0]
+  }
+  editDraft.value.permissions[resource][idx] =
+    editDraft.value.permissions[resource][idx] ? 0 : 1
+}
+
+async function saveEdit() {
+  editError.value = null
+  saving.value    = true
+  try {
+    if (isCreating.value) {
+      const res     = await apiCreateRole(editDraft.value)
+      const tempIdx = auth.roles.findIndex(r => r.slug === '__new__')
+      if (tempIdx !== -1) auth.roles.splice(tempIdx, 1, res.data)
+      selectedRoleSlug.value = res.data.slug
+    } else {
+      const res = await apiUpdateRole(editingRoleSlug.value!, editDraft.value)
+      const idx = auth.roles.findIndex(r => r.slug === editingRoleSlug.value)
+      if (idx !== -1) auth.roles.splice(idx, 1, res.data)
+      selectedRoleSlug.value = res.data.slug
+    }
+    editingRoleSlug.value = null
+    isCreating.value      = false
+    editDraft.value       = { name: '', color: '', permissions: {} }
+  } catch (e: any) {
+    editError.value = e?.response?.data?.message ?? 'Failed to save'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function deleteRole(slug: string) {
+  editError.value = null
+  try {
+    await apiDeleteRole(slug)
+    const idx = auth.roles.findIndex(r => r.slug === slug)
+    if (idx !== -1) auth.roles.splice(idx, 1)
+    selectedRoleSlug.value = auth.roles[0]?.slug ?? ''
+    deleteConfirm.value    = null
+  } catch (e: any) {
+    editError.value     = e?.response?.data?.message ?? 'Failed to delete'
+    deleteConfirm.value = null
+  }
+}
+
 function getPerm(resource: string, idx: number): boolean {
-  const role = selectedRole.value
-  if (role.perms === 'all') return true
-  return (role.perms as Record<string, number[]>)?.[resource]?.[idx] === 1
+  if (!isEditing.value && selectedRole.value?.slug === 'owner') return true
+  const source = isEditing.value ? editDraft.value.permissions : selectedRole.value?.permissions
+  if (!source) return false
+  return (source[resource]?.[idx] ?? 0) === 1
 }
 
 // ── KPI helpers ───────────────────────────────────────────────────────
 const stats = computed(() => ({
   total:     admins.value.length,
   active:    admins.value.filter(a => a.adminStatus === 'active').length,
-  roles:     rolesData.value.length,
+  roles:     auth.roles.length,
   suspended: admins.value.filter(a => a.adminStatus === 'suspended').length,
 }))
 
 // ── Visual helpers ────────────────────────────────────────────────────
 function roleLabel(role: string): string {
-  return ({
-    owner:           t('admins.roles.owner'),
-    admin:           t('admins.roles.admin'),
-    catalog_manager: t('admins.roles.catalogManager'),
-    sales:           t('admins.roles.sales'),
-    support:         t('admins.roles.support'),
-    read_only:       t('admins.roles.readOnly'),
-  } as Record<string, string>)[role] ?? role
-}
-
-const ROLE_HUE: Record<string, number> = {
-  owner: 250, admin: 210, catalog_manager: 340, sales: 32, support: 140, read_only: 230,
+  return auth.roles.find(r => r.slug === role)?.name ?? role
 }
 
 function roleColor(role: string): string {
-  const hue = ROLE_HUE[role] ?? 200
-  return `oklch(52% 0.07 ${hue})`
+  return auth.roles.find(r => r.slug === role)?.color ?? 'oklch(52% 0.07 200)'
 }
 
 function initials(name: string): string {
@@ -293,12 +389,12 @@ onMounted(load)
                 v-model="form.role"
                 class="w-full h-9 px-3 rounded-lg border border-dash-border bg-dash-paper-2 text-[12.5px] outline-none text-dash-text-2 focus:border-dash-primary transition-colors"
               >
-                <option v-if="isOwner" value="owner">{{ $t('admins.roles.owner') }}</option>
-                <option value="admin">{{ $t('admins.roles.admin') }}</option>
-                <option value="catalog_manager">{{ $t('admins.roles.catalogManager') }}</option>
-                <option value="sales">{{ $t('admins.roles.sales') }}</option>
-                <option value="support">{{ $t('admins.roles.support') }}</option>
-                <option value="read_only">{{ $t('admins.roles.readOnly') }}</option>
+                <option
+                  v-for="r in auth.roles"
+                  :key="r.slug"
+                  :value="r.slug"
+                  :style="{ display: r.slug === 'owner' && !isOwner ? 'none' : '' }"
+                >{{ r.name }}</option>
               </select>
             </div>
             <div class="col-span-12">
@@ -419,20 +515,21 @@ onMounted(load)
     <!-- ── Roles tab ── -->
     <template v-else>
       <div class="grid grid-cols-12 gap-4">
+
         <!-- Left: role list -->
-        <div class="col-span-4 bg-dash-paper border border-dash-border rounded-card overflow-hidden shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-          <div class="divide-y divide-dash-border-lt">
+        <div class="col-span-4 bg-dash-paper border border-dash-border rounded-card overflow-hidden shadow-[0_1px_0_oklch(26%_0.04_250/0.025)] flex flex-col">
+          <div class="divide-y divide-dash-border-lt flex-1">
             <button
               v-for="role in rolesWithCounts"
-              :key="role.id"
+              :key="role.slug"
               class="w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-dash-paper-2"
-              :class="{ 'bg-dash-primary-lt': selectedRoleId === role.id }"
-              @click="selectedRoleId = role.id"
+              :class="{ 'bg-dash-primary-lt': selectedRoleSlug === role.slug }"
+              @click="selectedRoleSlug = role.slug"
             >
               <div
                 class="h-9 w-9 rounded-lg grid place-items-center shrink-0 border border-dash-border-lt"
                 :style="{
-                  background: selectedRoleId === role.id ? 'white' : 'var(--dash-paper-2)',
+                  background: selectedRoleSlug === role.slug ? 'white' : 'var(--dash-paper-2)',
                   color: role.color
                 }"
               >
@@ -440,37 +537,122 @@ onMounted(load)
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <p class="text-[13px] font-semibold text-dash-text">{{ role.name }}</p>
-                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-dash-paper-2 border border-dash-border-lt text-dash-muted">{{ role.members }}</span>
+                  <p class="text-[13px] font-semibold text-dash-text">
+                    {{ role.slug === '__new__' ? (editDraft.name || 'New Role') : role.name }}
+                  </p>
+                  <span v-if="role.slug !== '__new__'" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-dash-paper-2 border border-dash-border-lt text-dash-muted">{{ role.members }}</span>
                 </div>
-                <p class="text-[10.5px] mt-0.5 text-dash-muted line-clamp-1">{{ role.desc }}</p>
               </div>
-              <svg v-if="selectedRoleId === role.id" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-dash-primary shrink-0 mt-0.5"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+              <svg v-if="selectedRoleSlug === role.slug" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-dash-primary shrink-0 mt-0.5"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+            </button>
+          </div>
+          <!-- New role button (owner only, not while editing) -->
+          <div v-if="isOwner && !isEditing" class="p-3 border-t border-dash-border-lt">
+            <button
+              class="w-full h-8 border-2 border-dashed border-dash-border rounded-lg flex items-center justify-center gap-1.5 text-[11.5px] font-medium text-dash-muted hover:text-dash-text hover:border-dash-border-dk transition-colors"
+              @click="startCreate"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              New role
             </button>
           </div>
         </div>
 
         <!-- Right: permission matrix -->
         <div class="col-span-8 bg-dash-paper border border-dash-border rounded-card p-6 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-          <div class="flex items-start justify-between gap-3 mb-6">
+
+          <!-- Header row -->
+          <div class="flex items-start justify-between gap-3 mb-5">
             <div class="flex items-center gap-3 min-w-0">
               <div
                 class="h-12 w-12 rounded-xl grid place-items-center border border-dash-border-lt shrink-0"
-                :style="{ background: 'var(--dash-primary-lt)', color: selectedRole.color }"
+                :style="{ background: 'var(--dash-primary-lt)', color: isEditing ? editDraft.color : (selectedRole?.color ?? '') }"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6z"/></svg>
               </div>
-              <div class="min-w-0">
-                <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ $t('admins.roleHeading') }}</p>
-                <h2 class="font-display text-[22px] leading-tight mt-0.5 text-dash-text">{{ selectedRole.name }}</h2>
-                <p class="text-[11.5px] text-dash-muted">{{ selectedRole.desc }}</p>
+              <div class="min-w-0 flex-1">
+                <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ isEditing ? (isCreating ? 'New Role' : 'Editing') : $t('admins.roleHeading') }}</p>
+                <!-- Name input (edit mode) or heading (view mode) -->
+                <input
+                  v-if="isEditing"
+                  v-model="editDraft.name"
+                  placeholder="Role name"
+                  maxlength="60"
+                  class="font-display text-[22px] leading-tight text-dash-text bg-transparent border-b border-dash-border focus:border-dash-primary outline-none w-full mt-0.5"
+                />
+                <h2 v-else class="font-display text-[22px] leading-tight mt-0.5 text-dash-text">{{ selectedRole?.name }}</h2>
               </div>
             </div>
-            <div v-if="selectedRole.id !== 'owner'" class="flex items-center gap-2 shrink-0">
-              <button class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 whitespace-nowrap transition-colors">{{ $t('common.edit') }}</button>
+            <!-- Action buttons -->
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- Edit mode: Save + Cancel -->
+              <template v-if="isEditing">
+                <button
+                  class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors"
+                  @click="cancelEdit"
+                >{{ $t('common.cancel') }}</button>
+                <button
+                  class="h-8 px-4 rounded-lg text-[12px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity disabled:opacity-50"
+                  :disabled="saving || !editDraft.name.trim()"
+                  @click="saveEdit"
+                >{{ saving ? 'Saving…' : $t('common.save') }}</button>
+              </template>
+              <!-- View mode: Delete + Edit (owner only, not for owner role) -->
+              <template v-else-if="isOwner && selectedRole?.slug !== 'owner'">
+                <!-- Delete confirm flow -->
+                <template v-if="deleteConfirm === selectedRole?.slug">
+                  <span class="text-[11.5px] text-dash-text-2 mr-1">Delete this role?</span>
+                  <button
+                    class="h-8 px-3 rounded-lg text-[12px] font-semibold bg-dash-danger text-white hover:opacity-80 transition-opacity"
+                    @click="deleteRole(selectedRole!.slug)"
+                  >Confirm</button>
+                  <button
+                    class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors"
+                    @click="deleteConfirm = null"
+                  >{{ $t('common.cancel') }}</button>
+                </template>
+                <template v-else>
+                  <button
+                    class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white transition-colors"
+                    :class="(selectedRole?.members ?? 0) > 0 ? 'text-dash-faint cursor-not-allowed' : 'text-dash-danger hover:bg-dash-danger-lt'"
+                    :disabled="(selectedRole?.members ?? 0) > 0"
+                    :title="(selectedRole?.members ?? 0) > 0 ? 'Remove all members first' : ''"
+                    @click="deleteConfirm = selectedRole?.slug ?? null"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline -mt-px mr-0.5"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                    Delete
+                  </button>
+                  <button
+                    class="h-8 px-3 rounded-lg border border-dash-border text-[12px] bg-white text-dash-text-2 hover:bg-dash-paper-2 whitespace-nowrap transition-colors"
+                    @click="startEdit(selectedRole!.slug)"
+                  >{{ $t('common.edit') }}</button>
+                </template>
+              </template>
             </div>
           </div>
 
+          <!-- Color palette (edit mode only) -->
+          <div v-if="isEditing" class="flex items-center gap-2 mb-5">
+            <span class="text-[11px] font-semibold text-dash-faint uppercase tracking-[.12em] mr-1">Color</span>
+            <button
+              v-for="color in COLOR_PALETTE"
+              :key="color"
+              type="button"
+              class="h-6 w-6 rounded-full transition-transform hover:scale-110"
+              :style="{
+                background: color,
+                boxShadow: editDraft.color === color ? `0 0 0 2px white, 0 0 0 4px ${color}` : 'none'
+              }"
+              @click="editDraft.color = color"
+            />
+          </div>
+
+          <!-- Error banner -->
+          <div v-if="editError" class="mb-4 rounded-lg border border-dash-danger/30 bg-dash-danger-lt px-4 py-2.5 text-[11.5px] text-dash-danger">
+            {{ editError }}
+          </div>
+
+          <!-- Permission matrix -->
           <table class="w-full text-[12.5px]">
             <thead>
               <tr class="text-[10.5px] uppercase tracking-wider text-dash-faint">
@@ -490,7 +672,20 @@ onMounted(load)
                     <span class="font-medium text-dash-text-2">{{ row.name }}</span>
                   </td>
                   <td v-for="idx in [0, 1, 2]" :key="idx" class="py-2.5 border-b border-dash-border-lt text-center">
+                    <button
+                      v-if="isEditing"
+                      type="button"
+                      class="inline-flex items-center justify-center h-6 w-6 rounded-md transition-colors"
+                      :style="{
+                        background: getPerm(row.id, idx) ? 'var(--dash-success)' : 'var(--dash-paper-2)',
+                        border: getPerm(row.id, idx) ? '1px solid var(--dash-success-dk)' : '2px solid var(--dash-border)'
+                      }"
+                      @click="togglePerm(row.id, idx)"
+                    >
+                      <svg v-if="getPerm(row.id, idx)" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>
+                    </button>
                     <span
+                      v-else
                       class="inline-flex items-center justify-center h-6 w-6 rounded-md"
                       :style="{
                         background: getPerm(row.id, idx) ? 'var(--dash-success)' : 'var(--dash-paper-2)',
