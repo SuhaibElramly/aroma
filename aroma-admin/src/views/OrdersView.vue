@@ -95,6 +95,9 @@
         </span>
         <span class="text-dash-muted text-[11px] ml-1">LYD</span>
       </template>
+      <template #cell-paymentStatus="{ value }">
+        <ABadge :status="value as string" />
+      </template>
       <template #cell-isPickup="{ value }">
         <span :class="[
           'text-[11px] rounded-full px-2 py-0.5',
@@ -151,8 +154,9 @@ const cols = computed(() => [
   { key: 'user',      label: t('orders.columns.customer') },
   { key: 'itemCount', label: t('orders.columns.items') },
   { key: 'total',     label: t('orders.columns.total') },
-  { key: 'status',    label: t('orders.columns.status') },
-  { key: 'isPickup',  label: t('orders.columns.type') },
+  { key: 'status',        label: t('orders.columns.status') },
+  { key: 'paymentStatus', label: t('paymentStatus') },
+  { key: 'isPickup',      label: t('orders.columns.type') },
   { key: 'date',      label: t('orders.columns.date') },
 ])
 
