@@ -680,10 +680,9 @@ onMounted(load)
                       v-if="isEditing"
                       type="button"
                       class="inline-flex items-center justify-center h-6 w-6 rounded-md transition-colors"
-                      :style="{
-                        background: getPerm(row.id, idx) ? 'var(--dash-success)' : 'var(--dash-paper-2)',
-                        border: getPerm(row.id, idx) ? '1px solid var(--dash-success-dk)' : '2px solid var(--dash-border)'
-                      }"
+                      :class="getPerm(row.id, idx)
+                        ? 'bg-dash-success border border-dash-success-dk'
+                        : 'bg-dash-paper-2 border-2 border-dash-border hover:border-dash-primary'"
                       @click="togglePerm(row.id, idx)"
                     >
                       <svg v-if="getPerm(row.id, idx)" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>
@@ -691,10 +690,9 @@ onMounted(load)
                     <span
                       v-else
                       class="inline-flex items-center justify-center h-6 w-6 rounded-md"
-                      :style="{
-                        background: getPerm(row.id, idx) ? 'var(--dash-success)' : 'var(--dash-paper-2)',
-                        border: getPerm(row.id, idx) ? '1px solid var(--dash-success-dk)' : '1px solid var(--dash-border)'
-                      }"
+                      :class="getPerm(row.id, idx)
+                        ? 'bg-dash-success border border-dash-success-dk'
+                        : 'bg-dash-paper-2 border border-dash-border'"
                     >
                       <svg v-if="getPerm(row.id, idx)" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 12l5 5 9-11"/></svg>
                     </span>
