@@ -205,11 +205,15 @@ function cancelEdit() {
 }
 
 function togglePerm(resource: string, idx: number) {
-  if (!editDraft.value.permissions[resource]) {
-    editDraft.value.permissions[resource] = [0, 0, 0]
+  const current = [...(editDraft.value.permissions[resource] ?? [0, 0, 0])]
+  current[idx] = current[idx] ? 0 : 1
+  editDraft.value = {
+    ...editDraft.value,
+    permissions: {
+      ...editDraft.value.permissions,
+      [resource]: current,
+    },
   }
-  editDraft.value.permissions[resource][idx] =
-    editDraft.value.permissions[resource][idx] ? 0 : 1
 }
 
 async function saveEdit() {
