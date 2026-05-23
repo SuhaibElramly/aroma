@@ -17,12 +17,9 @@ class AuthService
         return $user;
     }
 
-    public function login(string $email, string $password): bool
+    public function login(string $phone, string $password): bool
     {
-        // Try email first, then phone (admin users log in with phone number)
-        $user = User::where('email', $email)
-            ->orWhere('phone', $email)
-            ->first();
+        $user = User::where('phone', $phone)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
             return false;

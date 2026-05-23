@@ -14,12 +14,13 @@
       <div class="rounded-card bg-dash-surface border border-dash-border p-7 shadow-card">
         <form @submit.prevent="handleLogin" class="space-y-4" novalidate>
           <AInput
-            v-model="email"
-            :label="t('login.email')"
-            type="email"
-            :placeholder="t('login.emailPlaceholder')"
-            autocomplete="email"
-            :error="errors.email"
+            v-model="phone"
+            :label="t('login.phone')"
+            type="tel"
+            :placeholder="t('login.phonePlaceholder')"
+            autocomplete="tel"
+            dir="ltr"
+            :error="errors.phone"
           />
           <AInput
             v-model="password"
@@ -59,19 +60,19 @@ import AButton from '../components/ui/AButton.vue'
 const router   = useRouter()
 const { t }    = useI18n()
 const auth     = useAuthStore()
-const email    = ref('')
+const phone    = ref('')
 const password = ref('')
 const loading  = ref(false)
 const errors   = ref<Record<string, string>>({})
 
 async function handleLogin() {
   errors.value = {}
-  if (!email.value)    { errors.value.email    = t('login.emailRequired');    return }
+  if (!phone.value)    { errors.value.phone    = t('login.phoneRequired');    return }
   if (!password.value) { errors.value.password = t('login.passwordRequired'); return }
 
   loading.value = true
   try {
-    await auth.login(email.value, password.value)
+    await auth.login(phone.value, password.value)
     router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : t('login.loginFailed')

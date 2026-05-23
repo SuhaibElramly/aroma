@@ -7,8 +7,8 @@ import type {
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
-export const apiLogin = (email: string, password: string) =>
-  client.post<{ user: AdminUser; token: string }>('/auth/login', { email, password })
+export const apiLogin = (phone: string, password: string) =>
+  client.post<{ user: AdminUser; token: string }>('/auth/login', { phone, password })
 
 export const apiGetMe = () =>
   client.get<AdminUser>('/user')

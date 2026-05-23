@@ -29,8 +29,8 @@ export const useAuthStore = defineStore('auth', () => {
     return (perms[resource]?.[ACTION_IDX[action]] ?? 0) === 1
   }
 
-  async function login(email: string, password: string) {
-    const res = await apiLogin(email, password)
+  async function login(phone: string, password: string) {
+    const res = await apiLogin(phone, password)
     if (!res.data.user.is_admin) {
       throw new Error('This account does not have admin access.')
     }

@@ -28,7 +28,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        if (!$this->authService->login($request->email, $request->password)) {
+        if (!$this->authService->login($request->phone, $request->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
