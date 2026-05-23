@@ -25,10 +25,10 @@ const loading  = ref(true)
 const showForm = ref(false)
 const error    = ref<string | null>(null)
 const form        = ref({ name: '', phone: '', role: 'admin', password: '', showPw: false })
-const editingAdmin = ref<AdminMember | null>(null)
-const editForm     = ref({ name: '', phone: '', role: '' })
-const editError    = ref<string | null>(null)
-const editSaving   = ref(false)
+const editingAdmin    = ref<AdminMember | null>(null)
+const editForm        = ref({ name: '', phone: '', role: '' })
+const adminEditError  = ref<string | null>(null)
+const adminEditSaving = ref(false)
 
 const { t } = useI18n()
 
@@ -104,20 +104,20 @@ function startEditAdmin(a: AdminMember) {
   editingAdmin.value = a
   // Strip +218 prefix so the user sees/edits just the local number
   const local = (a.phone ?? '').replace(/^\+218/, '')
-  editForm.value = { name: a.name, phone: local, role: a.role }
-  editError.value = null
-  showForm.value  = false
+  editForm.value       = { name: a.name, phone: local, role: a.role }
+  adminEditError.value = null
+  showForm.value       = false
 }
 
 function cancelEditAdmin() {
-  editingAdmin.value = null
-  editError.value    = null
+  editingAdmin.value   = null
+  adminEditError.value = null
 }
 
 async function saveEditAdmin() {
   if (!editingAdmin.value) return
-  editError.value = null
-  editSaving.value = true
+  adminEditError.value  = null
+  adminEditSaving.value = true
   try {
     const localNum = editForm.value.phone.replace(/[\s\-]/g, '').replace(/^0/, '')
     const payload: Partial<{ name: string; phone: string; role: string }> = {
@@ -133,9 +133,9 @@ async function saveEditAdmin() {
     if (idx !== -1) admins.value[idx] = res.data
     editingAdmin.value = null
   } catch (e: any) {
-    editError.value = e?.response?.data?.message ?? 'Failed to save changes'
+    adminEditError.value = e?.response?.data?.message ?? 'Failed to save changes'
   } finally {
-    editSaving.value = false
+    adminEditSaving.value = false
   }
 }
 
@@ -500,7 +500,7 @@ onMounted(load)
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
           </button>
         </div>
-        <div v-if="editError" class="mb-3 rounded-lg border border-dash-danger/30 bg-dash-danger-lt px-3 py-2 text-xs text-dash-danger">{{ editError }}</div>
+        <div v-if="adminEditError" class="mb-3 rounded-lg border border-dash-danger/30 bg-dash-danger-lt px-3 py-2 text-xs text-dash-danger">{{ adminEditError }}</div>
         <div class="grid grid-cols-12 gap-3">
           <!-- Name -->
           <div class="col-span-5">
@@ -549,8 +549,8 @@ onMounted(load)
         </div>
         <div class="flex items-center justify-end gap-2 pt-4 mt-3 border-t border-dash-border-lt">
           <button type="button" @click="cancelEditAdmin" class="h-9 px-3.5 rounded-lg text-[12.5px] font-medium border border-dash-border bg-white text-dash-text-2 hover:bg-dash-paper-2 transition-colors">{{ $t('common.cancel') }}</button>
-          <button type="button" @click="saveEditAdmin" :disabled="editSaving || !editForm.name.trim()" class="h-9 px-4 rounded-lg text-[12.5px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity disabled:opacity-50">
-            {{ editSaving ? $t('common.saving') : $t('common.save') }}
+          <button type="button" @click="saveEditAdmin" :disabled="adminEditSaving || !editForm.name.trim()" class="h-9 px-4 rounded-lg text-[12.5px] font-semibold text-white bg-dash-text hover:opacity-90 transition-opacity disabled:opacity-50">
+            {{ adminEditSaving ? $t('common.saving') : $t('common.save') }}
           </button>
         </div>
       </div>
