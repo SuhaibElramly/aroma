@@ -4,7 +4,7 @@ import type {
   AdminBrand, AdminCategory, AdminUserRow, PageMeta, ProductVariant, ProductImage,
   AdminCartItem, AdminWishlistProduct, ProductType, AdminCoupon, CouponOrder,
   SpecType, ProductSpec, AdminUserOrder, AdminMember, AdminRole, AdminNotification,
-  OrderPaymentsResponse,
+  OrderPaymentsResponse, HomepageConfig, HomepageBlock, NewBlockPayload, ReorderItem,
 } from '../types'
 
 // ── Auth ──────────────────────────────────────────────────────────────
@@ -305,3 +305,24 @@ export const apiGetOrderPayments = (orderId: string) =>
 
 export const apiAddOrderPayment = (orderId: string, payload: { amount: number; note?: string }) =>
   client.post<OrderPaymentsResponse>(`/admin/orders/${orderId}/payments`, payload)
+
+// ── Homepage ──────────────────────────────────────────────────────────
+export const apiGetHomepage = () =>
+  client.get<HomepageConfig>('/admin/homepage')
+
+export const apiUpdateHero = (data: FormData) =>
+  client.put<void>('/admin/homepage/hero', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+
+export const apiAddBlock = (payload: NewBlockPayload) =>
+  client.post<HomepageBlock>('/admin/homepage/blocks', payload)
+
+export const apiUpdateBlock = (id: number, data: Partial<Pick<HomepageBlock, 'config' | 'enabled'>>) =>
+  client.put<HomepageBlock>(`/admin/homepage/blocks/${id}`, data)
+
+export const apiDeleteBlock = (id: number) =>
+  client.delete<void>(`/admin/homepage/blocks/${id}`)
+
+export const apiReorderBlocks = (order: ReorderItem[]) =>
+  client.put<void>('/admin/homepage/blocks/reorder', { order })
