@@ -2,8 +2,9 @@ import { Header }    from '@/components/layout/Header'
 import { Footer }    from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { Toast }     from '@/components/feedback/Toast'
+import { getApiUrl } from '@/lib/api-url'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_URL = getApiUrl()
 
 export default async function StorefrontLayout({ children }: { children: React.ReactNode }) {
   const logoUrl = await fetch(`${API_URL}/api/home`, { next: { revalidate: 60 } })
