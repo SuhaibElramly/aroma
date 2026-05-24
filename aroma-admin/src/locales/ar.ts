@@ -272,9 +272,6 @@ const ar = {
   stepper: {
     newProduct:      'منتج جديد',
     editProduct:     'تعديل المنتج',
-    stepBasicInfo:   'المعلومات الأساسية',
-    stepImages:      'الصور',
-    stepVariants:    'الأنواع',
     inProgress:      'جارٍ',
     locked:          'مقفل',
     done:            'تم',
@@ -285,7 +282,6 @@ const ar = {
     saveChanges:     'حفظ التغييرات',
     imagesRequired:  'يجب إضافة صورة واحدة على الأقل',
     variantImages:   'الصور',
-    noVariantImages: 'لا يوجد',
     addVariantImages: '+ إضافة',
     variantImagesTitle: 'صور النوع',
     variantImagesHint:  'اختياري — فقط إذا كان هذا النوع يختلف بصرياً عن الصور الرئيسية.',

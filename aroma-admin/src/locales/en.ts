@@ -270,9 +270,6 @@ const en = {
   stepper: {
     newProduct:      'New Product',
     editProduct:     'Edit Product',
-    stepBasicInfo:   'Basic Info',
-    stepImages:      'Images',
-    stepVariants:    'Variants',
     inProgress:      'In progress',
     locked:          'Locked',
     done:            'Done',
@@ -283,7 +280,6 @@ const en = {
     saveChanges:     'Save changes',
     imagesRequired:  'At least one product image is required',
     variantImages:   'Images',
-    noVariantImages: 'None',
     addVariantImages: '+ Add',
     variantImagesTitle: 'Variant Images',
     variantImagesHint:  'Optional — only if this variant looks different from the product images.',
