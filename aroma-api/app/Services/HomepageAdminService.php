@@ -30,7 +30,7 @@ class HomepageAdminService
         $bgPath   = $existing['bg_image_path'] ?? null;
 
         if ($image) {
-            if ($bgPath) Storage::disk('public')->delete($bgPath);
+            if ($bgPath) Storage::disk(config('filesystems.default'))->delete($bgPath);
             $bgPath = $image->store('homepage', 'public');
         }
 
@@ -40,7 +40,7 @@ class HomepageAdminService
     public function updateLogo(UploadedFile $image): string
     {
         $existing = Setting::get('site_logo_path');
-        if ($existing) Storage::disk('public')->delete($existing);
+        if ($existing) Storage::disk(config('filesystems.default'))->delete($existing);
         $path = $image->store('logos', 'public');
         Setting::set('site_logo_path', $path);
         return asset('storage/' . $path);
@@ -49,7 +49,7 @@ class HomepageAdminService
     public function deleteLogo(): void
     {
         $path = Setting::get('site_logo_path');
-        if ($path) Storage::disk('public')->delete($path);
+        if ($path) Storage::disk(config('filesystems.default'))->delete($path);
         Setting::set('site_logo_path', null);
     }
 

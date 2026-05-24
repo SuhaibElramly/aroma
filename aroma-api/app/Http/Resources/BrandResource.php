@@ -23,7 +23,7 @@ class BrandResource extends JsonResource
             'tagline' => $this->tagline,
             'count'   => $this->products_count ?? $this->products()->count(),
             'bg'      => $this->bg,
-            'logoUrl' => $this->logo ? Storage::disk('public')->url($this->logo) : null,
+            'logoUrl' => $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : null,
         ];
     }
 }
