@@ -77,12 +77,8 @@ const en = {
     footer: 'Aroma Shop · Benghazi, Libya',
   },
   dashboard: {
-    greeting: 'Good {timeOfDay}, {name}',
-    subtitle: "Here's what's happening in your store today.",
     totalRevenue: 'Total Revenue',
     totalOrders: 'Total Orders',
-    products: 'Products',
-    customers: 'Customers',
     grossProfit: 'Gross Profit',
     avgMargin: 'Avg Margin',
     vsLastMonth: 'vs last month',
@@ -98,8 +94,6 @@ const en = {
     noData: 'No data yet',
     brandFooter: 'Aroma Admin',
     brandLocation: 'Benghazi · Libya',
-    revenueChart: 'Revenue Overview',
-    ordersChart: 'Orders Overview',
     recentOrders: 'Recent Orders',
     topProducts: 'Top Products',
     latestActivity: 'Latest activity',
@@ -127,11 +121,6 @@ const en = {
       total: 'Total',
       status: 'Status',
       date: 'Date',
-    },
-    timeOfDay: {
-      morning: 'morning',
-      afternoon: 'afternoon',
-      evening: 'evening',
     },
   },
   orders: {

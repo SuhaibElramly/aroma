@@ -79,12 +79,8 @@ const ar = {
     footer: 'متجر أرومة · بنغازي، ليبيا',
   },
   dashboard: {
-    greeting: 'مرحباً {name}',
-    subtitle: 'إليك ما يحدث في متجرك اليوم.',
     totalRevenue: 'إجمالي الإيرادات',
     totalOrders: 'إجمالي الطلبات',
-    products: 'المنتجات',
-    customers: 'العملاء',
     grossProfit: 'إجمالي الربح',
     avgMargin: 'متوسط الهامش',
     vsLastMonth: 'مقارنةً بالشهر الماضي',
@@ -100,8 +96,6 @@ const ar = {
     noData: 'لا توجد بيانات بعد',
     brandFooter: 'إدارة أروما',
     brandLocation: 'بنغازي · ليبيا',
-    revenueChart: 'نظرة عامة على الإيرادات',
-    ordersChart: 'نظرة عامة على الطلبات',
     recentOrders: 'أحدث الطلبات',
     topProducts: 'أبرز المنتجات',
     latestActivity: 'آخر النشاطات',
@@ -129,11 +123,6 @@ const ar = {
       total: 'الإجمالي',
       status: 'الحالة',
       date: 'التاريخ',
-    },
-    timeOfDay: {
-      morning: 'الصباح',
-      afternoon: 'الظهر',
-      evening: 'المساء',
     },
   },
   orders: {
