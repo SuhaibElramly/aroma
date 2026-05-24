@@ -756,6 +756,7 @@ const ar = {
     markAllRead: 'تمييز الكل كمقروء',
     empty: 'لا توجد إشعارات بعد.',
   },
+  // Used via dynamic key lookup in UsersView.vue (t(segmentLabelKey[seg])) — static audits will not detect these references.
   userSegments: {
     all: 'الكل',
     vip: 'كبار العملاء',
@@ -828,7 +829,7 @@ const ar = {
       empty: 'لم يتم اختيار منتجات. ابحث أعلاه للإضافة.',
     },
   },
-  // Payment tracking
+  // Payment tracking — called as top-level t('paymentStatus'), not 'orders.paymentStatus'. Static audits scanning for namespace.key form will miss these.
   paymentStatus: 'حالة الدفع',
   paymentNotPaid: 'غير مدفوع',
   paymentPartiallyPaid: 'مدفوع جزئياً',

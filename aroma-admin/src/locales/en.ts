@@ -754,6 +754,7 @@ const en = {
     markAllRead: 'Mark all read',
     empty: 'No notifications yet.',
   },
+  // Used via dynamic key lookup in UsersView.vue (t(segmentLabelKey[seg])) — static audits will not detect these references.
   userSegments: {
     all: 'All',
     vip: 'VIP',
@@ -826,7 +827,7 @@ const en = {
       empty: 'No products selected. Search above to add.',
     },
   },
-  // Payment tracking
+  // Payment tracking — called as top-level t('paymentStatus'), not 'orders.paymentStatus'. Static audits scanning for namespace.key form will miss these.
   paymentStatus: 'Payment Status',
   paymentNotPaid: 'Not Paid',
   paymentPartiallyPaid: 'Partially Paid',
