@@ -53,6 +53,13 @@ class AdminProductController extends Controller
             );
         }
 
+        if ($request->filled('ids')) {
+            $ids = array_filter(array_map('intval', explode(',', $request->ids)));
+            if (!empty($ids)) {
+                $query->whereIn('id', $ids);
+            }
+        }
+
         $products = $query->paginate(20);
 
         return response()->json([

@@ -89,4 +89,28 @@ class HomeTest extends TestCase
             ->assertJsonStructure(['hero' => ['headline', 'subtext', 'bg_image_url']])
             ->assertJsonPath('blocks', []);
     }
+
+    public function test_home_hydrates_curated_block_in_order(): void
+    {
+        Setting::set('homepage_hero', $this->heroDefaults());
+
+        $p1 = Product::factory()->create(['name' => 'Alpha']);
+        $p2 = Product::factory()->create(['name' => 'Beta']);
+        $p3 = Product::factory()->create(['name' => 'Gamma']);
+
+        HomepageBlock::create([
+            'type'     => 'curated',
+            'position' => 1,
+            'enabled'  => true,
+            'config'   => ['label' => 'Pick', 'title' => 'Special', 'product_ids' => [$p3->id, $p1->id, $p2->id]],
+        ]);
+
+        $response = $this->getJson('/api/home');
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'blocks.0.data.products')
+            ->assertJsonPath('blocks.0.data.products.0.id', $p3->id)
+            ->assertJsonPath('blocks.0.data.products.1.id', $p1->id)
+            ->assertJsonPath('blocks.0.data.products.2.id', $p2->id);
+    }
 }

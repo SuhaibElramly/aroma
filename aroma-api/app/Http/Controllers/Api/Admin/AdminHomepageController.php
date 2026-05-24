@@ -40,7 +40,7 @@ class AdminHomepageController extends Controller
     public function storeBlock(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'type'    => 'required|in:bestsellers,new_arrivals,offers,categories,featured_brand',
+            'type'    => 'required|in:bestsellers,new_arrivals,offers,categories,featured_brand,curated',
             'config'  => 'nullable|array',
             'enabled' => 'boolean',
         ]);

@@ -55,6 +55,7 @@ class HomeService
             'offers'         => ['products' => $this->products(['is_offer' => true],       $config['limit'] ?? 3)],
             'categories'     => ['categories' => Category::withCount('products')->get()->toArray()],
             'featured_brand' => $this->hydrateFeaturedBrand($config),
+            'curated'        => ['products' => $this->curatedProducts($config['product_ids'] ?? [])],
             default          => [],
         };
     }
@@ -67,6 +68,23 @@ class HomeService
             ->get();
 
         return ProductResource::collection($products)->resolve();
+    }
+
+    private function curatedProducts(array $ids): array
+    {
+        if (empty($ids)) return [];
+
+        $byId = Product::whereIn('id', $ids)
+            ->with(['brand', 'category', 'variants.specValues.specType', 'notes', 'tags', 'images'])
+            ->get()
+            ->keyBy('id');
+
+        $ordered = collect($ids)
+            ->map(fn ($id) => $byId->get($id))
+            ->filter()
+            ->values();
+
+        return ProductResource::collection($ordered)->resolve();
     }
 
     private function hydrateFeaturedBrand(array $config): array
