@@ -46,6 +46,7 @@ export const apiGetProducts = (params: {
   type?:        ProductType
   price_min?:   number
   price_max?:   number
+  ids?:         string
   page?:        number
 }) =>
   client.get<{ data: AdminProduct[]; meta: PageMeta }>('/admin/products', { params })

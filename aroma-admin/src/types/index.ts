@@ -327,6 +327,7 @@ export type HomepageBlockType =
   | 'offers'
   | 'categories'
   | 'featured_brand'
+  | 'curated'
 
 export interface HeroConfig {
   headline: string
@@ -349,6 +350,7 @@ export interface HomepageBlock {
     limit?: number
     product_limit?: number
     brand_id?: string
+    product_ids?: number[]
   }
 }
 
