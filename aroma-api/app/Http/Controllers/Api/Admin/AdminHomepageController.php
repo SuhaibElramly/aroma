@@ -45,6 +45,13 @@ class AdminHomepageController extends Controller
             'enabled' => 'boolean',
         ]);
 
+        if ($request->input('type') === 'curated') {
+            $request->validate([
+                'config.product_ids'   => 'required|array',
+                'config.product_ids.*' => 'integer|min:1',
+            ]);
+        }
+
         $block = $this->service->addBlock(
             $request->type,
             $request->input('config', []),
@@ -60,6 +67,13 @@ class AdminHomepageController extends Controller
             'config'  => 'nullable|array',
             'enabled' => 'nullable|boolean',
         ]);
+
+        if ($block->type === 'curated') {
+            $request->validate([
+                'config.product_ids'   => 'required|array',
+                'config.product_ids.*' => 'integer|min:1',
+            ]);
+        }
 
         $this->service->updateBlock($block, $request->only(['config', 'enabled']));
 

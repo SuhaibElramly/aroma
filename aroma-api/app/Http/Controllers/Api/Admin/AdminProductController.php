@@ -61,30 +61,33 @@ class AdminProductController extends Controller
             }
         }
 
-        $products = $query->paginate(20);
+        $fetchById = $request->filled('ids');
+        $products  = $fetchById ? $query->get() : $query->paginate(20);
+
+        $mapped = $products->map(fn($p) => [
+            'id'             => $p->id,
+            'slug'           => $p->slug,
+            'name'           => $p->name,
+            'nameEn'         => $p->name_en,
+            'brand'          => $p->brand?->name,
+            'brandId'        => $p->brand_id,
+            'category'       => $p->category?->label,
+            'categoryId'     => $p->category_id,
+            'type'           => $p->type?->value,
+            'isNew'          => $p->is_new,
+            'isBestseller'   => $p->is_bestseller,
+            'isOffer'        => $p->is_offer,
+            'variantCount'   => $p->variants->count(),
+            'price'          => $p->variants->min('price'),
+            'thumbnailUrl'   => $p->images->firstWhere('is_thumbnail', true)?->url
+                             ?? $p->images->first()?->url,
+            'placeholderBg'  => $p->placeholder_bg,
+            'placeholderDot' => $p->placeholder_dot,
+        ]);
 
         return response()->json([
-            'data' => $products->map(fn($p) => [
-                'id'           => $p->id,
-                'slug'         => $p->slug,
-                'name'         => $p->name,
-                'nameEn'       => $p->name_en,
-                'brand'        => $p->brand?->name,
-                'brandId'      => $p->brand_id,
-                'category'     => $p->category?->label,
-                'categoryId'   => $p->category_id,
-                'type'         => $p->type?->value,
-                'isNew'          => $p->is_new,
-                'isBestseller'  => $p->is_bestseller,
-                'isOffer'       => $p->is_offer,
-                'variantCount'  => $p->variants->count(),
-                'price'         => $p->variants->min('price'),
-                'thumbnailUrl'  => $p->images->firstWhere('is_thumbnail', true)?->url
-                                ?? $p->images->first()?->url,
-                'placeholderBg'  => $p->placeholder_bg,
-                'placeholderDot' => $p->placeholder_dot,
-            ]),
-            'meta' => [
+            'data' => $mapped->values(),
+            'meta' => $fetchById ? null : [
                 'total'       => $products->total(),
                 'currentPage' => $products->currentPage(),
                 'lastPage'    => $products->lastPage(),
