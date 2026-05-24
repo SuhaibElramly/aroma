@@ -13,50 +13,51 @@ class AdminProductController extends Controller
         $query = Product::with(['brand', 'category', 'variants', 'images'])
             ->orderBy('name');
 
-        if ($request->filled('search')) {
-            $term = "%{$request->search}%";
-            $query->where(function ($q) use ($term) {
-                $q->where('name', 'like', $term)
-                  ->orWhere('name_en', 'like', $term);
-            });
-        }
-
-        if ($request->filled('brand_id')) {
-            $query->where('brand_id', (string) $request->brand_id);
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', (int) $request->category_id);
-        }
-
-        if ($request->filled('type') && in_array($request->type, ['EDP', 'EDT', 'Parfum', 'EDC'], true)) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('price_min') || $request->filled('price_max')) {
-            $conditions = [];
-            $bindings   = [];
-            if ($request->filled('price_min')) {
-                $conditions[] = 'MIN(price) >= ?';
-                $bindings[]   = (int) $request->price_min;
-            }
-            if ($request->filled('price_max')) {
-                $conditions[] = 'MIN(price) <= ?';
-                $bindings[]   = (int) $request->price_max;
-            }
-            $having = implode(' AND ', $conditions);
-            // Single whereRaw keeps all bindings in the WHERE array — avoids
-            // the Laravel binding-merge bug when using havingRaw inside a whereIn closure.
-            $query->whereRaw(
-                "id IN (SELECT product_id FROM product_variants GROUP BY product_id HAVING {$having})",
-                $bindings
-            );
-        }
-
         if ($request->filled('ids')) {
             $ids = array_filter(array_map('intval', explode(',', $request->ids)));
             if (!empty($ids)) {
                 $query->whereIn('id', $ids);
+            }
+            // Skip all other filters when ids is present
+        } else {
+            if ($request->filled('search')) {
+                $term = "%{$request->search}%";
+                $query->where(function ($q) use ($term) {
+                    $q->where('name', 'like', $term)
+                      ->orWhere('name_en', 'like', $term);
+                });
+            }
+
+            if ($request->filled('brand_id')) {
+                $query->where('brand_id', (string) $request->brand_id);
+            }
+
+            if ($request->filled('category_id')) {
+                $query->where('category_id', (int) $request->category_id);
+            }
+
+            if ($request->filled('type') && in_array($request->type, ['EDP', 'EDT', 'Parfum', 'EDC'], true)) {
+                $query->where('type', $request->type);
+            }
+
+            if ($request->filled('price_min') || $request->filled('price_max')) {
+                $conditions = [];
+                $bindings   = [];
+                if ($request->filled('price_min')) {
+                    $conditions[] = 'MIN(price) >= ?';
+                    $bindings[]   = (int) $request->price_min;
+                }
+                if ($request->filled('price_max')) {
+                    $conditions[] = 'MIN(price) <= ?';
+                    $bindings[]   = (int) $request->price_max;
+                }
+                $having = implode(' AND ', $conditions);
+                // Single whereRaw keeps all bindings in the WHERE array — avoids
+                // the Laravel binding-merge bug when using havingRaw inside a whereIn closure.
+                $query->whereRaw(
+                    "id IN (SELECT product_id FROM product_variants GROUP BY product_id HAVING {$having})",
+                    $bindings
+                );
             }
         }
 
