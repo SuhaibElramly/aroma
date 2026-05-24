@@ -327,3 +327,14 @@ export const apiDeleteBlock = (id: number) =>
 
 export const apiReorderBlocks = (order: ReorderItem[]) =>
   client.put<void>('/admin/homepage/blocks/reorder', { order })
+
+export const apiUploadLogo = (file: File) => {
+  const fd = new FormData()
+  fd.append('logo', file)
+  return client.post<{ logo_url: string }>('/admin/homepage/logo', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const apiDeleteLogo = () =>
+  client.delete<{ message: string }>('/admin/homepage/logo')

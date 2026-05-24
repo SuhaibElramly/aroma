@@ -357,6 +357,7 @@ export interface HomepageBlock {
 export interface HomepageConfig {
   hero: HeroConfig
   blocks: HomepageBlock[]
+  logo_url?: string | null
 }
 
 export interface NewBlockPayload {
