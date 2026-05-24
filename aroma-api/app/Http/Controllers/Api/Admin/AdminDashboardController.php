@@ -159,15 +159,20 @@ class AdminDashboardController extends Controller
 
     private function weeklyOrders(): array
     {
-        $counts = [];
-        // SQLite strftime('%w'): 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
-        // We want Mon(1)…Sun(0) order
-        $sqliteDow = [1, 2, 3, 4, 5, 6, 0];
-        foreach ($sqliteDow as $dow) {
-            $counts[] = Order::whereRaw("strftime('%w', created_at) = ?", [(string) $dow])
-                ->where('created_at', '>=', now()->subDays(28))
-                ->count();
-        }
+        // Group last 28 days of orders by day-of-week in PHP rather than SQL,
+        // so we don't depend on SQLite's strftime() or PG's EXTRACT(DOW). Carbon
+        // dayOfWeek: 0=Sun..6=Sat. We want output positions Mon..Sun.
+        $counts = array_fill(0, 7, 0);
+
+        Order::where('created_at', '>=', now()->subDays(28))
+            ->select('created_at')
+            ->get()
+            ->each(function ($order) use (&$counts) {
+                $dow = $order->created_at->dayOfWeek; // 0=Sun..6=Sat
+                $position = $dow === 0 ? 6 : $dow - 1; // 0=Mon..6=Sun
+                $counts[$position]++;
+            });
+
         return $counts;
     }
 }
