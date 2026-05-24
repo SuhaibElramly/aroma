@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies (Render/Vercel/etc. terminate TLS upstream and
+        // forward via X-Forwarded-Proto). Without this, URL generation emits
+        // http:// instead of https:// behind the proxy.
+        $middleware->trustProxies(at: '*');
+
         // Using stateless bearer token auth — no stateful/CSRF middleware needed
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\IsAdmin::class,
