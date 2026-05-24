@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import {
   apiGetHomepage, apiUpdateHero, apiAddBlock,
   apiUpdateBlock, apiDeleteBlock, apiReorderBlocks,
-  apiGetBrands,
+  apiGetBrands, apiUploadLogo, apiDeleteLogo,
 } from '../api/admin'
 import type { HomepageConfig, HomepageBlock, NewBlockPayload } from '../types'
 import HeroEditor  from '../components/homepage/HeroEditor.vue'
@@ -22,6 +22,9 @@ const blockError   = ref('')
 const editorOpen   = ref(false)
 const editingBlock = ref<HomepageBlock | null>(null)
 const brands       = ref<{ id: string; name: string }[]>([])
+const logoUrl       = ref<string | null>(null)
+const logoUploading = ref(false)
+const logoError     = ref('')
 
 const heroEditorRef = ref<InstanceType<typeof HeroEditor> | null>(null)
 
@@ -33,6 +36,7 @@ async function load() {
       apiGetBrands(),
     ])
     config.value = homepageRes.data
+    logoUrl.value = homepageRes.data.logo_url ?? null
     brands.value = brandsRes.data.map((b) => ({ id: b.id, name: b.name }))
   } catch {
     loadError.value = 'Failed to load homepage config.'
@@ -130,6 +134,32 @@ async function onReorder(blocks: HomepageBlock[]) {
 function onRemoveHeroImage() {
   if (config.value) config.value.hero.bg_image_path = null
 }
+
+async function onUploadLogo(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  logoUploading.value = true
+  logoError.value = ''
+  try {
+    const res = await apiUploadLogo(file)
+    logoUrl.value = res.data.logo_url
+  } catch {
+    logoError.value = 'Failed to upload logo. Please try again.'
+  } finally {
+    logoUploading.value = false
+  }
+}
+
+async function onDeleteLogo() {
+  if (!confirm('Remove the logo?')) return
+  logoError.value = ''
+  try {
+    await apiDeleteLogo()
+    logoUrl.value = null
+  } catch {
+    logoError.value = 'Failed to remove logo.'
+  }
+}
 </script>
 
 <template>
@@ -140,6 +170,56 @@ function onRemoveHeroImage() {
     <div v-if="loading" class="text-dash-muted text-[13px]">Loading…</div>
 
     <template v-else-if="config">
+      <!-- Logo -->
+      <div class="rounded-lg border border-dash-border bg-dash-paper p-4 space-y-3">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-dash-faint">
+          Store Logo
+        </p>
+
+        <!-- Preview -->
+        <div
+          class="w-40 h-16 rounded border-2 flex items-center justify-center overflow-hidden"
+          :class="logoUrl ? 'border-dash-border' : 'border-dashed border-dash-border'"
+        >
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            alt="Store logo"
+            class="max-w-full max-h-full object-contain"
+          />
+          <span v-else class="text-[11px] text-dash-faint">No logo</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+          <label
+            class="cursor-pointer px-3 py-1.5 rounded text-[12px] font-medium bg-dash-primary
+                   text-white hover:opacity-90 transition-opacity"
+            :class="{ 'opacity-60 pointer-events-none': logoUploading }"
+          >
+            {{ logoUploading ? 'Uploading…' : 'Upload logo' }}
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="onUploadLogo"
+              :disabled="logoUploading"
+            />
+          </label>
+          <button
+            v-if="logoUrl"
+            type="button"
+            @click="onDeleteLogo"
+            class="px-3 py-1.5 rounded text-[12px] font-medium text-dash-danger border
+                   border-dash-danger hover:bg-dash-danger hover:text-white transition-colors"
+          >
+            Remove
+          </button>
+        </div>
+
+        <p v-if="logoError" class="text-[11px] text-dash-danger">{{ logoError }}</p>
+      </div>
+
       <!-- Hero editor -->
       <div class="space-y-2">
         <HeroEditor
