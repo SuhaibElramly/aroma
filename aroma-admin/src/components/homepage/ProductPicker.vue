@@ -1,10 +1,13 @@
 <!-- aroma-admin/src/components/homepage/ProductPicker.vue -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 import { apiGetProducts } from '../../api/admin'
 import { GripVertical, X } from 'lucide-vue-next'
 import type { AdminProduct } from '../../types'
+
+const { t } = useI18n()
 
 interface PickedProduct {
   id: number
@@ -83,7 +86,7 @@ function onBlur() {
 <template>
   <div class="space-y-2">
     <label class="block text-[11px] font-medium text-dash-muted uppercase tracking-wide">
-      Products
+      {{ t('homepage.productPicker.label') }}
     </label>
 
     <!-- Search input -->
@@ -91,7 +94,7 @@ function onBlur() {
       <input
         v-model="query"
         type="text"
-        placeholder="Search products…"
+        :placeholder="t('homepage.productPicker.searchPlaceholder')"
         @input="onInput"
         @blur="onBlur"
         @focus="showResults = results.length > 0"
@@ -161,7 +164,7 @@ function onBlur() {
     </draggable>
 
     <p v-if="selected.length === 0" class="text-[11px] text-dash-faint italic">
-      No products selected. Search above to add.
+      {{ t('homepage.productPicker.empty') }}
     </p>
   </div>
 </template>

@@ -82,9 +82,10 @@
           <div class="absolute inset-0 opacity-[0.05] overflow-hidden"
             style="background-image: repeating-linear-gradient(135deg, transparent 0 8px, rgba(0,0,0,.6) 8px 9px)" />
           <!-- monogram badge at bottom-left, overlapping -->
-          <div class="absolute -bottom-7 left-4 h-14 w-14 rounded-2xl bg-white grid place-items-center font-display text-[20px] border border-dash-border-lt"
+          <div class="absolute -bottom-7 left-4 h-14 w-14 rounded-2xl bg-white grid place-items-center font-display text-[20px] border border-dash-border-lt overflow-hidden"
             :style="{ color: `oklch(34% 0.07 ${brandHue(brand, i)})`, boxShadow: '0 4px 14px oklch(26% 0.04 250 / .08)' }">
-            {{ monogram(brand.name || brand.nameEn || '') }}
+            <img v-if="brand.logoUrl" :src="brand.logoUrl" :alt="brand.name" class="w-full h-full object-contain p-1.5" />
+            <span v-else>{{ monogram(brand.name || brand.nameEn || '') }}</span>
           </div>
         </div>
         <!-- Card body -->
@@ -113,12 +114,13 @@
       <template #cell-name="{ row }">
         <RouterLink :to="`/brands/${(row as AdminBrand).id}`" class="group block">
           <div class="flex items-center gap-2.5">
-            <div class="h-9 w-9 rounded-lg grid place-items-center font-display text-[13px] border border-dash-border-lt"
+            <div class="h-9 w-9 rounded-lg grid place-items-center font-display text-[13px] border border-dash-border-lt overflow-hidden"
               :style="{
                 background: `oklch(94% 0.04 ${brandHue(row as AdminBrand, brands.indexOf(row as AdminBrand))})`,
                 color: `oklch(34% 0.07 ${brandHue(row as AdminBrand, brands.indexOf(row as AdminBrand))})`
               }">
-              {{ monogram((row as AdminBrand).name || (row as AdminBrand).nameEn || '') }}
+              <img v-if="(row as AdminBrand).logoUrl" :src="(row as AdminBrand).logoUrl!" :alt="(row as AdminBrand).name" class="w-full h-full object-contain p-1" />
+              <span v-else>{{ monogram((row as AdminBrand).name || (row as AdminBrand).nameEn || '') }}</span>
             </div>
             <div>
               <p class="font-medium text-xs group-hover:text-dash-primary transition-colors">{{ (row as AdminBrand).name }}</p>
@@ -161,7 +163,27 @@
 
         <AInput v-model="form.origin"  :label="t('brands.originLabel')" />
         <AInput v-model="form.tagline" :label="t('brands.taglineLabel')" />
-        <AInput v-model="form.bg"      :label="t('brands.bgLabel')" placeholder="#F4EFE8" :error="formErrors.bg" />
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-2xs font-semibold text-dash-muted uppercase tracking-wider">
+            {{ t('brands.bgLabel') }}
+          </label>
+          <div class="flex items-center gap-2">
+            <div class="relative w-9 h-9 rounded-btn overflow-hidden border border-dash-border shrink-0">
+              <input type="color" v-model="form.bg" class="absolute inset-0 w-full h-full cursor-pointer opacity-0" />
+              <div class="w-full h-full" :style="{ backgroundColor: form.bg }" />
+            </div>
+            <input
+              type="text"
+              v-model="form.bg"
+              maxlength="7"
+              placeholder="#F4EFE8"
+              class="flex-1 min-w-0 rounded-btn border bg-dash-surface px-3 py-2 text-xs font-mono text-dash-text placeholder:text-dash-faint focus:outline-none focus:border-dash-primary focus:ring-2 focus:ring-dash-primary/10 transition-all duration-200"
+              :class="formErrors.bg ? 'border-dash-danger bg-dash-danger-lt/40' : 'border-dash-border hover:border-dash-muted/40'"
+            />
+          </div>
+          <p v-if="formErrors.bg" class="text-2xs text-dash-danger">{{ formErrors.bg }}</p>
+        </div>
 
         <div>
           <p class="text-2xs font-semibold text-dash-muted uppercase tracking-wider mb-2">{{ t('brands.logoLabel') }}</p>
@@ -263,7 +285,7 @@ const logoPreview     = ref<string | null>(null)
 const pendingLogoFile = ref<File | null>(null)
 const logoRemoved     = ref(false)
 
-const emptyForm = () => ({ name: '', name_en: '', origin: '', tagline: '', bg: '' })
+const emptyForm = () => ({ name: '', name_en: '', origin: '', tagline: '', bg: '#F4EFE8' })
 const form = ref(emptyForm())
 
 // Derive slug from English name: "Jo Malone" → "jo-malone"

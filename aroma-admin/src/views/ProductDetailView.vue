@@ -393,7 +393,7 @@ onMounted(load)
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0">
             <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">
-              {{ product.category ?? product.brand ?? 'Perfume' }} · EDP
+              {{ product.category ?? product.brand ?? t('productDetail.categoryFallback') }} · EDP
             </p>
             <h1 class="font-display text-[26px] leading-tight mt-1 text-dash-text">
               {{ product.name_en ?? product.name ?? product.slug }}

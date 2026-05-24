@@ -1,6 +1,7 @@
 <!-- aroma-admin/src/views/HomepageView.vue -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   apiGetHomepage, apiUpdateHero, apiAddBlock,
   apiUpdateBlock, apiDeleteBlock, apiReorderBlocks,
@@ -10,6 +11,8 @@ import type { HomepageConfig, HomepageBlock, NewBlockPayload } from '../types'
 import HeroEditor  from '../components/homepage/HeroEditor.vue'
 import BlockList   from '../components/homepage/BlockList.vue'
 import BlockEditor from '../components/homepage/BlockEditor.vue'
+
+const { t } = useI18n()
 
 const config       = ref<HomepageConfig | null>(null)
 const loading      = ref(true)
@@ -39,7 +42,7 @@ async function load() {
     logoUrl.value = homepageRes.data.logo_url ?? null
     brands.value = brandsRes.data.map((b) => ({ id: b.id, name: b.name }))
   } catch {
-    loadError.value = 'Failed to load homepage config.'
+    loadError.value = t('homepage.loadFailed')
   } finally {
     loading.value = false
   }
@@ -69,7 +72,7 @@ async function saveHero() {
     heroSuccess.value = true
     setTimeout(() => { heroSuccess.value = false }, 3000)
   } catch {
-    heroError.value = 'Failed to save hero. Please try again.'
+    heroError.value = t('homepage.heroSaveFailed')
   } finally {
     heroSaving.value = false
   }
@@ -95,7 +98,7 @@ async function onToggleBlock(block: HomepageBlock) {
 
 async function onDeleteBlock(block: HomepageBlock) {
   if (!config.value) return
-  if (!confirm('Delete this block?')) return
+  if (!confirm(t('homepage.deleteBlockConfirm'))) return
   try {
     await apiDeleteBlock(block.id)
     config.value.blocks = config.value.blocks.filter(b => b.id !== block.id)
@@ -117,7 +120,7 @@ async function onSaveBlock(payload: Partial<HomepageBlock> | NewBlockPayload) {
     }
     editorOpen.value = false
   } catch {
-    blockError.value = 'Failed to save block.'
+    blockError.value = t('homepage.saveBlockFailed')
   } finally {
     blockSaving.value = false
   }
@@ -144,36 +147,36 @@ async function onUploadLogo(event: Event) {
     const res = await apiUploadLogo(file)
     logoUrl.value = res.data.logo_url
   } catch {
-    logoError.value = 'Failed to upload logo. Please try again.'
+    logoError.value = t('homepage.uploadLogoFailed')
   } finally {
     logoUploading.value = false
   }
 }
 
 async function onDeleteLogo() {
-  if (!confirm('Remove the logo?')) return
+  if (!confirm(t('homepage.removeLogoConfirm'))) return
   logoError.value = ''
   try {
     await apiDeleteLogo()
     logoUrl.value = null
   } catch {
-    logoError.value = 'Failed to remove logo.'
+    logoError.value = t('homepage.removeLogoFailed')
   }
 }
 </script>
 
 <template>
   <div class="p-6 max-w-3xl mx-auto space-y-6">
-    <h1 class="text-[18px] font-semibold text-dash-text">Homepage Editor</h1>
+    <h1 class="text-[18px] font-semibold text-dash-text">{{ t('homepage.title') }}</h1>
 
     <p v-if="loadError" class="text-xs text-dash-danger">{{ loadError }}</p>
-    <div v-if="loading" class="text-dash-muted text-[13px]">Loading…</div>
+    <div v-if="loading" class="text-dash-muted text-[13px]">{{ t('common.loading') }}</div>
 
     <template v-else-if="config">
       <!-- Logo -->
       <div class="rounded-lg border border-dash-border bg-dash-paper p-4 space-y-3">
         <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-dash-faint">
-          Store Logo
+          {{ t('homepage.storeLogo') }}
         </p>
 
         <!-- Preview -->
@@ -187,7 +190,7 @@ async function onDeleteLogo() {
             alt="Store logo"
             class="max-w-full max-h-full object-contain"
           />
-          <span v-else class="text-[11px] text-dash-faint">No logo</span>
+          <span v-else class="text-[11px] text-dash-faint">{{ t('homepage.noLogo') }}</span>
         </div>
 
         <!-- Actions -->
@@ -197,7 +200,7 @@ async function onDeleteLogo() {
                    text-white hover:opacity-90 transition-opacity"
             :class="{ 'opacity-60 pointer-events-none': logoUploading }"
           >
-            {{ logoUploading ? 'Uploading…' : 'Upload logo' }}
+            {{ logoUploading ? t('homepage.uploading') : t('homepage.uploadLogo') }}
             <input
               type="file"
               accept="image/*"
@@ -213,7 +216,7 @@ async function onDeleteLogo() {
             class="px-3 py-1.5 rounded text-[12px] font-medium text-dash-danger border
                    border-dash-danger hover:bg-dash-danger hover:text-white transition-colors"
           >
-            Remove
+            {{ t('homepage.removeLogo') }}
           </button>
         </div>
 
@@ -229,14 +232,14 @@ async function onDeleteLogo() {
           @save="saveHero"
           @remove-image="onRemoveHeroImage"
         />
-        <p v-if="heroSuccess" class="text-xs text-green-600 text-right">Hero saved ✓</p>
+        <p v-if="heroSuccess" class="text-xs text-green-600 text-right">{{ t('homepage.heroSaved') }}</p>
         <p v-if="heroError" class="text-xs text-dash-danger text-right">{{ heroError }}</p>
       </div>
 
       <!-- Block list -->
       <div>
         <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-dash-faint mb-3">
-          Page Blocks — drag to reorder
+          {{ t('homepage.pageBlocks') }}
         </p>
         <BlockList
           :blocks="config.blocks"

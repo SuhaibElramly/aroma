@@ -1,12 +1,15 @@
 <!-- aroma-admin/src/components/homepage/BlockList.vue -->
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 import type { HomepageBlock } from '../../types'
 import {
   Trophy, Sparkles, Tag, LayoutGrid, BadgePercent,
   GripVertical, Pencil, Trash2,
 } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   blocks: HomepageBlock[]
@@ -29,12 +32,13 @@ const ICONS: Record<string, any> = {
   featured_brand: Tag,
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  bestsellers:    'Bestsellers',
-  new_arrivals:   'New Arrivals',
-  offers:         'Offers',
-  categories:     'Categories',
-  featured_brand: 'Featured Brand',
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  bestsellers:    'homepage.blockTypes.bestsellers',
+  new_arrivals:   'homepage.blockTypes.newArrivals',
+  offers:         'homepage.blockTypes.offers',
+  categories:     'homepage.blockTypes.categories',
+  featured_brand: 'homepage.blockTypes.featuredBrand',
+  curated:        'homepage.blockTypes.curated',
 }
 
 const list = computed({
@@ -44,13 +48,13 @@ const list = computed({
 
 function blockMeta(block: HomepageBlock): string {
   if (['bestsellers', 'new_arrivals', 'offers'].includes(block.type)) {
-    return `Showing ${block.config.limit ?? '?'} products`
+    return t('homepage.blockList.showingProducts', { n: block.config.limit ?? '?' })
   }
   if (block.type === 'featured_brand') {
     const brand = props.brands?.find(b => b.id === block.config.brand_id)
-    return brand?.name ?? block.config.brand_id ?? 'No brand selected'
+    return brand?.name ?? block.config.brand_id ?? t('homepage.blockList.noBrandSelected')
   }
-  if (block.type === 'categories') return 'All categories'
+  if (block.type === 'categories') return t('homepage.blockList.allCategories')
   return ''
 }
 </script>
@@ -79,7 +83,7 @@ function blockMeta(block: HomepageBlock): string {
           <!-- Info -->
           <div class="flex-1 min-w-0">
             <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-dash-muted">
-              {{ TYPE_LABELS[block.type] }}
+              {{ TYPE_LABEL_KEYS[block.type] ? t(TYPE_LABEL_KEYS[block.type]) : '' }}
             </p>
             <p class="text-[13px] text-dash-text truncate" dir="rtl">
               {{ block.config.title || '—' }}
@@ -130,7 +134,7 @@ function blockMeta(block: HomepageBlock): string {
              text-dash-muted hover:border-dash-primary hover:text-dash-primary transition-colors
              flex items-center justify-center gap-1.5"
     >
-      + Add Block
+      {{ t('homepage.blockList.addBlock') }}
     </button>
   </div>
 </template>

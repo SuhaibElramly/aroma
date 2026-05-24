@@ -1,11 +1,14 @@
 <!-- aroma-admin/src/components/homepage/BlockEditor.vue -->
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { HomepageBlock, HomepageBlockType, NewBlockPayload } from '../../types'
 import AInput from '../ui/AInput.vue'
 import AButton from '../ui/AButton.vue'
 import ASelect from '../ui/ASelect.vue'
 import ProductPicker from './ProductPicker.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   open: boolean
@@ -20,14 +23,14 @@ const emit = defineEmits<{
   save: [payload: Partial<HomepageBlock> | NewBlockPayload]
 }>()
 
-const BLOCK_TYPES: { value: HomepageBlockType; label: string }[] = [
-  { value: 'bestsellers',    label: 'Bestsellers' },
-  { value: 'new_arrivals',   label: 'New Arrivals' },
-  { value: 'offers',         label: 'Offers' },
-  { value: 'categories',     label: 'Categories' },
-  { value: 'featured_brand', label: 'Featured Brand' },
-  { value: 'curated', label: 'Curated (manual pick)' },
-]
+const BLOCK_TYPES = computed<{ value: HomepageBlockType; label: string }[]>(() => [
+  { value: 'bestsellers',    label: t('homepage.blockTypes.bestsellers') },
+  { value: 'new_arrivals',   label: t('homepage.blockTypes.newArrivals') },
+  { value: 'offers',         label: t('homepage.blockTypes.offers') },
+  { value: 'categories',     label: t('homepage.blockTypes.categories') },
+  { value: 'featured_brand', label: t('homepage.blockTypes.featuredBrand') },
+  { value: 'curated',        label: t('homepage.blockTypes.curated') },
+])
 
 const type    = ref<HomepageBlockType>('bestsellers')
 const label   = ref('')
@@ -96,7 +99,7 @@ function submit() {
         <!-- Header -->
         <div class="px-5 py-4 border-b border-dash-border flex items-center justify-between">
           <h3 class="text-[14px] font-semibold text-dash-text">
-            {{ isNew ? 'Add Block' : 'Edit Block' }}
+            {{ isNew ? t('homepage.blockEditor.addBlock') : t('homepage.blockEditor.editBlock') }}
           </h3>
           <button @click="emit('close')" class="text-dash-muted hover:text-dash-text transition-colors text-lg">✕</button>
         </div>
@@ -106,20 +109,20 @@ function submit() {
           <!-- Type selector (only for new blocks) -->
           <ASelect
             v-if="isNew"
-            label="Block Type"
+            :label="t('homepage.blockEditor.blockType')"
             :model-value="type"
-            :options="BLOCK_TYPES.map(t => ({ value: t.value, label: t.label }))"
+            :options="BLOCK_TYPES.map(b => ({ value: b.value, label: b.label }))"
             @update:model-value="type = $event as HomepageBlockType"
           />
 
           <AInput
-            label="Label (small uppercase above title)"
+            :label="t('homepage.blockEditor.label')"
             dir="rtl"
             v-model="label"
           />
 
           <AInput
-            label="Title"
+            :label="t('homepage.blockEditor.blockTitle')"
             dir="rtl"
             v-model="title"
           />
@@ -127,7 +130,7 @@ function submit() {
           <!-- Product limit (for product blocks) -->
           <div v-if="['bestsellers', 'new_arrivals', 'offers'].includes(type)">
             <label class="block text-[11px] font-medium text-dash-muted uppercase tracking-wide mb-1">
-              Products to show (1–12)
+              {{ t('homepage.blockEditor.productLimit12') }}
             </label>
             <input
               type="number"
@@ -141,14 +144,14 @@ function submit() {
           <!-- Featured brand fields -->
           <template v-if="type === 'featured_brand'">
             <ASelect
-              label="Brand"
+              :label="t('homepage.blockEditor.brand')"
               :model-value="brandId"
               :options="brands.map(b => ({ value: b.id, label: b.name }))"
               @update:model-value="brandId = $event"
             />
             <div>
               <label class="block text-[11px] font-medium text-dash-muted uppercase tracking-wide mb-1">
-                Products to show (1–4)
+                {{ t('homepage.blockEditor.productLimit4') }}
               </label>
               <input
                 type="number"
@@ -181,7 +184,7 @@ function submit() {
                 :class="enabled ? 'left-[22px]' : 'left-0.5'"
               />
             </button>
-            <span class="text-[13px] text-dash-text">{{ enabled ? 'Visible' : 'Hidden' }}</span>
+            <span class="text-[13px] text-dash-text">{{ enabled ? t('homepage.blockEditor.visible') : t('homepage.blockEditor.hidden') }}</span>
           </div>
         </div>
 
@@ -189,9 +192,9 @@ function submit() {
         <div class="px-5 py-4 border-t border-dash-border space-y-2">
           <p v-if="error" class="text-xs text-dash-danger">{{ error }}</p>
           <div class="flex gap-2 justify-end">
-            <AButton variant="ghost" @click="emit('close')">Cancel</AButton>
+            <AButton variant="ghost" @click="emit('close')">{{ t('homepage.blockEditor.cancel') }}</AButton>
             <AButton :loading="saving" @click="submit">
-              {{ isNew ? 'Add Block' : 'Save Changes' }}
+              {{ isNew ? t('homepage.blockEditor.addBlock') : t('homepage.blockEditor.saveChanges') }}
             </AButton>
           </div>
         </div>

@@ -1,9 +1,12 @@
 <!-- aroma-admin/src/components/homepage/HeroEditor.vue -->
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { HeroConfig } from '../../types'
 import AInput from '../ui/AInput.vue'
 import AButton from '../ui/AButton.vue'
+
+const { t } = useI18n()
 
 defineProps<{
   modelValue: HeroConfig
@@ -37,17 +40,17 @@ defineExpose({ imageFile })
 
 <template>
   <div class="rounded-lg border border-dash-border bg-dash-paper-2 p-5 space-y-4">
-    <h2 class="text-[13px] font-semibold text-dash-text mb-1">Hero Section</h2>
+    <h2 class="text-[13px] font-semibold text-dash-text mb-1">{{ t('homepage.hero.sectionTitle') }}</h2>
 
     <div class="grid grid-cols-2 gap-3">
       <AInput
-        label="Headline"
+        :label="t('homepage.hero.headline')"
         dir="rtl"
         :model-value="modelValue.headline"
         @update:model-value="emit('update:modelValue', { ...modelValue, headline: $event })"
       />
       <AInput
-        label="Subtext"
+        :label="t('homepage.hero.subtext')"
         dir="rtl"
         :model-value="modelValue.subtext"
         @update:model-value="emit('update:modelValue', { ...modelValue, subtext: $event })"
@@ -56,13 +59,13 @@ defineExpose({ imageFile })
 
     <div class="grid grid-cols-2 gap-3">
       <AInput
-        label="Primary CTA — Label"
+        :label="t('homepage.hero.primaryCtaLabel')"
         dir="rtl"
         :model-value="modelValue.cta_primary_label"
         @update:model-value="emit('update:modelValue', { ...modelValue, cta_primary_label: $event })"
       />
       <AInput
-        label="Primary CTA — URL"
+        :label="t('homepage.hero.primaryCtaUrl')"
         :model-value="modelValue.cta_primary_url"
         @update:model-value="emit('update:modelValue', { ...modelValue, cta_primary_url: $event })"
       />
@@ -70,13 +73,13 @@ defineExpose({ imageFile })
 
     <div class="grid grid-cols-2 gap-3">
       <AInput
-        label="Secondary CTA — Label"
+        :label="t('homepage.hero.secondaryCtaLabel')"
         dir="rtl"
         :model-value="modelValue.cta_secondary_label"
         @update:model-value="emit('update:modelValue', { ...modelValue, cta_secondary_label: $event })"
       />
       <AInput
-        label="Secondary CTA — URL"
+        :label="t('homepage.hero.secondaryCtaUrl')"
         :model-value="modelValue.cta_secondary_url"
         @update:model-value="emit('update:modelValue', { ...modelValue, cta_secondary_url: $event })"
       />
@@ -84,7 +87,7 @@ defineExpose({ imageFile })
 
     <!-- Hero image -->
     <div>
-      <p class="text-[11px] font-medium text-dash-muted mb-2 uppercase tracking-wide">Hero Image</p>
+      <p class="text-[11px] font-medium text-dash-muted mb-2 uppercase tracking-wide">{{ t('homepage.hero.heroImage') }}</p>
       <div v-if="imagePreview || modelValue.bg_image_path" class="relative w-48 h-28 rounded overflow-hidden mb-2">
         <img
           :src="imagePreview ?? '/storage/' + modelValue.bg_image_path"
@@ -96,20 +99,20 @@ defineExpose({ imageFile })
           @click="removeImage"
           class="absolute top-1 right-1 bg-black/60 text-white rounded px-1.5 py-0.5 text-[10px]"
         >
-          Remove
+          {{ t('homepage.hero.removeImage') }}
         </button>
       </div>
       <label class="flex items-center gap-2 cursor-pointer">
         <span class="text-[12px] px-3 py-1.5 rounded border border-dash-border bg-dash-paper text-dash-text hover:bg-dash-bg transition-colors">
-          {{ imagePreview || modelValue.bg_image_path ? 'Replace image' : 'Upload image' }}
+          {{ imagePreview || modelValue.bg_image_path ? t('homepage.hero.replaceImage') : t('homepage.hero.uploadImage') }}
         </span>
-        <span class="text-[11px] text-dash-muted">Replaces animated bottle. Leave empty to keep default.</span>
+        <span class="text-[11px] text-dash-muted">{{ t('homepage.hero.imageHint') }}</span>
         <input type="file" accept="image/*" class="hidden" @change="onFileChange" />
       </label>
     </div>
 
     <div class="flex justify-end pt-1">
-      <AButton :loading="saving" @click="emit('save')">Save Hero</AButton>
+      <AButton :loading="saving" @click="emit('save')">{{ t('homepage.hero.saveHero') }}</AButton>
     </div>
   </div>
 </template>

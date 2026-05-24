@@ -556,7 +556,7 @@ onMounted(async () => {
     adminNote.value = order.value.adminNote ?? ''
     await loadPayments()
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Failed to load order.'
+    error.value = e instanceof Error ? e.message : t('orderDetail.loadFailed')
   } finally {
     loading.value = false
   }

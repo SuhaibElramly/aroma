@@ -16,13 +16,13 @@
         :value="stats ? Number(stats.totalRevenue).toLocaleString('en', { maximumFractionDigits: 0 }) : '—'"
         suffix="LYD"
         :change="stats?.revenueChange ?? undefined"
-        hint="vs last month"
+        :hint="t('dashboard.vsLastMonth')"
       />
       <AStatCard
         :label="t('dashboard.grossProfit')"
         :value="stats ? stats.grossProfit.toLocaleString('en', { maximumFractionDigits: 0 }) : '—'"
         suffix="LYD"
-        :hint="stats ? `${stats.avgMargin}% margin` : undefined"
+        :hint="stats ? t('dashboard.marginSuffix', { n: stats.avgMargin }) : undefined"
       />
       <AStatCard
         :label="t('dashboard.avgMargin')"
@@ -32,9 +32,9 @@
       <AStatCard
         :label="t('dashboard.totalOrders')"
         :value="stats?.totalOrders ?? '—'"
-        suffix="orders"
+        :suffix="t('dashboard.ordersSuffix')"
         :change="stats?.ordersChange ?? undefined"
-        hint="this month"
+        :hint="t('dashboard.thisMonthHint')"
       />
     </div>
 
@@ -64,27 +64,27 @@
               <span class="font-display text-[28px] leading-none tabular-nums text-dash-text">
                 {{ stats ? (stats.grossProfit / 1000).toFixed(1) + 'k' : '—' }}
               </span>
-              <span class="text-[12.5px] font-medium text-dash-muted">LYD gross profit · 30 days</span>
+              <span class="text-[12.5px] font-medium text-dash-muted">{{ t('dashboard.grossProfitSubtitle') }}</span>
               <span
                 v-if="stats"
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-dash-success-lt text-dash-success-dk"
               >
-                {{ stats.avgMargin }}% margin
+                {{ t('dashboard.marginSuffix', { n: stats.avgMargin }) }}
               </span>
             </div>
           </div>
           <div class="flex items-center gap-4 text-[11px] shrink-0">
             <span class="flex items-center gap-1.5">
               <span class="h-2 w-2 rounded-full bg-dash-primary" />
-              <span class="text-dash-muted">Revenue</span>
+              <span class="text-dash-muted">{{ t('dashboard.legendRevenue') }}</span>
             </span>
             <span class="flex items-center gap-1.5">
               <span class="h-2 w-2 rounded-full bg-dash-success" />
-              <span class="text-dash-muted">Profit</span>
+              <span class="text-dash-muted">{{ t('dashboard.legendProfit') }}</span>
             </span>
             <span class="flex items-center gap-1.5">
               <span class="h-2 w-2 rounded-full bg-dash-border border border-dash-border" />
-              <span class="text-dash-muted">Cost</span>
+              <span class="text-dash-muted">{{ t('dashboard.legendCost') }}</span>
             </span>
           </div>
         </div>
@@ -247,7 +247,7 @@
             <p class="text-[11px] tracking-[.16em] uppercase font-semibold text-dash-faint whitespace-nowrap">{{ t('dashboard.topProducts') }}</p>
             <h3 class="font-display text-[18px] leading-tight mt-0.5 text-dash-text">{{ t('dashboard.byCategory') }}</h3>
           </div>
-          <span class="text-[11px] text-dash-muted shrink-0">last 30 days</span>
+          <span class="text-[11px] text-dash-muted shrink-0">{{ t('dashboard.last30Days') }}</span>
         </div>
 
         <div v-if="stats?.categoryBreakdown?.length" class="mt-4 -mx-1">
@@ -262,7 +262,7 @@
             <div class="flex-1 min-w-0">
               <p class="text-[12.5px] font-semibold text-dash-text truncate">{{ cat.category }}</p>
               <p class="text-[10.5px] text-dash-muted tabular-nums">
-                {{ cat.revenue.toLocaleString('en', { maximumFractionDigits: 0 }) }} LYD revenue
+                {{ cat.revenue.toLocaleString('en', { maximumFractionDigits: 0 }) }} {{ t('dashboard.revenueSuffix') }}
               </p>
             </div>
             <div class="text-end whitespace-nowrap">
@@ -274,21 +274,21 @@
                 class="text-[10.5px] tabular-nums font-medium"
                 :class="cat.margin >= 0 ? 'text-dash-success-dk' : 'text-dash-danger'"
               >
-                {{ cat.margin }}% margin
+                {{ t('dashboard.marginSuffix', { n: cat.margin }) }}
               </p>
             </div>
           </div>
         </div>
         <div v-else class="mt-6 text-center">
-          <AEmptyState :icon="Package" heading="No data yet" />
+          <AEmptyState :icon="Package" :heading="t('dashboard.noData')" />
         </div>
       </div>
     </div>
 
     <!-- Footer strip -->
     <div class="pt-2 flex items-center justify-between text-[11px] text-dash-faint">
-      <span>Aroma Admin</span>
-      <span>Benghazi · Libya</span>
+      <span>{{ t('dashboard.brandFooter') }}</span>
+      <span>{{ t('dashboard.brandLocation') }}</span>
     </div>
 
   </div>

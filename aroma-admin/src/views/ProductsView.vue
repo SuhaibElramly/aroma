@@ -369,8 +369,8 @@ function isLow(_p: AdminProduct): boolean {
 }
 
 function stockLabel(p: AdminProduct): string {
-  if (isOut(p)) return 'Out of stock'
-  return 'In stock'
+  if (isOut(p)) return t('products.outOfStock')
+  return t('products.inStock')
 }
 
 function stockChipClass(p: AdminProduct): string {

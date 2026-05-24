@@ -50,7 +50,7 @@
             boxShadow: activeSegment === seg ? '0 1px 2px rgba(0,0,0,.05)' : 'none'
           }"
           @click="activeSegment = seg"
-        >{{ seg }}</button>
+        >{{ t(segmentLabelKey[seg]) }}</button>
       </div>
     </div>
 
@@ -142,6 +142,13 @@ const maxOrders  = ref('')
 // ── Segment filter ────────────────────────────────────────────────────
 const segments = ['All', 'VIP', 'Loyal', 'New', 'Lapsed'] as const
 const activeSegment = ref<string>('All')
+const segmentLabelKey: Record<string, string> = {
+  All:    'userSegments.all',
+  VIP:    'userSegments.vip',
+  Loyal:  'userSegments.loyal',
+  New:    'userSegments.new',
+  Lapsed: 'userSegments.lapsed',
+}
 
 // ── Design helpers ────────────────────────────────────────────────────
 function initials(name: string): string {

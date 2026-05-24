@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ShoppingBag, Package, Star, Ticket } from 'lucide-vue-next'
 import { useNotificationsStore } from '../stores/notifications'
 import type { NotifKind, AdminNotification } from '../types'
 
+const { t } = useI18n()
 const notif  = useNotificationsStore()
 const router = useRouter()
 
@@ -37,18 +39,18 @@ const notifHueMap: Record<NotifKind, number> = {
 <template>
   <div class="max-w-2xl mx-auto space-y-1">
     <div class="flex items-center justify-between mb-4">
-      <p class="text-[13px] text-dash-muted">{{ notif.unreadCount }} unread</p>
+      <p class="text-[13px] text-dash-muted">{{ t('notifications.unread', { n: notif.unreadCount }) }}</p>
       <button
         v-if="notif.unreadCount > 0"
         @click="notif.markAllRead()"
         class="text-[12px] font-medium text-dash-primary-dk hover:underline"
       >
-        Mark all read
+        {{ t('notifications.markAllRead') }}
       </button>
     </div>
 
     <div v-if="notif.notifications.length === 0" class="text-center py-16 text-dash-muted text-[13px]">
-      No notifications yet.
+      {{ t('notifications.empty') }}
     </div>
 
     <div

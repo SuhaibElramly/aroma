@@ -8,24 +8,24 @@
     <!-- KPI strip -->
     <div class="grid grid-cols-4 gap-4">
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Spec types</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('specTypes.kpiSpecTypes') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ specTypes.length }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">reusable across catalog</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('specTypes.kpiSpecTypesSub') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Total values</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('specTypes.kpiTotalValues') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">—</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">across all specs</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('specTypes.kpiTotalValuesSub') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">Linked products</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('specTypes.kpiLinkedProducts') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ specTypes.reduce((s, t) => s + (t.productCount ?? 0), 0) }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">products tagged</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('specTypes.kpiLinkedProductsSub') }}</p>
       </div>
       <div class="bg-dash-paper border border-dash-border rounded-card p-5 shadow-[0_1px_0_oklch(26%_0.04_250/0.025)]">
-        <p class="text-[12px] font-medium text-dash-muted">With units</p>
+        <p class="text-[12px] font-medium text-dash-muted">{{ t('specTypes.kpiWithUnits') }}</p>
         <p class="font-display text-[28px] mt-2 leading-none text-dash-text">{{ specTypes.filter(s => s.unit).length }}</p>
-        <p class="text-[11.5px] mt-2 text-dash-muted">e.g. ml, h</p>
+        <p class="text-[11.5px] mt-2 text-dash-muted">{{ t('specTypes.kpiWithUnitsSub') }}</p>
       </div>
     </div>
 
@@ -35,7 +35,7 @@
         <svg class="absolute start-3 top-1/2 -translate-y-1/2 text-dash-faint" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input
           v-model="searchQuery"
-          placeholder="Search spec types…"
+          :placeholder="t('specTypes.searchPlaceholder')"
           class="w-full rounded-lg border border-dash-border bg-dash-paper-2 ps-9 pe-3 py-2 text-[13px] outline-none text-dash-text focus:border-dash-primary transition-colors"
         />
       </div>
@@ -67,7 +67,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-[13px] font-medium text-dash-text truncate">{{ spec.name }}</p>
-              <p class="text-[10.5px] text-dash-faint mt-0.5">{{ spec.productCount }} products</p>
+              <p class="text-[10.5px] text-dash-faint mt-0.5">{{ spec.productCount }} {{ t('specTypes.productsLabel') }}</p>
             </div>
             <!-- Unit chip -->
             <span v-if="spec.unit" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-dash-paper-2 border border-dash-border-lt text-dash-muted shrink-0">
@@ -87,8 +87,8 @@
           <div class="h-12 w-12 rounded-xl bg-dash-paper-2 border border-dash-border-lt flex items-center justify-center mb-3">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="text-dash-faint"><path d="M4 6h10"/><path d="M4 12h6"/><path d="M4 18h12"/><circle cx="17" cy="6" r="2"/><circle cx="13" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg>
           </div>
-          <p class="text-[13px] font-medium text-dash-text">Select a spec type to view details</p>
-          <p class="text-[12px] text-dash-muted mt-1">Choose from the list on the left</p>
+          <p class="text-[13px] font-medium text-dash-text">{{ t('specTypes.selectPrompt') }}</p>
+          <p class="text-[12px] text-dash-muted mt-1">{{ t('specTypes.selectPromptSub') }}</p>
         </div>
 
         <!-- Detail panel -->
@@ -96,9 +96,9 @@
           <!-- Header -->
           <div class="flex items-start justify-between gap-4">
             <div>
-              <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">Spec type</p>
+              <p class="text-[10.5px] tracking-[.16em] uppercase font-semibold text-dash-faint">{{ t('specTypes.specTypeLabel') }}</p>
               <h2 class="font-display text-[22px] leading-tight mt-0.5 text-dash-text">{{ selectedSpec.name }}</h2>
-              <p v-if="selectedSpec.unit" class="text-[12px] text-dash-muted mt-0.5">Unit: <span class="font-medium text-dash-text">{{ selectedSpec.unit }}</span></p>
+              <p v-if="selectedSpec.unit" class="text-[12px] text-dash-muted mt-0.5">{{ t('specTypes.unitPrefix') }} <span class="font-medium text-dash-text">{{ selectedSpec.unit }}</span></p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <button
@@ -117,16 +117,16 @@
           <!-- Stats row -->
           <div class="flex gap-4">
             <div class="bg-dash-paper-2 border border-dash-border-lt rounded-card px-4 py-3">
-              <p class="text-[10.5px] text-dash-muted">Products</p>
+              <p class="text-[10.5px] text-dash-muted">{{ t('specTypes.productsColLabel') }}</p>
               <p class="font-display text-[20px] text-dash-text leading-none mt-1">{{ selectedSpec.productCount }}</p>
             </div>
           </div>
 
           <!-- Values section -->
           <div>
-            <p class="text-[10.5px] tracking-[.14em] uppercase font-semibold text-dash-faint mb-3">Values</p>
+            <p class="text-[10.5px] tracking-[.14em] uppercase font-semibold text-dash-faint mb-3">{{ t('specTypes.valuesLabel') }}</p>
             <div v-if="selectedSpec" class="flex flex-wrap gap-2 mb-4">
-              <p v-if="specTypeValues.length === 0" class="text-[12px] text-dash-muted italic">No values yet.</p>
+              <p v-if="specTypeValues.length === 0" class="text-[12px] text-dash-muted italic">{{ t('specTypes.noValuesYet') }}</p>
               <span
                 v-for="val in specTypeValues"
                 :key="val"
@@ -145,14 +145,14 @@
             <div class="flex items-center gap-2">
               <input
                 v-model="newValueInput"
-                :placeholder="t('specTypes.form.unitPlaceholder') || 'Add a new value…'"
+                :placeholder="t('specTypes.addValuePlaceholder')"
                 class="flex-1 rounded-lg border border-dash-border bg-dash-paper-2 px-3 py-2 text-[13px] outline-none text-dash-text focus:border-dash-primary transition-colors"
                 @keydown.enter.prevent="addValue"
               />
               <button
                 class="h-9 px-3 rounded-lg text-[12px] font-medium bg-dash-text text-white hover:opacity-90 transition-opacity"
                 @click="addValue"
-              >Add</button>
+              >{{ t('specTypes.addValueBtn') }}</button>
             </div>
           </div>
         </div>
