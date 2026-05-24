@@ -456,6 +456,7 @@ const ar = {
     done: 'تم',
     variantsAndImages: 'المتغيرات والصور',
     imagesSection: 'الصور',
+    specsSection: 'المواصفات',
     clickToSetThumbnail: 'انقر على أي صورة لتعيينها كصورة مصغرة',
     imagesUploaded: '{count} صورة مرفوعة | {count} صور مرفوعة',
     upload: 'رفع',

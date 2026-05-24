@@ -454,6 +454,7 @@ const en = {
     done: 'Done',
     variantsAndImages: 'Variants & Images',
     imagesSection: 'Images',
+    specsSection: 'Specs',
     clickToSetThumbnail: 'Click any image to set as thumbnail',
     imagesUploaded: '{count} image uploaded | {count} images uploaded',
     upload: 'Upload',
