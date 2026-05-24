@@ -5,6 +5,7 @@ import type { HomepageBlock, HomepageBlockType, NewBlockPayload } from '../../ty
 import AInput from '../ui/AInput.vue'
 import AButton from '../ui/AButton.vue'
 import ASelect from '../ui/ASelect.vue'
+import ProductPicker from './ProductPicker.vue'
 
 const props = defineProps<{
   open: boolean
@@ -25,6 +26,7 @@ const BLOCK_TYPES: { value: HomepageBlockType; label: string }[] = [
   { value: 'offers',         label: 'Offers' },
   { value: 'categories',     label: 'Categories' },
   { value: 'featured_brand', label: 'Featured Brand' },
+  { value: 'curated', label: 'Curated (manual pick)' },
 ]
 
 const type    = ref<HomepageBlockType>('bestsellers')
@@ -34,6 +36,7 @@ const limit   = ref(3)
 const brandId = ref('')
 const productLimit = ref(2)
 const enabled = ref(true)
+const productIds = ref<number[]>([])
 
 const isNew = computed(() => !props.block)
 
@@ -46,12 +49,14 @@ watch(() => props.block, (b) => {
     brandId.value      = b.config.brand_id      ?? ''
     productLimit.value = b.config.product_limit ?? 2
     enabled.value      = b.enabled
+    productIds.value   = b.config.product_ids ?? []
   } else {
     type.value = 'bestsellers'
     label.value = title.value = brandId.value = ''
     limit.value = 3
     productLimit.value = 2
     enabled.value = true
+    productIds.value = []
   }
 }, { immediate: true })
 
@@ -65,6 +70,10 @@ function submit() {
   if (type.value === 'featured_brand') {
     config.brand_id      = brandId.value
     config.product_limit = productLimit.value
+  }
+
+  if (type.value === 'curated') {
+    config.product_ids = productIds.value
   }
 
   if (isNew.value) {
@@ -150,6 +159,12 @@ function submit() {
               />
             </div>
           </template>
+
+          <!-- Curated fields -->
+          <ProductPicker
+            v-if="type === 'curated'"
+            v-model="productIds"
+          />
 
           <!-- Enabled toggle -->
           <div class="flex items-center gap-3 pt-1">
