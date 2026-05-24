@@ -36,7 +36,7 @@ const groups = computed(() => {
         { key: 'dashboard',  label: t('nav.dashboard'),  icon: LayoutDashboard, path: 'dashboard',  badge: null },
         c('orders')    && { key: 'orders',     label: t('nav.orders'),    icon: ShoppingBag, path: 'orders',     badge: null },
         c('customers') && { key: 'users',      label: t('nav.customers'), icon: Users,       path: 'users',      badge: null },
-      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
+      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: null } => Boolean(x)),
     },
     {
       label: t('nav.catalog'),
@@ -46,7 +46,7 @@ const groups = computed(() => {
         c('brands')   && { key: 'brands',     label: t('nav.brands'),    icon: Tag,               path: 'brands',     badge: null },
         c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null }, // shares brands permission — no separate ROLE_PERMS key
         c('coupons')  && { key: 'coupons',    label: t('nav.coupons'),   icon: Ticket,            path: 'coupons',    badge: null },
-      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: string | null } => Boolean(x)),
+      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: null } => Boolean(x)),
     },
     {
       label: t('nav.storefront'),
@@ -60,7 +60,7 @@ const groups = computed(() => {
         { key: 'admins', label: t('nav.admins'), icon: ShieldCheck, path: 'admins', badge: null },
       ],
     } : null,
-  ].filter((g): g is { label: string; items: { key: string; label: string; icon: any; path: string; badge: string | null }[] } => Boolean(g))
+  ].filter((g): g is { label: string; items: { key: string; label: string; icon: any; path: string; badge: null }[] } => Boolean(g))
 })
 
 const userInitials = computed(() => {

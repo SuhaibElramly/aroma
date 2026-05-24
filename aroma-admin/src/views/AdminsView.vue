@@ -3,7 +3,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import type { AdminMember, AdminRole } from '../types'
+import type { AdminMember } from '../types'
 import {
   apiGetAdmins,
   apiCreateAdmin,

@@ -18,7 +18,7 @@ export interface PageMeta {
 }
 
 // ── Notifications ─────────────────────────────────────────────────────
-export type NotifKind = 'order' | 'stock'
+export type NotifKind = 'order' | 'stock' | 'review' | 'coupon'
 
 export interface AdminNotification {
   id:    number
