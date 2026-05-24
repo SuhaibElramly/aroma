@@ -566,10 +566,8 @@ const en = {
     },
   },
   brandDetail: {
-    title: 'Brand Detail',
     loadError: 'Failed to load brand.',
     back: 'Back to Brands',
-    products: 'Products',
     noProducts: 'No products for this brand.',
     productsCount: 'Products',
     originLabel: 'Origin',

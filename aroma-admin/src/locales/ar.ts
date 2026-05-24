@@ -568,10 +568,8 @@ const ar = {
     },
   },
   brandDetail: {
-    title: 'تفاصيل العلامة التجارية',
     loadError: 'فشل تحميل العلامة التجارية.',
     back: 'العودة إلى العلامات التجارية',
-    products: 'المنتجات',
     noProducts: 'لا توجد منتجات لهذه العلامة التجارية.',
     productsCount: 'المنتجات',
     originLabel: 'البلد',
