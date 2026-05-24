@@ -11,10 +11,12 @@ return new class extends Migration {
             $table->boolean('is_default')->default(false)->after('low_stock_threshold');
         });
 
-        // Auto-promote the smallest variant of each product
+        // Auto-promote the smallest variant of each product.
+        // Use `true` (not `1`) so PostgreSQL's strict boolean typing accepts it;
+        // SQLite treats `true` as 1, so this works on both drivers.
         DB::statement("
             UPDATE product_variants
-            SET is_default = 1
+            SET is_default = true
             WHERE id IN (
                 SELECT MIN(id) FROM product_variants
                 GROUP BY product_id
