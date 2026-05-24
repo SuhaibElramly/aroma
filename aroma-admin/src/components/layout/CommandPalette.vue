@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -9,6 +9,8 @@ import {
 } from 'lucide-vue-next'
 import { useAuthStore } from '../../stores/auth'
 import { useCommandPalette } from '../../composables/useCommandPalette'
+import { apiGetProducts, apiGetUsers, apiGetBrands, apiGetOrders, apiGetCoupons } from '../../api/admin'
+import type { AdminProduct, AdminUserRow, AdminBrand, AdminOrder, AdminCoupon } from '../../types'
 
 type ResultKind = 'nav' | 'product' | 'user' | 'brand' | 'order' | 'coupon'
 
@@ -59,6 +61,95 @@ function matchesNav(item: NavItem, q: string): boolean {
   return item.label.toLowerCase().includes(q.toLowerCase())
 }
 
+const products = ref<AdminProduct[]>([])
+const users    = ref<AdminUserRow[]>([])
+const brands   = ref<AdminBrand[]>([])
+const orders   = ref<AdminOrder[]>([])
+const coupons  = ref<AdminCoupon[]>([])
+
+let abortCtrl: AbortController | null = null
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+function clearEntities() {
+  products.value = []
+  users.value    = []
+  brands.value   = []
+  orders.value   = []
+  coupons.value  = []
+}
+
+async function fetchEntities(q: string) {
+  if (abortCtrl) abortCtrl.abort()
+  abortCtrl = new AbortController()
+  const signal = abortCtrl.signal
+
+  const tasks: Promise<unknown>[] = []
+  const swallow = () => { /* surfacing inline errors in a search palette is noisier than it's worth */ }
+
+  if (auth.can('products', 'view')) {
+    tasks.push(
+      apiGetProducts({ search: q, page: 1 })
+        .then(r => { if (!signal.aborted) products.value = r.data.data.slice(0, 5) })
+        .catch(swallow)
+    )
+  }
+
+  if (auth.can('customers', 'view')) {
+    const userParams: { search?: string; phone?: string; page: number } = { page: 1 }
+    if (/^\d/.test(q)) userParams.phone  = q
+    else               userParams.search = q
+    tasks.push(
+      apiGetUsers(userParams)
+        .then(r => { if (!signal.aborted) users.value = r.data.data.slice(0, 5) })
+        .catch(swallow)
+    )
+  }
+
+  if (auth.can('brands', 'view')) {
+    tasks.push(
+      apiGetBrands({ name: q })
+        .then(r => { if (!signal.aborted) brands.value = r.data.slice(0, 3) })
+        .catch(swallow)
+    )
+  }
+
+  if (auth.can('orders', 'view')) {
+    const orderParams: { order_id?: string; phone?: string; page?: number } = { page: 1 }
+    if (q.toUpperCase().startsWith('ORD')) orderParams.order_id = q
+    else if (/^\d/.test(q))                orderParams.phone    = q
+    if (orderParams.order_id || orderParams.phone) {
+      tasks.push(
+        apiGetOrders(orderParams)
+          .then(r => { if (!signal.aborted) orders.value = r.data.data.slice(0, 3) })
+          .catch(swallow)
+      )
+    } else {
+      orders.value = []
+    }
+  }
+
+  if (auth.can('coupons', 'view')) {
+    tasks.push(
+      apiGetCoupons({ search: q })
+        .then(r => { if (!signal.aborted) coupons.value = r.data.slice(0, 3) })
+        .catch(swallow)
+    )
+  }
+
+  await Promise.all(tasks)
+}
+
+watch(query, (q) => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  const trimmed = q.trim()
+  if (trimmed.length < 2) {
+    if (abortCtrl) abortCtrl.abort()
+    clearEntities()
+    return
+  }
+  debounceTimer = setTimeout(() => fetchEntities(trimmed), 250)
+})
+
 const sections = computed<Section[]>(() => {
   const q = query.value.trim()
   const navMatching = q
@@ -73,8 +164,53 @@ const sections = computed<Section[]>(() => {
     })),
   }
 
-  const all: Section[] = [navSection]
-  return all.filter(s => s.items.length > 0)
+  const productSection: Section = {
+    key:   'products',
+    label: t('commandPalette.sectionProducts'),
+    items: products.value.map<Result>(p => ({
+      kind: 'product', id: String(p.id), label: p.name,
+      sub: p.brand || undefined, icon: Package, to: `/products/${p.id}`,
+    })),
+  }
+
+  const userSection: Section = {
+    key:   'users',
+    label: t('commandPalette.sectionUsers'),
+    items: users.value.map<Result>(u => ({
+      kind: 'user', id: String(u.id), label: u.name || u.phone || u.email || `#${u.id}`,
+      sub: u.phone || u.email || undefined, icon: Users, to: `/users/${u.id}`,
+    })),
+  }
+
+  const brandSection: Section = {
+    key:   'brands',
+    label: t('commandPalette.sectionBrands'),
+    items: brands.value.map<Result>(b => ({
+      kind: 'brand', id: String(b.id), label: b.name,
+      sub: b.origin ?? undefined, icon: Tag, to: `/brands/${b.id}`,
+    })),
+  }
+
+  const orderSection: Section = {
+    key:   'orders',
+    label: t('commandPalette.sectionOrders'),
+    items: orders.value.map<Result>(o => ({
+      kind: 'order', id: String(o.id), label: `#${o.id}`,
+      sub: o.status ?? undefined, icon: ShoppingBag, to: `/orders/${o.id}`,
+    })),
+  }
+
+  const couponSection: Section = {
+    key:   'coupons',
+    label: t('commandPalette.sectionCoupons'),
+    items: coupons.value.map<Result>(c => ({
+      kind: 'coupon', id: String(c.id), label: c.code,
+      sub: c.type, icon: Ticket, to: `/coupons`,
+    })),
+  }
+
+  return [navSection, productSection, userSection, orderSection, brandSection, couponSection]
+    .filter(s => s.items.length > 0)
 })
 
 const flatItems = computed<Result[]>(() => sections.value.flatMap(s => s.items))
@@ -128,8 +264,10 @@ watch(open, async (v) => {
 
 function onBackdrop() { closePalette() }
 
-onMounted(() => {})
-onUnmounted(() => {})
+onUnmounted(() => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  if (abortCtrl)     abortCtrl.abort()
+})
 </script>
 
 <template>
