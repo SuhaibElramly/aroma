@@ -567,13 +567,8 @@ const en = {
     },
   },
   specTypes: {
-    title: 'Spec Types',
-    subtitle: 'Global list of product specification types (Size, Color, Weight…)',
     add: 'Add Spec Type',
-    edit: 'Edit Spec Type',
-    delete: 'Delete Spec Type',
     noData: 'No spec types found.',
-    noDataSub: 'Create spec types to use as product variant options',
     inUseTooltip: 'In use — cannot delete',
     create: 'Create',
     kpiSpecTypes: 'Spec types',
@@ -595,19 +590,12 @@ const en = {
     noValuesYet: 'No values yet.',
     addValuePlaceholder: 'Add a new value…',
     addValueBtn: 'Add',
-    columns: {
-      name: 'Name',
-      unit: 'Unit',
-      inUse: 'In Use',
-      actions: 'Actions',
-    },
     form: {
       nameLabel: 'Name',
       namePlaceholder: 'e.g. Size, Volume, Weight',
       unitLabel: 'Unit',
       unitPlaceholder: 'e.g. ml, g, kg',
       unitHint: 'Unit is appended to variant values when displayed (e.g. "30ml").',
-      nameRequired: 'Name is required.',
     },
     modal: {
       createTitle: 'Create Spec Type',

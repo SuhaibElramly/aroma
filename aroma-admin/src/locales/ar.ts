@@ -569,13 +569,8 @@ const ar = {
     },
   },
   specTypes: {
-    title: 'أنواع المواصفات',
-    subtitle: 'قائمة عامة لأنواع مواصفات المنتجات (الحجم، اللون، الوزن…)',
     add: 'إضافة نوع مواصفة',
-    edit: 'تعديل نوع المواصفة',
-    delete: 'حذف نوع المواصفة',
     noData: 'لا توجد أنواع مواصفات.',
-    noDataSub: 'أنشئ أنواع مواصفات لاستخدامها كخيارات متغيرات المنتج',
     inUseTooltip: 'مستخدم — لا يمكن حذفه',
     create: 'إنشاء',
     kpiSpecTypes: 'أنواع المواصفات',
@@ -597,19 +592,12 @@ const ar = {
     noValuesYet: 'لا توجد قيم بعد.',
     addValuePlaceholder: 'أضف قيمة جديدة…',
     addValueBtn: 'إضافة',
-    columns: {
-      name: 'الاسم',
-      unit: 'الوحدة',
-      inUse: 'مستخدم',
-      actions: 'الإجراءات',
-    },
     form: {
       nameLabel: 'الاسم',
       namePlaceholder: 'مثال: الحجم، الوزن، السعة',
       unitLabel: 'الوحدة',
       unitPlaceholder: 'مثال: ml، g، kg',
       unitHint: 'تُضاف الوحدة إلى قيم المتغيرات عند العرض (مثال: "30ml").',
-      nameRequired: 'الاسم مطلوب.',
     },
     modal: {
       createTitle: 'إنشاء نوع مواصفة',
