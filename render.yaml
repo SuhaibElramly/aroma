@@ -1,16 +1,11 @@
 services:
   - type: web
     name: aroma-api
-    runtime: php
+    runtime: docker
     plan: free
-    rootDir: aroma-api
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader --no-interaction
-      php artisan storage:link || true
-      php artisan config:cache
-      php artisan route:cache
-      php artisan migrate --force
-    startCommand: php -S 0.0.0.0:$PORT -t public public/index.php
+    region: frankfurt
+    dockerfilePath: ./aroma-api/Dockerfile
+    dockerContext: ./aroma-api
     healthCheckPath: /up
     autoDeploy: true
     envVars:
