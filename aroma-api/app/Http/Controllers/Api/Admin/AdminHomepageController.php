@@ -37,6 +37,19 @@ class AdminHomepageController extends Controller
         return response()->json(['message' => 'Hero updated']);
     }
 
+    public function uploadLogo(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate(['logo' => 'required|image|max:2048']);
+        $url = $this->service->updateLogo($request->file('logo'));
+        return response()->json(['logo_url' => $url]);
+    }
+
+    public function destroyLogo(): \Illuminate\Http\JsonResponse
+    {
+        $this->service->deleteLogo();
+        return response()->json(['message' => 'Logo removed']);
+    }
+
     public function storeBlock(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([

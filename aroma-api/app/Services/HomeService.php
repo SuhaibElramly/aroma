@@ -31,6 +31,12 @@ class HomeService
         ]);
     }
 
+    public function getLogoUrl(): ?string
+    {
+        $path = Setting::get('site_logo_path');
+        return $path ? asset('storage/' . $path) : null;
+    }
+
     public function getBlocks(): array
     {
         return HomepageBlock::where('enabled', true)

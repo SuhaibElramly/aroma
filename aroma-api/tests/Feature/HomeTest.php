@@ -90,6 +90,16 @@ class HomeTest extends TestCase
             ->assertJsonPath('blocks', []);
     }
 
+    public function test_home_includes_logo_url_null_when_not_set(): void
+    {
+        Setting::set('homepage_hero', $this->heroDefaults());
+
+        $response = $this->getJson('/api/home');
+
+        $response->assertOk()
+            ->assertJsonPath('logo_url', null);
+    }
+
     public function test_home_hydrates_curated_block_in_order(): void
     {
         Setting::set('homepage_hero', $this->heroDefaults());

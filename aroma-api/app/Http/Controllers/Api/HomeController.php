@@ -10,8 +10,9 @@ class HomeController extends Controller
     public function index(HomeService $homeService)
     {
         return response()->json([
-            'hero'   => $homeService->getHero(),
-            'blocks' => $homeService->getBlocks(),
+            'hero'     => $homeService->getHero(),
+            'blocks'   => $homeService->getBlocks(),
+            'logo_url' => $homeService->getLogoUrl(),
         ]);
     }
 }

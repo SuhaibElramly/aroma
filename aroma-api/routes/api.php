@@ -146,6 +146,8 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
 
     Route::get('/homepage',                   [AdminHomepageController::class, 'show']);
     Route::put('/homepage/hero',              [AdminHomepageController::class, 'updateHero']);
+    Route::post('/homepage/logo',             [AdminHomepageController::class, 'uploadLogo']);
+    Route::delete('/homepage/logo',           [AdminHomepageController::class, 'destroyLogo']);
     Route::post('/homepage/blocks',           [AdminHomepageController::class, 'storeBlock']);
     Route::put('/homepage/blocks/reorder',    [AdminHomepageController::class, 'reorder']);
     Route::put('/homepage/blocks/{block}',    [AdminHomepageController::class, 'updateBlock']);

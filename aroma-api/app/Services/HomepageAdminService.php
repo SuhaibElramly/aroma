@@ -11,9 +11,11 @@ class HomepageAdminService
 {
     public function getConfig(): array
     {
+        $logoPath = Setting::get('site_logo_path');
         return [
-            'hero'   => Setting::get('homepage_hero', []),
-            'blocks' => HomepageBlock::orderBy('position')->get()->toArray(),
+            'hero'     => Setting::get('homepage_hero', []),
+            'blocks'   => HomepageBlock::orderBy('position')->get()->toArray(),
+            'logo_url' => $logoPath ? asset('storage/' . $logoPath) : null,
         ];
     }
 
@@ -28,6 +30,22 @@ class HomepageAdminService
         }
 
         Setting::set('homepage_hero', array_merge($fields, ['bg_image_path' => $bgPath]));
+    }
+
+    public function updateLogo(UploadedFile $image): string
+    {
+        $existing = Setting::get('site_logo_path');
+        if ($existing) Storage::disk('public')->delete($existing);
+        $path = $image->store('logos', 'public');
+        Setting::set('site_logo_path', $path);
+        return asset('storage/' . $path);
+    }
+
+    public function deleteLogo(): void
+    {
+        $path = Setting::get('site_logo_path');
+        if ($path) Storage::disk('public')->delete($path);
+        Setting::set('site_logo_path', null);
     }
 
     public function addBlock(string $type, array $config, bool $enabled): HomepageBlock
