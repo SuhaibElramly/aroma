@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../stores/auth'
+import { useCommandPalette } from '../../composables/useCommandPalette'
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -22,6 +23,7 @@ const { t, locale } = useI18n()
 const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
+const { openPalette } = useCommandPalette()
 
 const isActive = (path: string) => route.path.startsWith('/' + path)
 
@@ -98,11 +100,15 @@ function signOut() {
 
     <!-- Search -->
     <div class="px-3 mb-1">
-      <div class="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-dash-border-lt bg-dash-paper-2 cursor-pointer">
+      <button
+        type="button"
+        class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg border border-dash-border-lt bg-dash-paper-2 hover:border-dash-border transition-colors text-start"
+        @click="openPalette"
+      >
         <Search :size="14" class="text-dash-faint shrink-0" />
         <span class="flex-1 text-[12.5px] text-dash-muted">{{ $t('nav.search') }}…</span>
         <kbd class="text-[10px] px-1.5 py-0.5 rounded border border-dash-border-lt bg-white text-dash-faint">⌘K</kbd>
-      </div>
+      </button>
     </div>
 
     <!-- Nav groups -->
