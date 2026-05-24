@@ -1,6 +1,6 @@
 # Dynamic Roles & Permissions Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the hardcoded `ROLE_PERMS` constant with a database-backed roles system so owners can create, edit, and delete roles with custom permission matrices from the admin dashboard.
 
@@ -32,7 +32,7 @@
 - Create: `aroma-api/database/migrations/2026_05_23_000001_create_roles_table.php`
 - Create: `aroma-api/app/Models/Role.php`
 
-- [ ] **Step 1: Create the migration file**
+- [x] **Step 1: Create the migration file**
 
 ```php
 <?php
@@ -113,7 +113,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Create the Role Eloquent model**
+- [x] **Step 2: Create the Role Eloquent model**
 
 ```php
 <?php
@@ -130,7 +130,7 @@ class Role extends Model
 }
 ```
 
-- [ ] **Step 3: Run the migration**
+- [x] **Step 3: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -138,7 +138,7 @@ cd aroma-api && php artisan migrate
 
 Expected output contains: `Running migrations... 2026_05_23_000001_create_roles_table .... DONE`
 
-- [ ] **Step 4: Verify the seed data**
+- [x] **Step 4: Verify the seed data**
 
 ```bash
 cd aroma-api && php artisan tinker --execute="echo App\Models\Role::count() . ' roles';"
@@ -146,7 +146,7 @@ cd aroma-api && php artisan tinker --execute="echo App\Models\Role::count() . ' 
 
 Expected: `6 roles`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_05_23_000001_create_roles_table.php aroma-api/app/Models/Role.php
@@ -161,7 +161,7 @@ git commit -m "feat(roles): create roles table and seed 6 default roles"
 - Create: `aroma-api/app/Http/Controllers/Api/Admin/AdminRolesController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Create the controller**
+- [x] **Step 1: Create the controller**
 
 ```php
 <?php
@@ -252,7 +252,7 @@ class AdminRolesController extends Controller
 }
 ```
 
-- [ ] **Step 2: Add the 4 routes to `api.php`**
+- [x] **Step 2: Add the 4 routes to `api.php`**
 
 In `aroma-api/routes/api.php`, add `AdminRolesController` to the existing `use` import at the top of the admin section:
 
@@ -276,7 +276,7 @@ Then inside the `Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin'
     Route::delete('/roles/{slug}',[AdminRolesController::class, 'destroy']);
 ```
 
-- [ ] **Step 3: Verify the routes are registered**
+- [x] **Step 3: Verify the routes are registered**
 
 ```bash
 cd aroma-api && php artisan route:list --path=admin/roles
@@ -284,7 +284,7 @@ cd aroma-api && php artisan route:list --path=admin/roles
 
 Expected output: 4 rows — GET, POST, PUT, DELETE for `/api/admin/roles` and `/api/admin/roles/{slug}`.
 
-- [ ] **Step 4: Test the GET endpoint manually**
+- [x] **Step 4: Test the GET endpoint manually**
 
 ```bash
 # Get a token first (replace with real credentials)
@@ -297,7 +297,7 @@ curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8000/api/admin/roles 
 
 Expected: JSON array of 6 role objects with id, name, slug, color, permissions.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminRolesController.php aroma-api/routes/api.php
@@ -313,7 +313,7 @@ git commit -m "feat(roles): add AdminRolesController with CRUD endpoints"
 
 Currently `store()` and `update()` use hardcoded `Rule::in([...])`. Replace with dynamic lookup from the `roles` table.
 
-- [ ] **Step 1: Add `Role` import to the controller**
+- [x] **Step 1: Add `Role` import to the controller**
 
 In `aroma-api/app/Http/Controllers/Api/Admin/AdminAdminsController.php`, add to the `use` block at the top:
 
@@ -321,7 +321,7 @@ In `aroma-api/app/Http/Controllers/Api/Admin/AdminAdminsController.php`, add to 
 use App\Models\Role;
 ```
 
-- [ ] **Step 2: Replace hardcoded role slugs in `store()`**
+- [x] **Step 2: Replace hardcoded role slugs in `store()`**
 
 Find the `store()` method validation. Replace:
 
@@ -342,7 +342,7 @@ With:
             )],
 ```
 
-- [ ] **Step 3: Replace hardcoded role slugs in `update()`**
+- [x] **Step 3: Replace hardcoded role slugs in `update()`**
 
 Find the `update()` method validation. Replace:
 
@@ -356,7 +356,7 @@ With:
             'role' => ['sometimes', Rule::in(Role::where('slug', '!=', 'owner')->pluck('slug')->toArray())],
 ```
 
-- [ ] **Step 4: Verify the file looks correct**
+- [x] **Step 4: Verify the file looks correct**
 
 ```bash
 grep -n "Role::pluck\|Rule::in" aroma-api/app/Http/Controllers/Api/Admin/AdminAdminsController.php
@@ -364,7 +364,7 @@ grep -n "Role::pluck\|Rule::in" aroma-api/app/Http/Controllers/Api/Admin/AdminAd
 
 Expected: 2 lines with `Role::pluck` (or `Role::where`) and `Rule::in`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminAdminsController.php
@@ -379,7 +379,7 @@ git commit -m "feat(roles): validate admin role assignment against DB roles tabl
 - Modify: `aroma-admin/src/types/index.ts`
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add `AdminRole` interface to types**
+- [x] **Step 1: Add `AdminRole` interface to types**
 
 In `aroma-admin/src/types/index.ts`, add after the `AdminMember` interface (after line 35):
 
@@ -393,7 +393,7 @@ export interface AdminRole {
 }
 ```
 
-- [ ] **Step 2: Add the 4 role API functions to `admin.ts`**
+- [x] **Step 2: Add the 4 role API functions to `admin.ts`**
 
 In `aroma-admin/src/api/admin.ts`, add `AdminRole` to the import at the top:
 
@@ -431,7 +431,7 @@ export const apiDeleteRole = (slug: string) =>
   client.delete(`/admin/roles/${slug}`)
 ```
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
@@ -439,7 +439,7 @@ cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors related to the new types or API functions (pre-existing errors are fine).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/types/index.ts aroma-admin/src/api/admin.ts
@@ -455,7 +455,7 @@ git commit -m "feat(roles): add AdminRole type and role CRUD API functions"
 
 Replace the hardcoded `ROLE_PERMS` constant with a reactive `roles` ref loaded from the API. The `can()` function reads from a computed `rolePermsMap`.
 
-- [ ] **Step 1: Rewrite `auth.ts` with dynamic roles**
+- [x] **Step 1: Rewrite `auth.ts` with dynamic roles**
 
 Replace the entire contents of `aroma-admin/src/stores/auth.ts` with:
 
@@ -530,7 +530,7 @@ export const useAuthStore = defineStore('auth', () => {
 })
 ```
 
-- [ ] **Step 2: Verify TypeScript compiles**
+- [x] **Step 2: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
@@ -538,7 +538,7 @@ cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no new errors from auth.ts.
 
-- [ ] **Step 3: Start the dev server and log in to verify roles load**
+- [x] **Step 3: Start the dev server and log in to verify roles load**
 
 ```bash
 cd aroma-admin && npm run dev &
@@ -552,7 +552,7 @@ window.__pinia?.state.value?.auth?.roles?.length
 
 Expected: `6` (the 6 seeded roles).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/stores/auth.ts
@@ -568,7 +568,7 @@ git commit -m "feat(roles): load roles from API in auth store, replace hardcoded
 
 This task rewrites the roles tab script logic and template. The members tab and all other script sections (load, createAdmin, toggleStatus, etc.) remain unchanged.
 
-- [ ] **Step 1: Update the imports in `<script setup>`**
+- [x] **Step 1: Update the imports in `<script setup>`**
 
 Replace the current imports at the top of `AdminsView.vue` with:
 
@@ -589,7 +589,7 @@ import {
 import { useAuthStore } from '../stores/auth'
 ```
 
-- [ ] **Step 2: Remove `rolesData`, add roles logic — replace the `// ── Roles & permissions data` section**
+- [x] **Step 2: Remove `rolesData`, add roles logic — replace the `// ── Roles & permissions data` section**
 
 Remove everything from `// ── Roles & permissions data ─────────────────────────────────────` through the end of `function getPerm(...)` (lines 96–151 in the current file). Replace with:
 
@@ -757,7 +757,7 @@ function getPerm(resource: string, idx: number): boolean {
 }
 ```
 
-- [ ] **Step 3: Update the KPI helpers and visual helpers**
+- [x] **Step 3: Update the KPI helpers and visual helpers**
 
 Replace the `// ── KPI helpers` section:
 
@@ -795,7 +795,7 @@ function adminHue(name: string): number {
 }
 ```
 
-- [ ] **Step 4: Update the create-admin form's role `<select>`**
+- [x] **Step 4: Update the create-admin form's role `<select>`**
 
 Find the `<select v-model="form.role" ...>` block (around line 292). Replace its `<option>` children with dynamic options from `auth.roles`:
 
@@ -814,7 +814,7 @@ Find the `<select v-model="form.role" ...>` block (around line 292). Replace its
               </select>
 ```
 
-- [ ] **Step 5: Replace the roles tab template**
+- [x] **Step 5: Replace the roles tab template**
 
 Replace the entire `<!-- ── Roles tab ── -->` section (from `<template v-else>` to its closing `</template>`, including the grid inside) with:
 
@@ -1011,7 +1011,7 @@ Replace the entire `<!-- ── Roles tab ── -->` section (from `<template v
     </template>
 ```
 
-- [ ] **Step 6: Verify TypeScript compiles**
+- [x] **Step 6: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit 2>&1 | grep -v "node_modules" | head -30
@@ -1019,7 +1019,7 @@ cd aroma-admin && npx tsc --noEmit 2>&1 | grep -v "node_modules" | head -30
 
 Expected: no errors from AdminsView.vue.
 
-- [ ] **Step 7: Test the full UI flow in the browser**
+- [x] **Step 7: Test the full UI flow in the browser**
 
 Open http://localhost:5173 in the browser and log in as an owner. Test:
 
@@ -1033,7 +1033,7 @@ Open http://localhost:5173 in the browser and log in as an owner. Test:
 8. With 0 members on the new role, click **Delete**. Confirm. Verify it disappears.
 9. Verify the **Delete** button is disabled (greyed) on the Admin role when it has members.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma-admin/src/views/AdminsView.vue

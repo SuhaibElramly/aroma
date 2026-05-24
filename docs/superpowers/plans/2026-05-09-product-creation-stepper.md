@@ -1,6 +1,6 @@
 # Product Creation Stepper Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the admin product creation modal + separate variants page with a single 3-step stepper page (Basic Info → Images → Variants), add per-variant image galleries, and update the storefront to show variant images when available.
 
@@ -44,7 +44,7 @@
 - Modify: `aroma-admin/src/locales/en.ts`
 - Modify: `aroma-admin/src/locales/ar.ts`
 
-- [ ] **Step 1: Add `images` field to `ProductVariant` in admin types**
+- [x] **Step 1: Add `images` field to `ProductVariant` in admin types**
 
 In `aroma-admin/src/types/index.ts`, update `ProductVariant`:
 
@@ -63,7 +63,7 @@ export interface ProductVariant {
 }
 ```
 
-- [ ] **Step 2: Add `images` field to `StorefrontVariant` in storefront types**
+- [x] **Step 2: Add `images` field to `StorefrontVariant` in storefront types**
 
 In `aroma/src/types/index.ts`, update `StorefrontVariant`:
 
@@ -79,7 +79,7 @@ export interface StorefrontVariant {
 }
 ```
 
-- [ ] **Step 3: Add `apiGetProduct` and variant-image functions to `aroma-admin/src/api/admin.ts`**
+- [x] **Step 3: Add `apiGetProduct` and variant-image functions to `aroma-admin/src/api/admin.ts`**
 
 Add after `apiDeleteProduct`:
 
@@ -105,7 +105,7 @@ export const apiDeleteVariantImage = (productId: number, variantId: number, imag
   client.delete(`/admin/products/${productId}/variants/${variantId}/images/${imageId}`)
 ```
 
-- [ ] **Step 4: Add stepper and variant-image i18n keys to `aroma-admin/src/locales/en.ts`**
+- [x] **Step 4: Add stepper and variant-image i18n keys to `aroma-admin/src/locales/en.ts`**
 
 Add a new `stepper` section after `productCreate`. Find the line `productVariants: {` and insert before it:
 
@@ -134,7 +134,7 @@ Add a new `stepper` section after `productCreate`. Find the line `productVariant
   },
 ```
 
-- [ ] **Step 5: Add same keys in Arabic to `aroma-admin/src/locales/ar.ts`**
+- [x] **Step 5: Add same keys in Arabic to `aroma-admin/src/locales/ar.ts`**
 
 Find the equivalent location in `ar.ts` (after `productCreate` block, before `productVariants`) and insert:
 
@@ -163,7 +163,7 @@ Find the equivalent location in `ar.ts` (after `productCreate` block, before `pr
   },
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-admin/src/api/admin.ts aroma-admin/src/types/index.ts \
@@ -181,7 +181,7 @@ Inline upload panel that sits below a variant row when expanded. Uploads and del
 **Files:**
 - Create: `aroma-admin/src/components/product/VariantImagePanel.vue`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 ```vue
 <!-- aroma-admin/src/components/product/VariantImagePanel.vue -->
@@ -285,7 +285,7 @@ watch(() => props.variantId, load, { immediate: true })
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/product/VariantImagePanel.vue
@@ -301,7 +301,7 @@ Step 1 of the stepper. On create it calls `apiCreateProduct`; on edit it calls `
 **Files:**
 - Create: `aroma-admin/src/components/product/StepBasicInfo.vue`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 ```vue
 <!-- aroma-admin/src/components/product/StepBasicInfo.vue -->
@@ -585,7 +585,7 @@ onMounted(async () => {
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/product/StepBasicInfo.vue
@@ -601,7 +601,7 @@ Step 2 of the stepper. Required: at least one image before the user can proceed.
 **Files:**
 - Create: `aroma-admin/src/components/product/StepImages.vue`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 ```vue
 <!-- aroma-admin/src/components/product/StepImages.vue -->
@@ -804,7 +804,7 @@ onBeforeUnmount(() => {
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/product/StepImages.vue
@@ -820,7 +820,7 @@ Step 3 of the stepper. Ports the wizard + editing logic from `ProductVariantsVie
 **Files:**
 - Create: `aroma-admin/src/components/product/StepVariants.vue`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 This is a large component. It combines the wizard logic (no-variants mode) and edit mode from `ProductVariantsView.vue`, minus the product-images section, plus the Images column using `VariantImagePanel`.
 
@@ -1437,7 +1437,7 @@ onMounted(async () => {
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/product/StepVariants.vue
@@ -1453,7 +1453,7 @@ The route-level shell. Manages step state, loads product data in edit mode, comp
 **Files:**
 - Create: `aroma-admin/src/views/ProductStepperView.vue`
 
-- [ ] **Step 1: Create the view**
+- [x] **Step 1: Create the view**
 
 ```vue
 <!-- aroma-admin/src/views/ProductStepperView.vue -->
@@ -1643,7 +1643,7 @@ onMounted(async () => {
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/ProductStepperView.vue
@@ -1660,7 +1660,7 @@ Wire the new view into the router and clean up `ProductsView.vue`.
 - Modify: `aroma-admin/src/router/index.ts`
 - Modify: `aroma-admin/src/views/ProductsView.vue`
 
-- [ ] **Step 1: Update `router/index.ts`**
+- [x] **Step 1: Update `router/index.ts`**
 
 Replace the `products/new` and `products/:id/variants` entries:
 
@@ -1677,7 +1677,7 @@ Remove the old entries:
 { path: 'products/:id/variants', name: 'product-variants', component: () => import('../views/ProductVariantsView.vue'), props: true },
 ```
 
-- [ ] **Step 2: Clean up `ProductsView.vue` — remove modal and update buttons**
+- [x] **Step 2: Clean up `ProductsView.vue` — remove modal and update buttons**
 
 **2a.** In the `<template>`, replace the "Add Product" button (the `<AButton @click="openCreate">` near the top) with a RouterLink:
 
@@ -1706,7 +1706,7 @@ Remove the old entries:
 
 **2e.** Add `'products.editBtn': 'Edit'` to `en.ts` and `'تعديل'` to `ar.ts` under the `products` section.
 
-- [ ] **Step 3: Verify in browser**
+- [x] **Step 3: Verify in browser**
 
 ```bash
 cd aroma-admin && npm run dev
@@ -1720,7 +1720,7 @@ cd aroma-admin && npm run dev
 6. Click "Edit" on any product — should navigate to `/products/:id/edit` with all fields pre-populated and all steps clickable
 7. Navigate directly to `/products/123/variants` — should redirect to `/products/123/edit`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/router/index.ts aroma-admin/src/views/ProductsView.vue \
@@ -1738,14 +1738,14 @@ Only do this after Task 7 verification passes.
 - Delete: `aroma-admin/src/views/ProductCreateView.vue`
 - Delete: `aroma-admin/src/views/ProductVariantsView.vue`
 
-- [ ] **Step 1: Delete the files**
+- [x] **Step 1: Delete the files**
 
 ```bash
 git rm aroma-admin/src/views/ProductCreateView.vue
 git rm aroma-admin/src/views/ProductVariantsView.vue
 ```
 
-- [ ] **Step 2: Verify build still passes**
+- [x] **Step 2: Verify build still passes**
 
 ```bash
 cd aroma-admin && npm run build
@@ -1753,7 +1753,7 @@ cd aroma-admin && npm run build
 
 Expected: build completes with no errors. If TypeScript errors appear, fix them before committing.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git commit -m "chore: remove ProductCreateView and ProductVariantsView (replaced by ProductStepperView)"
@@ -1766,7 +1766,7 @@ git commit -m "chore: remove ProductCreateView and ProductVariantsView (replaced
 **Files:**
 - Modify: `aroma/src/features/product/ProductPageClient.tsx`
 
-- [ ] **Step 1: Update `ProductPageClient.tsx` to use variant images when available**
+- [x] **Step 1: Update `ProductPageClient.tsx` to use variant images when available**
 
 Replace the gallery section (lines 53–156). The key changes are:
 
@@ -1854,7 +1854,7 @@ const displayImg = (activeImg && displayImages.some(i => i.url === activeImg))
 import { useState, useRef } from 'react'
 ```
 
-- [ ] **Step 2: Verify in browser**
+- [x] **Step 2: Verify in browser**
 
 ```bash
 cd aroma && npm run dev
@@ -1865,7 +1865,7 @@ cd aroma && npm run dev
 3. Switching to a variant without images should show the product gallery again.
 4. Products with no variant images should behave exactly as before.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/product/ProductPageClient.tsx

@@ -1,6 +1,6 @@
 # Brand Logo Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add an optional logo image to brands — admin can upload/remove it, it appears as a small badge in the bottom-right of every product card image area, and near the brand name on the product detail page.
 
@@ -35,7 +35,7 @@
 **Files:**
 - Create: `aroma-api/database/migrations/2026_05_01_000001_add_logo_to_brands_table.php`
 
-- [ ] **Step 1: Create the migration**
+- [x] **Step 1: Create the migration**
 
 ```php
 <?php
@@ -58,7 +58,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Run the migration**
+- [x] **Step 2: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -66,7 +66,7 @@ cd aroma-api && php artisan migrate
 
 Expected: `Migrating: 2026_05_01_000001_add_logo_to_brands_table` then `Migrated`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_05_01_000001_add_logo_to_brands_table.php
@@ -81,7 +81,7 @@ git commit -m "feat: add logo column to brands table"
 - Modify: `aroma-api/app/Models/Brand.php`
 - Modify: `aroma-api/app/Http/Resources/BrandResource.php`
 
-- [ ] **Step 1: Add `logo` to Brand `$fillable`**
+- [x] **Step 1: Add `logo` to Brand `$fillable`**
 
 In `aroma-api/app/Models/Brand.php`, change the `$fillable` line:
 
@@ -89,7 +89,7 @@ In `aroma-api/app/Models/Brand.php`, change the `$fillable` line:
 protected $fillable = ['id', 'name', 'name_en', 'origin', 'tagline', 'bg', 'logo'];
 ```
 
-- [ ] **Step 2: Add `logoUrl` to BrandResource**
+- [x] **Step 2: Add `logoUrl` to BrandResource**
 
 Replace the full `toArray` body in `aroma-api/app/Http/Resources/BrandResource.php`:
 
@@ -113,7 +113,7 @@ public function toArray(Request $request): array
 
 Note: add `use Illuminate\Support\Facades\Storage;` at the top of the file (after the namespace line) if not already present.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-api/app/Models/Brand.php aroma-api/app/Http/Resources/BrandResource.php
@@ -127,7 +127,7 @@ git commit -m "feat: expose brandLogoUrl in BrandResource"
 **Files:**
 - Modify: `aroma-api/app/Http/Resources/ProductResource.php`
 
-- [ ] **Step 1: Add `brandLogoUrl` field**
+- [x] **Step 1: Add `brandLogoUrl` field**
 
 Inside the `toArray` return array in `ProductResource.php`, add this line right after `'brandId' => $this->brand_id,`:
 
@@ -139,7 +139,7 @@ Inside the `toArray` return array in `ProductResource.php`, add this line right 
 
 The brand relation is already eager-loaded by both `ProductController::show` and `ProductService::search`, so no query changes needed.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-api/app/Http/Resources/ProductResource.php
@@ -154,7 +154,7 @@ git commit -m "feat: add brandLogoUrl to ProductResource"
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminBrandController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Add `use` imports at the top of `AdminBrandController`**
+- [x] **Step 1: Add `use` imports at the top of `AdminBrandController`**
 
 The file currently has no Storage/Str imports. Add them after the `use App\Models\Brand;` line:
 
@@ -163,7 +163,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 ```
 
-- [ ] **Step 2: Add `logoUrl` to index and show responses**
+- [x] **Step 2: Add `logoUrl` to index and show responses**
 
 In `AdminBrandController::index`, inside the `map` callback, add:
 
@@ -177,7 +177,7 @@ In `AdminBrandController::show`, add the same field to the response array:
 'logoUrl'      => $brand->logo ? Storage::disk('public')->url($brand->logo) : null,
 ```
 
-- [ ] **Step 3: Add `uploadLogo` method**
+- [x] **Step 3: Add `uploadLogo` method**
 
 Add this method to `AdminBrandController`:
 
@@ -207,7 +207,7 @@ public function uploadLogo(Request $request, string $id)
 }
 ```
 
-- [ ] **Step 4: Add `destroyLogo` method**
+- [x] **Step 4: Add `destroyLogo` method**
 
 ```php
 public function destroyLogo(string $id)
@@ -223,7 +223,7 @@ public function destroyLogo(string $id)
 }
 ```
 
-- [ ] **Step 5: Register routes in `aroma-api/routes/api.php`**
+- [x] **Step 5: Register routes in `aroma-api/routes/api.php`**
 
 Find the admin brand routes block:
 ```php
@@ -240,7 +240,7 @@ Route::post('/brands/{id}/logo', [AdminBrandController::class, 'uploadLogo']);
 Route::delete('/brands/{id}/logo', [AdminBrandController::class, 'destroyLogo']);
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminBrandController.php aroma-api/routes/api.php
@@ -255,7 +255,7 @@ git commit -m "feat: add brand logo upload/delete API endpoints"
 - Modify: `aroma-admin/src/types/index.ts`
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add `logoUrl` to `AdminBrand`**
+- [x] **Step 1: Add `logoUrl` to `AdminBrand`**
 
 In `aroma-admin/src/types/index.ts`, find:
 
@@ -286,7 +286,7 @@ export interface AdminBrand {
 }
 ```
 
-- [ ] **Step 2: Add logo API functions**
+- [x] **Step 2: Add logo API functions**
 
 In `aroma-admin/src/api/admin.ts`, add these two functions right after `apiDeleteBrand`:
 
@@ -303,7 +303,7 @@ export const apiDeleteBrandLogo = (id: string) =>
   client.delete(`/admin/brands/${id}/logo`)
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/types/index.ts aroma-admin/src/api/admin.ts
@@ -319,7 +319,7 @@ git commit -m "feat: add brand logo types and API client functions"
 
 The brand create/edit modal in `BrandsView.vue` currently handles text fields only. We add a logo upload widget at the bottom of the form. When editing an existing brand that already has a logo, show the current logo with a remove button. When creating or after removal, show a file-input upload area.
 
-- [ ] **Step 1: Update imports in `<script setup>`**
+- [x] **Step 1: Update imports in `<script setup>`**
 
 In the script section, add `Image` and `X` to the lucide imports and add the two new API functions:
 
@@ -328,7 +328,7 @@ import { Plus, Tag, Link2, Image, X } from 'lucide-vue-next'
 import { apiGetBrands, apiCreateBrand, apiUpdateBrand, apiDeleteBrand, apiUploadBrandLogo, apiDeleteBrandLogo } from '../api/admin'
 ```
 
-- [ ] **Step 2: Add logo reactive state**
+- [x] **Step 2: Add logo reactive state**
 
 After `const formErrors = ref<Record<string, string>>({})`, add:
 
@@ -338,7 +338,7 @@ const pendingLogoFile = ref<File | null>(null)     // file to upload after save
 const logoRemoved    = ref(false)                  // flagged for deletion on save
 ```
 
-- [ ] **Step 3: Update `emptyForm` and `openCreate` / `openEdit`**
+- [x] **Step 3: Update `emptyForm` and `openCreate` / `openEdit`**
 
 `emptyForm` stays as-is (no logo in form since it's managed separately).
 
@@ -390,7 +390,7 @@ function openEdit(b: AdminBrand) {
 }
 ```
 
-- [ ] **Step 4: Add `pickLogoFile` helper**
+- [x] **Step 4: Add `pickLogoFile` helper**
 
 ```typescript
 function pickLogoFile(e: Event) {
@@ -408,7 +408,7 @@ function removeLogo() {
 }
 ```
 
-- [ ] **Step 5: Update `handleSave` to handle logo after brand save**
+- [x] **Step 5: Update `handleSave` to handle logo after brand save**
 
 The existing `handleSave` creates or updates the brand then closes the modal. Replace it with:
 
@@ -460,7 +460,7 @@ async function handleSave() {
 
 Note: check the existing `handleSave` to confirm the validation and API call shape — the replacement above mirrors the existing logic exactly, just adds logo handling after the brand save.
 
-- [ ] **Step 6: Add logo widget to the modal template**
+- [x] **Step 6: Add logo widget to the modal template**
 
 Inside the `<AModal>` form, after the `<AInput v-model="form.bg" ...>` line and before `<p v-if="formErrors.general">`, add:
 
@@ -482,7 +482,7 @@ Inside the `<AModal>` form, after the `<AInput v-model="form.bg" ...>` line and 
 </div>
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-admin/src/views/BrandsView.vue
@@ -498,7 +498,7 @@ git commit -m "feat: add brand logo upload/remove to admin BrandsView"
 
 The brand header currently shows a colour swatch div and the brand name. We add the logo (if present) next to the swatch.
 
-- [ ] **Step 1: Add logo display in brand header**
+- [x] **Step 1: Add logo display in brand header**
 
 Find the brand header block (around line 21):
 ```html
@@ -523,7 +523,7 @@ After the colour-swatch `<div>`, add:
 />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/BrandDetailView.vue
@@ -537,7 +537,7 @@ git commit -m "feat: show brand logo in BrandDetailView header"
 **Files:**
 - Modify: `aroma/src/types/index.ts`
 
-- [ ] **Step 1: Add `logoUrl` to `Brand` interface**
+- [x] **Step 1: Add `logoUrl` to `Brand` interface**
 
 Find:
 ```typescript
@@ -566,14 +566,14 @@ export interface Brand {
 }
 ```
 
-- [ ] **Step 2: Add `brandLogoUrl` to `Product` interface**
+- [x] **Step 2: Add `brandLogoUrl` to `Product` interface**
 
 Find the `Product` interface (around line 55). Locate the line `brandId: string` and add below it:
 ```typescript
 brandLogoUrl?: string | null
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/types/index.ts
@@ -589,7 +589,7 @@ git commit -m "feat: add brandLogoUrl to Product and logoUrl to Brand types"
 
 The logo should appear as a small ~28×28 image in the bottom-right corner of the product image area, above the bestseller strip if present. Use `object-contain` with a white/neutral background circle so logos of any shape look clean.
 
-- [ ] **Step 1: Add logo badge to the image area**
+- [x] **Step 1: Add logo badge to the image area**
 
 In `ProductCard.tsx`, inside the image `<div>` (the relative container), find the bestseller strip:
 ```tsx
@@ -616,7 +616,7 @@ Just before that bestseller block, add:
 
 The `Image` component is already imported in this file.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/components/shared/ProductCard.tsx
@@ -632,7 +632,7 @@ git commit -m "feat: show brand logo badge on ProductCard"
 
 The purchase module already has a brand name line at the top. We show the logo as a small inline image to the right of the brand text.
 
-- [ ] **Step 1: Update brand name section**
+- [x] **Step 1: Update brand name section**
 
 Find (around line 160):
 ```tsx
@@ -661,7 +661,7 @@ Replace with:
 </div>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/product/ProductPageClient.tsx

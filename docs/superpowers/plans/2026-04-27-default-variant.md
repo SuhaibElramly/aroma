@@ -1,6 +1,6 @@
 # Default Variant Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Mark one variant per product as the default so its price/stock appear on the product card, and make the product detail page update price, original price, and stock live when the user switches sizes.
 
@@ -33,7 +33,7 @@
 **Files:**
 - Create: `aroma-api/database/migrations/2026_04_27_200000_add_is_default_to_product_variants.php`
 
-- [ ] **Step 1: Create the migration**
+- [x] **Step 1: Create the migration**
 
 ```php
 <?php
@@ -69,7 +69,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Run the migration**
+- [x] **Step 2: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -80,7 +80,7 @@ Expected output:
 2026_04_27_200000_add_is_default_to_product_variants .......... DONE
 ```
 
-- [ ] **Step 3: Verify the data**
+- [x] **Step 3: Verify the data**
 
 ```bash
 php artisan tinker --execute="
@@ -91,7 +91,7 @@ App\Models\ProductVariant::where('is_default', true)->get(['id','product_id','si
 
 Expected: one row per product_id with `default:1`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add database/migrations/2026_04_27_200000_add_is_default_to_product_variants.php
@@ -105,7 +105,7 @@ git commit -m "feat: add is_default column to product_variants"
 **Files:**
 - Modify: `aroma-api/app/Models/ProductVariant.php`
 
-- [ ] **Step 1: Add `is_default` to fillable and the boot hook**
+- [x] **Step 1: Add `is_default` to fillable and the boot hook**
 
 Replace the entire `ProductVariant.php` with:
 
@@ -165,7 +165,7 @@ class ProductVariant extends Model
 }
 ```
 
-- [ ] **Step 2: Verify model loads cleanly**
+- [x] **Step 2: Verify model loads cleanly**
 
 ```bash
 php artisan tinker --execute="echo App\Models\ProductVariant::where('is_default',true)->count().' defaults'.PHP_EOL;"
@@ -173,7 +173,7 @@ php artisan tinker --execute="echo App\Models\ProductVariant::where('is_default'
 
 Expected: `12 defaults` (one per product).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/Models/ProductVariant.php
@@ -188,7 +188,7 @@ git commit -m "feat: auto-set is_default on first variant creation"
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Update the controller**
+- [x] **Step 1: Update the controller**
 
 Replace `AdminProductVariantController.php` with:
 
@@ -286,7 +286,7 @@ class AdminProductVariantController extends Controller
 }
 ```
 
-- [ ] **Step 2: Register the new route in `routes/api.php`**
+- [x] **Step 2: Register the new route in `routes/api.php`**
 
 Find the existing variant routes block and add one line:
 
@@ -305,7 +305,7 @@ Route::patch('products/{product}/variants/{variant}/default', [AdminProductVaria
 Route::delete('products/{product}/variants/{variant}',  [AdminProductVariantController::class, 'destroy']);
 ```
 
-- [ ] **Step 3: Smoke-test the new endpoint**
+- [x] **Step 3: Smoke-test the new endpoint**
 
 ```bash
 # Get product 1's variants first
@@ -316,7 +316,7 @@ curl -s http://localhost:8000/api/admin/products/1/variants \
 
 Expected: list of variants, one with `"isDefault": true`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/Http/Controllers/Api/Admin/AdminProductVariantController.php routes/api.php
@@ -330,7 +330,7 @@ git commit -m "feat: add setDefault endpoint and expose isDefault on variants"
 **Files:**
 - Modify: `aroma-api/app/Http/Resources/ProductResource.php`
 
-- [ ] **Step 1: Update the resource**
+- [x] **Step 1: Update the resource**
 
 Replace `ProductResource.php` with:
 
@@ -403,7 +403,7 @@ class ProductResource extends JsonResource
 }
 ```
 
-- [ ] **Step 2: Verify API response includes variants array**
+- [x] **Step 2: Verify API response includes variants array**
 
 ```bash
 curl -s http://localhost:8000/api/products/sauvage | python3 -m json.tool | grep -A 20 '"variants"'
@@ -411,7 +411,7 @@ curl -s http://localhost:8000/api/products/sauvage | python3 -m json.tool | grep
 
 Expected: a `variants` array with `id`, `size`, `price`, `originalPrice`, `stock`, `isDefault` for each variant. One entry has `"isDefault": true`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/Http/Resources/ProductResource.php
@@ -427,7 +427,7 @@ git commit -m "feat: ProductResource uses default variant and exposes full varia
 - Modify: `aroma-admin/src/api/admin.ts`
 - Modify: `aroma-admin/src/views/ProductVariantsView.vue`
 
-- [ ] **Step 1: Update `ProductVariant` type**
+- [x] **Step 1: Update `ProductVariant` type**
 
 In `aroma-admin/src/types/index.ts`, change:
 
@@ -445,7 +445,7 @@ export interface ProductVariant {
 }
 ```
 
-- [ ] **Step 2: Add `apiSetDefaultVariant` to `admin.ts`**
+- [x] **Step 2: Add `apiSetDefaultVariant` to `admin.ts`**
 
 In `aroma-admin/src/api/admin.ts`, add after `apiDeleteVariant`:
 
@@ -454,7 +454,7 @@ export const apiSetDefaultVariant = (productId: number, variantId: number) =>
   client.patch<ProductVariant>(`/admin/products/${productId}/variants/${variantId}/default`)
 ```
 
-- [ ] **Step 3: Update `ProductVariantsView.vue`**
+- [x] **Step 3: Update `ProductVariantsView.vue`**
 
 In the variants table section, update the `#actions` slot and add a "Default" badge to the size column. Make these targeted changes:
 
@@ -521,14 +521,14 @@ const cols = [
 </template>
 ```
 
-- [ ] **Step 4: Verify in the browser**
+- [x] **Step 4: Verify in the browser**
 
 1. Open admin → any product → Variants
 2. Each row should show either a "Default" badge or a "Set default" button
 3. Click "Set default" on a non-default row — it should flip immediately
 4. Refresh the page — the same row should still show "Default"
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 # from aroma-admin/
@@ -543,7 +543,7 @@ git commit -m "feat: set-default variant UI in admin panel"
 **Files:**
 - Modify: `aroma/src/types/index.ts`
 
-- [ ] **Step 1: Add a `StorefrontVariant` interface and extend `Product`**
+- [x] **Step 1: Add a `StorefrontVariant` interface and extend `Product`**
 
 In `aroma/src/types/index.ts`, add after the existing `ProductImage` interface:
 
@@ -564,7 +564,7 @@ Then extend the `Product` interface — add these two fields after `thumbnailUrl
   variants?:     StorefrontVariant[]
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 # from aroma/
@@ -579,7 +579,7 @@ git commit -m "feat: add StorefrontVariant type and variants field to Product"
 **Files:**
 - Modify: `aroma/src/features/product/ProductPageClient.tsx`
 
-- [ ] **Step 1: Replace the gallery + purchase module with variant-aware logic**
+- [x] **Step 1: Replace the gallery + purchase module with variant-aware logic**
 
 The key change: derive the active variant from `selectedSize`, then read `price`, `originalPrice`, and `stock` from that variant object instead of from the top-level `product` fields.
 
@@ -606,7 +606,7 @@ Replace it with:
   const displayImg      = activeImg ?? product.thumbnailUrl ?? null
 ```
 
-- [ ] **Step 2: Update the price display**
+- [x] **Step 2: Update the price display**
 
 Find:
 
@@ -634,7 +634,7 @@ Replace with:
             )}
 ```
 
-- [ ] **Step 3: Update the stock badge**
+- [x] **Step 3: Update the stock badge**
 
 Find:
 
@@ -648,7 +648,7 @@ Replace with:
             <StockBadge status={displayStock} />
 ```
 
-- [ ] **Step 4: Update the add-to-cart guard and button state**
+- [x] **Step 4: Update the add-to-cart guard and button state**
 
 Find every occurrence of `product.stock === 'out-of-stock'` (there are 3: the guard inside `handleAdd`, the `disabled` prop, and the button style/label). Replace all three with `displayStock === 'out-of-stock'`:
 
@@ -670,14 +670,14 @@ Find every occurrence of `product.stock === 'out-of-stock'` (there are 3: the gu
   ) : displayStock === 'out-of-stock' ? (
 ```
 
-- [ ] **Step 5: Verify in the browser**
+- [x] **Step 5: Verify in the browser**
 
 1. Open `http://localhost:3000/product/sauvage`
 2. The price shown should match the default variant's price
 3. Click a different size — price, original price, and stock badge should update instantly with no page reload
 4. If a variant is `out-of-stock`, the Add to Cart button should go grey and be disabled
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 # from aroma/
@@ -692,7 +692,7 @@ git commit -m "feat: reactive price and stock on variant size change"
 **Files:**
 - Modify: `aroma-api/database/seeders/ProductSeeder.php`
 
-- [ ] **Step 1: Mark the first variant as default in each product's variants array**
+- [x] **Step 1: Mark the first variant as default in each product's variants array**
 
 In `ProductSeeder.php`, the `variants` arrays currently have no `is_default` key. Update every product's first variant to include `'is_default' => true`. Example for Sauvage (the pattern repeats for all 12 products):
 
@@ -708,7 +708,7 @@ Apply the same pattern to all 12 products: first variant gets `'is_default' => t
 
 Also remove `'stock'` from the seeder variant arrays — the model's `saving` hook computes it automatically from `quantity` and `low_stock_threshold`. You'll need to add `quantity` and `low_stock_threshold` to each variant if they aren't present already (they were added in a previous migration). Use `'quantity' => 50, 'low_stock_threshold' => 5` as defaults where not specified.
 
-- [ ] **Step 2: Verify a fresh seed works**
+- [x] **Step 2: Verify a fresh seed works**
 
 ```bash
 php artisan migrate:fresh --seed 2>&1 | tail -5
@@ -724,7 +724,7 @@ php artisan tinker --execute="
 
 Expected: `12 defaults / 12 products`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add database/seeders/ProductSeeder.php

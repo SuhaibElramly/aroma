@@ -1,6 +1,6 @@
 # Arabic Support Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a bilingual EN/AR toggle to the Aroma admin with full RTL layout flip, Cairo font, and complete Arabic UI translations persisted to `localStorage`.
 
@@ -49,7 +49,7 @@
 - Create: `aroma-admin/src/composables/useLocale.ts`
 - Modify: `aroma-admin/src/main.ts`
 
-- [ ] **Step 1: Install vue-i18n**
+- [x] **Step 1: Install vue-i18n**
 
 ```bash
 cd aroma-admin
@@ -58,7 +58,7 @@ npm install vue-i18n@9
 
 Expected: `vue-i18n` appears in `package.json` dependencies.
 
-- [ ] **Step 2: Create `src/i18n.ts`**
+- [x] **Step 2: Create `src/i18n.ts`**
 
 ```ts
 // aroma-admin/src/i18n.ts
@@ -74,7 +74,7 @@ export const i18n = createI18n({
 })
 ```
 
-- [ ] **Step 3: Create `src/composables/useLocale.ts`**
+- [x] **Step 3: Create `src/composables/useLocale.ts`**
 
 ```ts
 // aroma-admin/src/composables/useLocale.ts
@@ -105,7 +105,7 @@ export function useLocale() {
 }
 ```
 
-- [ ] **Step 4: Update `src/main.ts` to boot with saved locale and register i18n**
+- [x] **Step 4: Update `src/main.ts` to boot with saved locale and register i18n**
 
 Replace the entire file:
 
@@ -127,7 +127,7 @@ if (saved === 'ar') applyLocale('ar')
 createApp(App).use(createPinia()).use(router).use(i18n).mount('#app')
 ```
 
-- [ ] **Step 5: Create placeholder locale files so the app compiles**
+- [x] **Step 5: Create placeholder locale files so the app compiles**
 
 `src/locales/en.ts`:
 ```ts
@@ -139,7 +139,7 @@ export default {}
 export default {}
 ```
 
-- [ ] **Step 6: Verify app starts**
+- [x] **Step 6: Verify app starts**
 
 ```bash
 npm run dev
@@ -147,7 +147,7 @@ npm run dev
 
 Expected: App loads at `http://localhost:5173` with no console errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-admin/package.json aroma-admin/package-lock.json \
@@ -167,7 +167,7 @@ git commit -m "feat: install vue-i18n and scaffold i18n infrastructure"
 - Modify: `aroma-admin/src/locales/en.ts`
 - Modify: `aroma-admin/src/locales/ar.ts`
 
-- [ ] **Step 1: Write `src/locales/en.ts`**
+- [x] **Step 1: Write `src/locales/en.ts`**
 
 ```ts
 // aroma-admin/src/locales/en.ts
@@ -611,7 +611,7 @@ export default {
 }
 ```
 
-- [ ] **Step 2: Write `src/locales/ar.ts`**
+- [x] **Step 2: Write `src/locales/ar.ts`**
 
 ```ts
 // aroma-admin/src/locales/ar.ts
@@ -1055,7 +1055,7 @@ export default {
 }
 ```
 
-- [ ] **Step 3: Verify app compiles**
+- [x] **Step 3: Verify app compiles**
 
 ```bash
 npm run build 2>&1 | tail -5
@@ -1063,7 +1063,7 @@ npm run build 2>&1 | tail -5
 
 Expected: Build succeeds with no TypeScript errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/locales/en.ts aroma-admin/src/locales/ar.ts
@@ -1077,7 +1077,7 @@ git commit -m "feat: add English and Arabic locale files"
 **Files:**
 - Modify: `aroma-admin/src/style.css`
 
-- [ ] **Step 1: Update Google Fonts import and add RTL font rule**
+- [x] **Step 1: Update Google Fonts import and add RTL font rule**
 
 At the top of `src/style.css`, replace the existing `@import` line with:
 
@@ -1113,7 +1113,7 @@ The full updated `@layer base` opening should look like:
   /* ... rest unchanged */
 ```
 
-- [ ] **Step 2: Verify font loads in browser**
+- [x] **Step 2: Verify font loads in browser**
 
 ```bash
 npm run dev
@@ -1121,7 +1121,7 @@ npm run dev
 
 Open `http://localhost:5173` and in DevTools → Network → filter "cairo" — the font should appear (or be cached). No new console errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/style.css
@@ -1136,7 +1136,7 @@ git commit -m "feat: add Cairo font for Arabic RTL mode"
 - Modify: `aroma-admin/src/components/layout/Topbar.vue`
 - Modify: `aroma-admin/src/components/layout/Sidebar.vue`
 
-- [ ] **Step 1: Rewrite `Topbar.vue`**
+- [x] **Step 1: Rewrite `Topbar.vue`**
 
 Replace the entire file:
 
@@ -1217,7 +1217,7 @@ function handleLogout() {
 </script>
 ```
 
-- [ ] **Step 2: Update `Sidebar.vue` with RTL variants and translations**
+- [x] **Step 2: Update `Sidebar.vue` with RTL variants and translations**
 
 Replace the entire file:
 
@@ -1338,7 +1338,7 @@ const catalogItems = computed(() => [
 </script>
 ```
 
-- [ ] **Step 3: Smoke test — toggle the locale**
+- [x] **Step 3: Smoke test — toggle the locale**
 
 ```bash
 npm run dev
@@ -1349,7 +1349,7 @@ npm run dev
 3. Refresh the page → Arabic persists.
 4. Click **EN** → back to English LTR.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/components/layout/Topbar.vue \
@@ -1365,7 +1365,7 @@ git commit -m "feat: add language toggle to topbar, apply RTL variants to layout
 - Modify: `aroma-admin/src/components/ui/APagination.vue`
 - Modify: `aroma-admin/src/components/ui/AConfirmDialog.vue`
 
-- [ ] **Step 1: Update `APagination.vue`**
+- [x] **Step 1: Update `APagination.vue`**
 
 Replace the entire file:
 
@@ -1403,7 +1403,7 @@ const { t } = useI18n()
 </script>
 ```
 
-- [ ] **Step 2: Update `AConfirmDialog.vue`**
+- [x] **Step 2: Update `AConfirmDialog.vue`**
 
 Replace the entire file:
 
@@ -1438,7 +1438,7 @@ const { t } = useI18n()
 </script>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/components/ui/APagination.vue \
@@ -1453,7 +1453,7 @@ git commit -m "feat: translate APagination and AConfirmDialog"
 **Files:**
 - Modify: `aroma-admin/src/views/LoginView.vue`
 
-- [ ] **Step 1: Update `LoginView.vue`**
+- [x] **Step 1: Update `LoginView.vue`**
 
 In the `<template>` section, replace all hardcoded strings:
 
@@ -1545,11 +1545,11 @@ async function handleLogin() {
 }
 ```
 
-- [ ] **Step 2: Verify in browser**
+- [x] **Step 2: Verify in browser**
 
 Switch to Arabic → visit `/login` → all text renders in Arabic, layout is RTL.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/LoginView.vue
@@ -1563,7 +1563,7 @@ git commit -m "feat: translate LoginView"
 **Files:**
 - Modify: `aroma-admin/src/views/DashboardView.vue`
 
-- [ ] **Step 1: Update `<script setup>` in `DashboardView.vue`**
+- [x] **Step 1: Update `<script setup>` in `DashboardView.vue`**
 
 Add `useI18n` and `useLocale`, and replace the `greeting` computed:
 
@@ -1619,7 +1619,7 @@ onMounted(async () => {
 })
 ```
 
-- [ ] **Step 2: Update `<template>` strings in `DashboardView.vue`**
+- [x] **Step 2: Update `<template>` strings in `DashboardView.vue`**
 
 Replace hardcoded strings in the template. Key changes:
 
@@ -1655,7 +1655,7 @@ Also add `rtl:text-right` to the `<th>` elements that use `text-left`:
 <th class="pb-3 text-left rtl:text-right text-2xs font-semibold text-dash-faint uppercase tracking-wider">
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/DashboardView.vue
@@ -1670,7 +1670,7 @@ git commit -m "feat: translate DashboardView"
 - Modify: `aroma-admin/src/views/OrdersView.vue`
 - Modify: `aroma-admin/src/views/OrderDetailView.vue`
 
-- [ ] **Step 1: Update `OrdersView.vue`**
+- [x] **Step 1: Update `OrdersView.vue`**
 
 Add `useI18n` import and make `statusOptions` and `cols` computed:
 
@@ -1711,7 +1711,7 @@ In the template, replace the pickup/delivery badge and empty state:
 <AEmptyState :icon="ShoppingBag" :heading="t('orders.noOrders')" :sub="t('orders.noOrdersSub')" />
 ```
 
-- [ ] **Step 2: Update `OrderDetailView.vue`**
+- [x] **Step 2: Update `OrderDetailView.vue`**
 
 Add `useI18n` and translate the back link, section headers, table headers, status options, and action labels:
 
@@ -1776,7 +1776,7 @@ Also replace the `items` count span. The current code uses a JS ternary for plur
 
 Not found: `'Order not found.'` — replace with `t('orderDetail.notFound')`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/OrdersView.vue \
@@ -1791,7 +1791,7 @@ git commit -m "feat: translate OrdersView and OrderDetailView"
 **Files:**
 - Modify: `aroma-admin/src/views/ProductsView.vue`
 
-- [ ] **Step 1: Update `ProductsView.vue`**
+- [x] **Step 1: Update `ProductsView.vue`**
 
 Add `useI18n` and make filter options and column definitions computed:
 
@@ -1893,7 +1893,7 @@ formErrors.value.general = e instanceof Error ? e.message : t('common.saveFailed
 formErrors.value.general = e instanceof Error ? e.message : t('common.deleteFailed')
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/ProductsView.vue
@@ -1907,7 +1907,7 @@ git commit -m "feat: translate ProductsView"
 **Files:**
 - Modify: `aroma-admin/src/views/ProductCreateView.vue`
 
-- [ ] **Step 1: Add `useI18n` and translate computed flags**
+- [x] **Step 1: Add `useI18n` and translate computed flags**
 
 In `<script setup>`:
 
@@ -1935,7 +1935,7 @@ if (!form.value.category_id) { formErrors.value.category_id = t('productCreate.c
 if (!form.value.type)        { formErrors.value.type        = t('productCreate.typeRequired'); return }
 ```
 
-- [ ] **Step 2: Replace template strings**
+- [x] **Step 2: Replace template strings**
 
 ```vue
 <!-- Sticky header -->
@@ -1980,7 +1980,7 @@ if (!form.value.type)        { formErrors.value.type        = t('productCreate.t
 <span ...>{{ t('productCreate.preview') }}</span>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/ProductCreateView.vue
@@ -1994,14 +1994,14 @@ git commit -m "feat: translate ProductCreateView"
 **Files:**
 - Modify: `aroma-admin/src/views/ProductVariantsView.vue`
 
-- [ ] **Step 1: Add `useI18n` to script**
+- [x] **Step 1: Add `useI18n` to script**
 
 ```ts
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 ```
 
-- [ ] **Step 2: Replace template strings**
+- [x] **Step 2: Replace template strings**
 
 Key replacements — read the full file and replace every hardcoded user-visible string:
 
@@ -2065,7 +2065,7 @@ Key replacements — read the full file and replace every hardcoded user-visible
 <p ...>{{ t('productVariants.noVariantsYetSub') }}</p>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/ProductVariantsView.vue
@@ -2080,7 +2080,7 @@ git commit -m "feat: translate ProductVariantsView"
 - Modify: `aroma-admin/src/views/BrandsView.vue`
 - Modify: `aroma-admin/src/views/BrandDetailView.vue`
 
-- [ ] **Step 1: Update `BrandsView.vue`**
+- [x] **Step 1: Update `BrandsView.vue`**
 
 Add `useI18n` and make `cols` computed:
 
@@ -2140,7 +2140,7 @@ Key template replacements:
   ... />
 ```
 
-- [ ] **Step 2: Update `BrandDetailView.vue`**
+- [x] **Step 2: Update `BrandDetailView.vue`**
 
 Add `useI18n` and make `cols` and filter computed:
 
@@ -2175,7 +2175,7 @@ const flags = computed(() => [
 
 Key template replacements (back link, field labels, section headers, modal content, action buttons — follow same pattern as BrandsView).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/BrandsView.vue \
@@ -2190,7 +2190,7 @@ git commit -m "feat: translate BrandsView and BrandDetailView"
 **Files:**
 - Modify: `aroma-admin/src/views/CategoriesView.vue`
 
-- [ ] **Step 1: Update `CategoriesView.vue`**
+- [x] **Step 1: Update `CategoriesView.vue`**
 
 ```ts
 import { useI18n } from 'vue-i18n'
@@ -2231,7 +2231,7 @@ Key template replacements:
   ... />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/CategoriesView.vue
@@ -2246,7 +2246,7 @@ git commit -m "feat: translate CategoriesView"
 - Modify: `aroma-admin/src/views/UsersView.vue`
 - Modify: `aroma-admin/src/views/UserDetailView.vue`
 
-- [ ] **Step 1: Update `UsersView.vue`**
+- [x] **Step 1: Update `UsersView.vue`**
 
 ```ts
 import { useI18n } from 'vue-i18n'
@@ -2271,7 +2271,7 @@ Template:
 <AEmptyState :icon="Users" :heading="t('users.noUsers')" :sub="t('users.noUsersSub')" />
 ```
 
-- [ ] **Step 2: Update `UserDetailView.vue`**
+- [x] **Step 2: Update `UserDetailView.vue`**
 
 ```ts
 import { useI18n } from 'vue-i18n'
@@ -2292,7 +2292,7 @@ Template:
 <p ...>{{ t('userDetail.qty', { n: item.quantity }) }}</p>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/UsersView.vue \
@@ -2307,7 +2307,7 @@ git commit -m "feat: translate UsersView and UserDetailView"
 **Files:**
 - Modify: `aroma-admin/src/views/CouponsView.vue`
 
-- [ ] **Step 1: Update `CouponsView.vue`**
+- [x] **Step 1: Update `CouponsView.vue`**
 
 ```ts
 import { useI18n } from 'vue-i18n'
@@ -2354,7 +2354,7 @@ Key template replacements:
 <AConfirmDialog :title="t('coupons.deleteTitle')" :message="t('common.confirmDelete', { name: deletingCoupon?.code })" ... />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/CouponsView.vue
@@ -2368,7 +2368,7 @@ git commit -m "feat: translate CouponsView"
 **Files:**
 - Modify: `aroma-admin/src/views/SpecTypesView.vue`
 
-- [ ] **Step 1: Update `SpecTypesView.vue`**
+- [x] **Step 1: Update `SpecTypesView.vue`**
 
 ```ts
 import { useI18n } from 'vue-i18n'
@@ -2418,7 +2418,7 @@ Key template replacements:
 <AConfirmDialog :title="t('specTypes.deleteTitle')" :message="t('specTypes.deleteMsg')" ... />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/SpecTypesView.vue
@@ -2429,7 +2429,7 @@ git commit -m "feat: translate SpecTypesView"
 
 ## Task 17: Final verification
 
-- [ ] **Step 1: Build to check for TypeScript errors**
+- [x] **Step 1: Build to check for TypeScript errors**
 
 ```bash
 cd aroma-admin && npm run build 2>&1
@@ -2437,37 +2437,37 @@ cd aroma-admin && npm run build 2>&1
 
 Expected: Exits 0, no TypeScript errors. Fix any type errors before proceeding.
 
-- [ ] **Step 2: Full EN→AR→EN cycle test**
+- [x] **Step 2: Full EN→AR→EN cycle test**
 
 ```bash
 npm run dev
 ```
 
 Walk through each page in both locales and verify:
-- [ ] Login page: Arabic text renders, layout is RTL
-- [ ] Dashboard: greeting in Arabic, date in Arabic, stat card labels translated
-- [ ] Orders: status pills translated, table columns translated, pickup/delivery badges translated
-- [ ] Order detail: all section headers, field labels, action panel in Arabic
-- [ ] Products: filters, table, modals fully translated
-- [ ] Product create: all sections translated
-- [ ] Product variants: wizard steps, image section translated
-- [ ] Brands: filters, table, modal translated
-- [ ] Brand detail: header fields, product table translated
-- [ ] Categories: table, modal translated
-- [ ] Customers: search, table translated
-- [ ] Customer detail: tabs, empty states translated
-- [ ] Coupons: table, modal, type/status labels translated
-- [ ] Spec types: header, table, modal translated
-- [ ] Sidebar: all nav labels in Arabic in RTL; in LTR shows English
-- [ ] Pagination: "صفحة X من Y" in Arabic
+- [x] Login page: Arabic text renders, layout is RTL
+- [x] Dashboard: greeting in Arabic, date in Arabic, stat card labels translated
+- [x] Orders: status pills translated, table columns translated, pickup/delivery badges translated
+- [x] Order detail: all section headers, field labels, action panel in Arabic
+- [x] Products: filters, table, modals fully translated
+- [x] Product create: all sections translated
+- [x] Product variants: wizard steps, image section translated
+- [x] Brands: filters, table, modal translated
+- [x] Brand detail: header fields, product table translated
+- [x] Categories: table, modal translated
+- [x] Customers: search, table translated
+- [x] Customer detail: tabs, empty states translated
+- [x] Coupons: table, modal, type/status labels translated
+- [x] Spec types: header, table, modal translated
+- [x] Sidebar: all nav labels in Arabic in RTL; in LTR shows English
+- [x] Pagination: "صفحة X من Y" in Arabic
 
-- [ ] **Step 3: Refresh persistence check**
+- [x] **Step 3: Refresh persistence check**
 
 1. Switch to Arabic
 2. Refresh the page
 3. Verify: still Arabic, RTL, Cairo font
 
-- [ ] **Step 4: Final commit**
+- [x] **Step 4: Final commit**
 
 ```bash
 git add -p  # stage any remaining unstaged changes

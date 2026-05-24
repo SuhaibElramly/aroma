@@ -1,6 +1,6 @@
 # Wishlist API & UI Cleanup Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Wire the storefront wishlist to the real API, remove all rating displays, translate wishlist UI copy to Arabic, and add per-user cart/wishlist views in the admin panel.
 
@@ -45,7 +45,7 @@
 **Files:**
 - Modify: `aroma/src/features/product/ProductPageClient.tsx`
 
-- [ ] **Step 1: Delete the rating block**
+- [x] **Step 1: Delete the rating block**
 
 In `aroma/src/features/product/ProductPageClient.tsx`, find and remove the entire "Rating" section (lines that render the 5 `<Star>` icons and the `{product.rating} ({product.reviews} تقييم)` text). The block looks like:
 
@@ -72,7 +72,7 @@ import { ChevronLeft, Minus, Plus, Check, Star } from 'lucide-react'
 import { ChevronLeft, Minus, Plus, Check } from 'lucide-react'
 ```
 
-- [ ] **Step 2: Verify the page still builds**
+- [x] **Step 2: Verify the page still builds**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -20
@@ -80,7 +80,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors related to `Star` or rating.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd aroma && git add src/features/product/ProductPageClient.tsx
@@ -94,7 +94,7 @@ git commit -m "feat: remove rating display from product detail page"
 **Files:**
 - Modify: `aroma/src/components/shared/WishlistButton.tsx`
 
-- [ ] **Step 1: Replace English copy with Arabic**
+- [x] **Step 1: Replace English copy with Arabic**
 
 Replace the entire file content:
 
@@ -173,7 +173,7 @@ export function WishlistButton({ productId, size = 16, className, variant = 'ove
 }
 ```
 
-- [ ] **Step 2: Verify types**
+- [x] **Step 2: Verify types**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -20
@@ -181,7 +181,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/components/shared/WishlistButton.tsx
@@ -199,7 +199,7 @@ git commit -m "feat: translate WishlistButton copy to Arabic"
 
 The API already has `GET /api/wishlist` (returns `ProductResource[]`), `POST /api/wishlist` `{ product_id }`, and `DELETE /api/wishlist/{productId}`.
 
-- [ ] **Step 1: Add `setIds` action to the wishlist store**
+- [x] **Step 1: Add `setIds` action to the wishlist store**
 
 Replace `aroma/src/store/wishlist.ts` with:
 
@@ -256,7 +256,7 @@ export const useWishlistStore = create<WishlistStore>()(
 )
 ```
 
-- [ ] **Step 2: Update `getWishlist` service in `aroma/src/mocks/services.ts`**
+- [x] **Step 2: Update `getWishlist` service in `aroma/src/mocks/services.ts`**
 
 Replace the existing `getWishlistProducts` function (which takes `ids: number[]`) with a properly-typed `getWishlist` that calls the API:
 
@@ -288,7 +288,7 @@ export async function removeFromWishlist(productId: number): Promise<void> {
 
 (Remove the old `addToWishlist` / `removeFromWishlist` functions that had different signatures if they exist — check the file for duplicates and keep only these.)
 
-- [ ] **Step 3: Add wishlist query keys and hooks to `aroma/src/lib/api/queries.ts`**
+- [x] **Step 3: Add wishlist query keys and hooks to `aroma/src/lib/api/queries.ts`**
 
 Add after the existing `useSimilarProducts` hook:
 
@@ -323,7 +323,7 @@ export function useRemoveFromWishlist() {
 }
 ```
 
-- [ ] **Step 4: Verify types**
+- [x] **Step 4: Verify types**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -20
@@ -331,7 +331,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/store/wishlist.ts src/lib/api/queries.ts src/mocks/services.ts
@@ -347,7 +347,7 @@ git commit -m "feat: add wishlist API hooks and setIds action to wishlist store"
 
 The button currently calls `toggle(productId)` on the Zustand store only. Now it should also call the API mutation and sync the store `ids` from the query cache.
 
-- [ ] **Step 1: Update WishlistButton to call API mutations**
+- [x] **Step 1: Update WishlistButton to call API mutations**
 
 Replace the file:
 
@@ -438,7 +438,7 @@ export function WishlistButton({ productId, size = 16, className, variant = 'ove
 }
 ```
 
-- [ ] **Step 2: Verify types**
+- [x] **Step 2: Verify types**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -20
@@ -446,7 +446,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/components/shared/WishlistButton.tsx
@@ -462,7 +462,7 @@ git commit -m "feat: wire WishlistButton to API add/remove mutations with optimi
 
 The wishlist page currently filters `PRODUCTS` (mock data) by stored `ids`. Replace with `useWishlist()` query and also sync `ids` into the store so `WishlistButton` knows what's saved.
 
-- [ ] **Step 1: Rewrite WishlistPageClient**
+- [x] **Step 1: Rewrite WishlistPageClient**
 
 Replace the file:
 
@@ -525,7 +525,7 @@ export function WishlistPageClient() {
 }
 ```
 
-- [ ] **Step 2: Verify types**
+- [x] **Step 2: Verify types**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -20
@@ -533,7 +533,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/features/wishlist/WishlistPageClient.tsx
@@ -548,7 +548,7 @@ git commit -m "feat: load wishlist from API and sync ids to store"
 - Create: `aroma-api/app/Http/Controllers/Api/Admin/AdminUserDetailController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Create `AdminUserDetailController.php`**
+- [x] **Step 1: Create `AdminUserDetailController.php`**
 
 ```php
 <?php
@@ -584,7 +584,7 @@ class AdminUserDetailController extends Controller
 }
 ```
 
-- [ ] **Step 2: Register the routes in `routes/api.php`**
+- [x] **Step 2: Register the routes in `routes/api.php`**
 
 Add inside the admin middleware group, after the existing `Route::get('/users', ...)` line:
 
@@ -604,7 +604,7 @@ use App\Http\Controllers\Api\Admin\{
 };
 ```
 
-- [ ] **Step 3: Test the endpoints manually**
+- [x] **Step 3: Test the endpoints manually**
 
 ```bash
 # Get a user id first
@@ -618,7 +618,7 @@ curl -s -H "Authorization: Bearer TOKEN" \
 
 Expected: JSON arrays (may be empty if the user has no items).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-api && git add app/Http/Controllers/Api/Admin/AdminUserDetailController.php routes/api.php
@@ -633,7 +633,7 @@ git commit -m "feat: admin endpoints for per-user cart and wishlist"
 - Modify: `aroma-admin/src/types/index.ts`
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add types to `aroma-admin/src/types/index.ts`**
+- [x] **Step 1: Add types to `aroma-admin/src/types/index.ts`**
 
 Add at the end of the file:
 
@@ -661,7 +661,7 @@ export interface AdminWishlistProduct {
 }
 ```
 
-- [ ] **Step 2: Add API functions to `aroma-admin/src/api/admin.ts`**
+- [x] **Step 2: Add API functions to `aroma-admin/src/api/admin.ts`**
 
 Add after `apiGetUsers`:
 
@@ -682,7 +682,7 @@ import type {
 } from '../types'
 ```
 
-- [ ] **Step 3: Verify TypeScript**
+- [x] **Step 3: Verify TypeScript**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
@@ -690,7 +690,7 @@ cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin && git add src/types/index.ts src/api/admin.ts
@@ -706,7 +706,7 @@ git commit -m "feat: add AdminCartItem, AdminWishlistProduct types and API funct
 - Modify: `aroma-admin/src/router/index.ts`
 - Modify: `aroma-admin/src/views/UsersView.vue`
 
-- [ ] **Step 1: Create `UserDetailView.vue`**
+- [x] **Step 1: Create `UserDetailView.vue`**
 
 ```vue
 <!-- aroma-admin/src/views/UserDetailView.vue -->
@@ -859,7 +859,7 @@ onMounted(() => {
 </script>
 ```
 
-- [ ] **Step 2: Register the route in `aroma-admin/src/router/index.ts`**
+- [x] **Step 2: Register the route in `aroma-admin/src/router/index.ts`**
 
 Find the `users` route entry and add a child (or add a sibling route). Open `router/index.ts` and after `{ path: 'users', name: 'users', component: () => import('../views/UsersView.vue') }` add:
 
@@ -867,7 +867,7 @@ Find the `users` route entry and add a child (or add a sibling route). Open `rou
 { path: 'users/:id', name: 'user-detail', props: true, component: () => import('../views/UserDetailView.vue') },
 ```
 
-- [ ] **Step 3: Make user rows clickable in `UsersView.vue`**
+- [x] **Step 3: Make user rows clickable in `UsersView.vue`**
 
 Add an `#actions` slot to the `<ATable>` in `UsersView.vue`:
 
@@ -888,7 +888,7 @@ Also import `AdminUserRow` in the script if not already imported — add to the 
 import type { AdminUserRow } from '../types'
 ```
 
-- [ ] **Step 4: Verify TypeScript**
+- [x] **Step 4: Verify TypeScript**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
@@ -896,7 +896,7 @@ cd aroma-admin && npx tsc --noEmit 2>&1 | head -20
 
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/views/UserDetailView.vue src/router/index.ts src/views/UsersView.vue

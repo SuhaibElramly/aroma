@@ -1,6 +1,6 @@
 # Admin Dashboard Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a standalone Vue 3 + Tailwind CSS admin dashboard SPA (at `aroma-admin/`) that lets store staff manage orders, products, brands, categories, and users through the existing Laravel API, plus new admin-only API routes.
 
@@ -94,7 +94,7 @@ aroma-admin/
 - Create: `aroma-api/app/Http/Middleware/IsAdmin.php`
 - Modify: `aroma-api/bootstrap/app.php`
 
-- [ ] **Step 1: Create the migration**
+- [x] **Step 1: Create the migration**
 
 ```php
 <?php
@@ -120,14 +120,14 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Run the migration**
+- [x] **Step 2: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
 ```
 Expected: `Migrating: 2026_04_26_add_is_admin_to_users_table` … `Migrated`
 
-- [ ] **Step 3: Update User model — add is_admin to fillable and casts**
+- [x] **Step 3: Update User model — add is_admin to fillable and casts**
 
 In `aroma-api/app/Models/User.php`, update:
 ```php
@@ -143,7 +143,7 @@ protected function casts(): array
 }
 ```
 
-- [ ] **Step 4: Create the IsAdmin middleware**
+- [x] **Step 4: Create the IsAdmin middleware**
 
 ```php
 <?php
@@ -166,7 +166,7 @@ class IsAdmin
 }
 ```
 
-- [ ] **Step 5: Register middleware alias in bootstrap/app.php**
+- [x] **Step 5: Register middleware alias in bootstrap/app.php**
 
 In `aroma-api/bootstrap/app.php`, inside `->withMiddleware(function (Middleware $middleware) {` add:
 ```php
@@ -175,14 +175,14 @@ $middleware->alias([
 ]);
 ```
 
-- [ ] **Step 6: Create a seeder to make the first admin user**
+- [x] **Step 6: Create a seeder to make the first admin user**
 
 Run this once manually to seed an admin (you'll use this account to log in):
 ```bash
 cd aroma-api && php artisan tinker --execute="App\Models\User::create(['name'=>'Admin','email'=>'admin@aroma.ly','password'=>bcrypt('password'),'phone'=>'0910000000','is_admin'=>true]);"
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd aroma-api && git add database/migrations/2026_04_26_add_is_admin_to_users_table.php app/Models/User.php app/Http/Middleware/IsAdmin.php bootstrap/app.php
@@ -202,7 +202,7 @@ git commit -m "feat(admin): add is_admin flag and middleware"
 - Create: `aroma-api/app/Http/Controllers/Api/Admin/AdminUserController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Create AdminDashboardController**
+- [x] **Step 1: Create AdminDashboardController**
 
 ```php
 <?php
@@ -240,7 +240,7 @@ class AdminDashboardController extends Controller
 }
 ```
 
-- [ ] **Step 2: Create AdminOrderController**
+- [x] **Step 2: Create AdminOrderController**
 
 ```php
 <?php
@@ -336,7 +336,7 @@ class AdminOrderController extends Controller
 }
 ```
 
-- [ ] **Step 3: Create AdminProductController**
+- [x] **Step 3: Create AdminProductController**
 
 ```php
 <?php
@@ -437,7 +437,7 @@ class AdminProductController extends Controller
 }
 ```
 
-- [ ] **Step 4: Create AdminBrandController**
+- [x] **Step 4: Create AdminBrandController**
 
 ```php
 <?php
@@ -500,7 +500,7 @@ class AdminBrandController extends Controller
 }
 ```
 
-- [ ] **Step 5: Create AdminCategoryController**
+- [x] **Step 5: Create AdminCategoryController**
 
 ```php
 <?php
@@ -554,7 +554,7 @@ class AdminCategoryController extends Controller
 }
 ```
 
-- [ ] **Step 6: Create AdminUserController**
+- [x] **Step 6: Create AdminUserController**
 
 ```php
 <?php
@@ -601,7 +601,7 @@ class AdminUserController extends Controller
 }
 ```
 
-- [ ] **Step 7: Add admin routes to api.php**
+- [x] **Step 7: Add admin routes to api.php**
 
 At the bottom of `aroma-api/routes/api.php`, add:
 
@@ -638,14 +638,14 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
 });
 ```
 
-- [ ] **Step 8: Test all routes exist**
+- [x] **Step 8: Test all routes exist**
 
 ```bash
 cd aroma-api && php artisan route:list --path=admin
 ```
 Expected: 14 admin routes listed.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 cd aroma-api && git add app/Http/Controllers/Api/Admin/ routes/api.php
@@ -666,7 +666,7 @@ git commit -m "feat(admin): add admin API controllers and routes"
 - Create: `aroma-admin/src/main.ts`
 - Create: `aroma-admin/src/App.vue`
 
-- [ ] **Step 1: Scaffold the Vite+Vue project**
+- [x] **Step 1: Scaffold the Vite+Vue project**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project
@@ -678,7 +678,7 @@ npm install -D tailwindcss@3 postcss autoprefixer
 npx tailwindcss init -p
 ```
 
-- [ ] **Step 2: Configure tailwind.config.ts**
+- [x] **Step 2: Configure tailwind.config.ts**
 
 Replace contents of `aroma-admin/tailwind.config.ts`:
 ```ts
@@ -711,7 +711,7 @@ export default {
 } satisfies Config
 ```
 
-- [ ] **Step 3: Update src/main.ts**
+- [x] **Step 3: Update src/main.ts**
 
 ```ts
 // aroma-admin/src/main.ts
@@ -727,7 +727,7 @@ createApp(App)
   .mount('#app')
 ```
 
-- [ ] **Step 4: Create src/style.css**
+- [x] **Step 4: Create src/style.css**
 
 ```css
 @tailwind base;
@@ -741,7 +741,7 @@ body {
 }
 ```
 
-- [ ] **Step 5: Create src/App.vue**
+- [x] **Step 5: Create src/App.vue**
 
 ```vue
 <template>
@@ -753,14 +753,14 @@ import { RouterView } from 'vue-router'
 </script>
 ```
 
-- [ ] **Step 6: Verify it runs**
+- [x] **Step 6: Verify it runs**
 
 ```bash
 cd aroma-admin && npm run dev
 ```
 Expected: Vite server starts on `http://localhost:5173` with no errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd aroma-admin && git add . && git commit -m "feat(admin): scaffold Vite+Vue+Tailwind project"
@@ -775,7 +775,7 @@ cd aroma-admin && git add . && git commit -m "feat(admin): scaffold Vite+Vue+Tai
 - Create: `aroma-admin/src/api/admin.ts`
 - Create: `aroma-admin/src/stores/auth.ts`
 
-- [ ] **Step 1: Create the Axios client**
+- [x] **Step 1: Create the Axios client**
 
 ```ts
 // aroma-admin/src/api/client.ts
@@ -793,7 +793,7 @@ client.interceptors.request.use((config) => {
 })
 ```
 
-- [ ] **Step 2: Create admin.ts API functions**
+- [x] **Step 2: Create admin.ts API functions**
 
 ```ts
 // aroma-admin/src/api/admin.ts
@@ -867,7 +867,7 @@ export const getAdminUsers = (params?: { search?: string; page?: number }) =>
   client.get<{ data: AdminUserRow[]; meta: PageMeta }>('/admin/users', { params })
 ```
 
-- [ ] **Step 3: Create auth store**
+- [x] **Step 3: Create auth store**
 
 ```ts
 // aroma-admin/src/stores/auth.ts
@@ -899,7 +899,7 @@ export const useAuthStore = defineStore('auth', () => {
 })
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin && git add src/api/ src/stores/auth.ts
@@ -913,7 +913,7 @@ git commit -m "feat(admin): add API client and auth store"
 **Files:**
 - Create: `aroma-admin/src/router/index.ts`
 
-- [ ] **Step 1: Create router**
+- [x] **Step 1: Create router**
 
 ```ts
 // aroma-admin/src/router/index.ts
@@ -955,7 +955,7 @@ router.beforeEach((to) => {
 })
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 cd aroma-admin && git add src/router/
@@ -975,7 +975,7 @@ git commit -m "feat(admin): add Vue Router with auth guards"
 - Create: `aroma-admin/src/components/ui/StatCard.vue`
 - Create: `aroma-admin/src/components/ui/Pagination.vue`
 
-- [ ] **Step 1: Create BaseButton.vue**
+- [x] **Step 1: Create BaseButton.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/BaseButton.vue -->
@@ -1003,7 +1003,7 @@ const variants = {
 </script>
 ```
 
-- [ ] **Step 2: Create BaseInput.vue**
+- [x] **Step 2: Create BaseInput.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/BaseInput.vue -->
@@ -1032,7 +1032,7 @@ const id = useId()
 </script>
 ```
 
-- [ ] **Step 3: Create BaseSelect.vue**
+- [x] **Step 3: Create BaseSelect.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/BaseSelect.vue -->
@@ -1064,7 +1064,7 @@ const id = useId()
 </script>
 ```
 
-- [ ] **Step 4: Create BaseModal.vue**
+- [x] **Step 4: Create BaseModal.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/BaseModal.vue -->
@@ -1099,7 +1099,7 @@ defineEmits<{ close: [] }>()
 </style>
 ```
 
-- [ ] **Step 5: Create BaseBadge.vue**
+- [x] **Step 5: Create BaseBadge.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/BaseBadge.vue -->
@@ -1131,7 +1131,7 @@ const colorClass = computed(() => colorMap[props.status] ?? 'bg-gray-100 text-gr
 </script>
 ```
 
-- [ ] **Step 6: Create StatCard.vue**
+- [x] **Step 6: Create StatCard.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/StatCard.vue -->
@@ -1155,7 +1155,7 @@ defineProps<{ label: string; value: string | number; icon: Component }>()
 </script>
 ```
 
-- [ ] **Step 7: Create Pagination.vue**
+- [x] **Step 7: Create Pagination.vue**
 
 ```vue
 <!-- aroma-admin/src/components/ui/Pagination.vue -->
@@ -1183,7 +1183,7 @@ defineEmits<{ change: [page: number] }>()
 </script>
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd aroma-admin && git add src/components/ui/
@@ -1199,7 +1199,7 @@ git commit -m "feat(admin): add reusable UI component library"
 - Create: `aroma-admin/src/components/layout/Topbar.vue`
 - Create: `aroma-admin/src/components/layout/AppLayout.vue`
 
-- [ ] **Step 1: Create Sidebar.vue**
+- [x] **Step 1: Create Sidebar.vue**
 
 ```vue
 <!-- aroma-admin/src/components/layout/Sidebar.vue -->
@@ -1245,7 +1245,7 @@ const isActive = (path: string) => route.path.startsWith(path)
 </script>
 ```
 
-- [ ] **Step 2: Create Topbar.vue**
+- [x] **Step 2: Create Topbar.vue**
 
 ```vue
 <!-- aroma-admin/src/components/layout/Topbar.vue -->
@@ -1288,7 +1288,7 @@ function handleLogout() {
 </script>
 ```
 
-- [ ] **Step 3: Create AppLayout.vue**
+- [x] **Step 3: Create AppLayout.vue**
 
 ```vue
 <!-- aroma-admin/src/components/layout/AppLayout.vue -->
@@ -1311,7 +1311,7 @@ import Topbar from './Topbar.vue'
 </script>
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin && git add src/components/layout/
@@ -1325,7 +1325,7 @@ git commit -m "feat(admin): add app layout with sidebar and topbar"
 **Files:**
 - Create: `aroma-admin/src/views/LoginView.vue`
 
-- [ ] **Step 1: Create LoginView.vue**
+- [x] **Step 1: Create LoginView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/LoginView.vue -->
@@ -1388,7 +1388,7 @@ async function handleLogin() {
 </script>
 ```
 
-- [ ] **Step 2: Test login manually**
+- [x] **Step 2: Test login manually**
 
 Start both servers:
 ```bash
@@ -1400,7 +1400,7 @@ cd aroma-admin && npm run dev
 ```
 Open `http://localhost:5173/login`. Enter `admin@aroma.ly` / `password`. Expect redirect to `/dashboard`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd aroma-admin && git add src/views/LoginView.vue
@@ -1414,7 +1414,7 @@ git commit -m "feat(admin): add login view"
 **Files:**
 - Create: `aroma-admin/src/views/DashboardView.vue`
 
-- [ ] **Step 1: Create DashboardView.vue**
+- [x] **Step 1: Create DashboardView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/DashboardView.vue -->
@@ -1487,11 +1487,11 @@ onMounted(async () => {
 </script>
 ```
 
-- [ ] **Step 2: Verify in browser**
+- [x] **Step 2: Verify in browser**
 
 Navigate to `/dashboard`. Expect 4 stat cards and a recent orders table.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd aroma-admin && git add src/views/DashboardView.vue
@@ -1506,7 +1506,7 @@ git commit -m "feat(admin): add dashboard view with stats and recent orders"
 - Create: `aroma-admin/src/views/OrdersView.vue`
 - Create: `aroma-admin/src/views/OrderDetailView.vue`
 
-- [ ] **Step 1: Create OrdersView.vue**
+- [x] **Step 1: Create OrdersView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/OrdersView.vue -->
@@ -1599,7 +1599,7 @@ onMounted(() => fetchOrders())
 </script>
 ```
 
-- [ ] **Step 2: Create OrderDetailView.vue**
+- [x] **Step 2: Create OrderDetailView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/OrderDetailView.vue -->
@@ -1731,11 +1731,11 @@ async function handleAddNote() {
 </script>
 ```
 
-- [ ] **Step 3: Test in browser**
+- [x] **Step 3: Test in browser**
 
 Navigate to `/orders`, click an order. Expect full detail, timeline, and ability to update status.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin && git add src/views/OrdersView.vue src/views/OrderDetailView.vue
@@ -1749,7 +1749,7 @@ git commit -m "feat(admin): add orders list and order detail views"
 **Files:**
 - Create: `aroma-admin/src/views/ProductsView.vue`
 
-- [ ] **Step 1: Create ProductsView.vue**
+- [x] **Step 1: Create ProductsView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/ProductsView.vue -->
@@ -1900,7 +1900,7 @@ onMounted(() => fetchProducts())
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 cd aroma-admin && git add src/views/ProductsView.vue
@@ -1916,7 +1916,7 @@ git commit -m "feat(admin): add products management view"
 - Create: `aroma-admin/src/views/CategoriesView.vue`
 - Create: `aroma-admin/src/views/UsersView.vue`
 
-- [ ] **Step 1: Create BrandsView.vue**
+- [x] **Step 1: Create BrandsView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/BrandsView.vue -->
@@ -2010,7 +2010,7 @@ async function handleDelete(id: string) {
 </script>
 ```
 
-- [ ] **Step 2: Create CategoriesView.vue**
+- [x] **Step 2: Create CategoriesView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/CategoriesView.vue -->
@@ -2099,7 +2099,7 @@ async function handleDelete(id: string) {
 </script>
 ```
 
-- [ ] **Step 3: Create UsersView.vue**
+- [x] **Step 3: Create UsersView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/UsersView.vue -->
@@ -2162,7 +2162,7 @@ onMounted(() => fetchUsers())
 </script>
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin && git add src/views/BrandsView.vue src/views/CategoriesView.vue src/views/UsersView.vue
@@ -2176,7 +2176,7 @@ git commit -m "feat(admin): add brands, categories, and users views"
 **Files:**
 - Modify: `aroma-api/config/cors.php` (or `.env`)
 
-- [ ] **Step 1: Allow the admin dev server origin in CORS**
+- [x] **Step 1: Allow the admin dev server origin in CORS**
 
 In `aroma-api/.env`, ensure:
 ```
@@ -2189,14 +2189,14 @@ In `aroma-api/config/cors.php`, ensure:
 'supports_credentials' => true,
 ```
 
-- [ ] **Step 2: Create .env for aroma-admin**
+- [x] **Step 2: Create .env for aroma-admin**
 
 ```bash
 # aroma-admin/.env
 echo "VITE_API_URL=http://localhost:8000/api" > /Users/suhaib/web_projects/aroma-full-project/aroma-admin/.env
 ```
 
-- [ ] **Step 3: Full end-to-end smoke test**
+- [x] **Step 3: Full end-to-end smoke test**
 
 Start servers:
 ```bash
@@ -2217,7 +2217,7 @@ Run through these flows manually:
 7. Brands and categories CRUD work
 8. Users page loads with search
 
-- [ ] **Step 4: Final commit**
+- [x] **Step 4: Final commit**
 
 ```bash
 cd aroma-admin && git add .env && git commit -m "chore(admin): add env config"

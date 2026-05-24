@@ -1,6 +1,6 @@
 # Brands Admin Enhancements Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add server-side filters to the brands list, a brand detail page with a full paginated product table, and auto-generated slug from the English name on brand creation.
 
@@ -33,7 +33,7 @@
 - Modify: `aroma-api/app/Models/Brand.php`
 - Modify: `aroma-api/app/Models/Product.php`
 
-- [ ] **Step 1: Add `name_en` to Brand `$fillable`**
+- [x] **Step 1: Add `name_en` to Brand `$fillable`**
 
 Open `aroma-api/app/Models/Brand.php`. Replace:
 ```php
@@ -44,7 +44,7 @@ With:
 protected $fillable = ['id', 'name', 'name_en', 'origin', 'tagline', 'bg'];
 ```
 
-- [ ] **Step 2: Add `name_en` to Product `$fillable`**
+- [x] **Step 2: Add `name_en` to Product `$fillable`**
 
 Open `aroma-api/app/Models/Product.php`. Replace:
 ```php
@@ -63,7 +63,7 @@ protected $fillable = [
 ];
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-api/app/Models/Brand.php aroma-api/app/Models/Product.php
@@ -77,7 +77,7 @@ git commit -m "fix: add name_en to Brand and Product fillable arrays"
 **Files:**
 - Create: `aroma-api/database/factories/BrandFactory.php`
 
-- [ ] **Step 1: Create the factory file**
+- [x] **Step 1: Create the factory file**
 
 Create `aroma-api/database/factories/BrandFactory.php` with this content:
 
@@ -109,7 +109,7 @@ class BrandFactory extends Factory
 }
 ```
 
-- [ ] **Step 2: Add `HasFactory` trait to Brand model**
+- [x] **Step 2: Add `HasFactory` trait to Brand model**
 
 Open `aroma-api/app/Models/Brand.php`. The full file should be:
 
@@ -136,7 +136,7 @@ class Brand extends Model
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-api/database/factories/BrandFactory.php aroma-api/app/Models/Brand.php
@@ -152,7 +152,7 @@ git commit -m "feat: add BrandFactory and HasFactory trait to Brand model"
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminBrandController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `aroma-api/tests/Feature/AdminBrandTest.php`:
 
@@ -284,7 +284,7 @@ class AdminBrandTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests — confirm they all fail**
+- [x] **Step 2: Run tests — confirm they all fail**
 
 Run from `aroma-api/`:
 ```bash
@@ -293,7 +293,7 @@ php artisan test tests/Feature/AdminBrandTest.php
 
 Expected: all tests fail. The `show` tests fail with 404 (route doesn't exist). The filter tests fail because the current `index()` ignores query params but may still pass for the "no filters" test — the filter tests that expect 1 result while 2 exist will fail.
 
-- [ ] **Step 3: Implement filters + `show()` in AdminBrandController**
+- [x] **Step 3: Implement filters + `show()` in AdminBrandController**
 
 Replace the entire contents of `aroma-api/app/Http/Controllers/Api/Admin/AdminBrandController.php`:
 
@@ -413,7 +413,7 @@ class AdminBrandController extends Controller
 }
 ```
 
-- [ ] **Step 4: Register the `show` route**
+- [x] **Step 4: Register the `show` route**
 
 Open `aroma-api/routes/api.php`. Find the admin brands section and add the `show` route:
 
@@ -425,7 +425,7 @@ Route::put('/brands/{id}', [AdminBrandController::class, 'update']);
 Route::delete('/brands/{id}', [AdminBrandController::class, 'destroy']);
 ```
 
-- [ ] **Step 5: Run tests — confirm they all pass**
+- [x] **Step 5: Run tests — confirm they all pass**
 
 ```bash
 php artisan test tests/Feature/AdminBrandTest.php
@@ -433,7 +433,7 @@ php artisan test tests/Feature/AdminBrandTest.php
 
 Expected output: `9 tests, 9 assertions` — all green.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/tests/Feature/AdminBrandTest.php \
@@ -449,7 +449,7 @@ git commit -m "feat: add brand list filters and show endpoint to admin API"
 **Files:**
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Update `apiGetBrands` and add `apiGetBrand`**
+- [x] **Step 1: Update `apiGetBrands` and add `apiGetBrand`**
 
 In `aroma-admin/src/api/admin.ts`, replace the brands section:
 
@@ -477,7 +477,7 @@ export const apiDeleteBrand = (id: string) =>
   client.delete(`/admin/brands/${id}`)
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/api/admin.ts
@@ -491,7 +491,7 @@ git commit -m "feat: add filter params to apiGetBrands and add apiGetBrand"
 **Files:**
 - Modify: `aroma-admin/src/views/BrandsView.vue`
 
-- [ ] **Step 1: Replace BrandsView.vue with the updated version**
+- [x] **Step 1: Replace BrandsView.vue with the updated version**
 
 Replace the full contents of `aroma-admin/src/views/BrandsView.vue`:
 
@@ -729,7 +729,7 @@ onUnmounted(() => clearTimeout(debounceTimer))
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/BrandsView.vue
@@ -743,7 +743,7 @@ git commit -m "feat: add brand list filters, RouterLink on name, and auto-genera
 **Files:**
 - Create: `aroma-admin/src/views/BrandDetailView.vue`
 
-- [ ] **Step 1: Create the file**
+- [x] **Step 1: Create the file**
 
 Create `aroma-admin/src/views/BrandDetailView.vue` with this content:
 
@@ -1182,7 +1182,7 @@ onUnmounted(() => clearTimeout(debounceTimer))
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/BrandDetailView.vue
@@ -1196,7 +1196,7 @@ git commit -m "feat: add BrandDetailView with brand header and full product tabl
 **Files:**
 - Modify: `aroma-admin/src/router/index.ts`
 
-- [ ] **Step 1: Add the brand detail route**
+- [x] **Step 1: Add the brand detail route**
 
 Open `aroma-admin/src/router/index.ts`. In the children array, add the brand detail route directly after the brands list route:
 
@@ -1205,7 +1205,7 @@ Open `aroma-admin/src/router/index.ts`. In the children array, add the brand det
 { path: 'brands/:id',  name: 'brand-detail', component: () => import('../views/BrandDetailView.vue'), props: true },
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/router/index.ts

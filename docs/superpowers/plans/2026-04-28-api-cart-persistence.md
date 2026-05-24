@@ -1,6 +1,6 @@
 # API Cart Persistence Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the client-side Zustand/localStorage cart with the existing backend cart API so the cart persists across devices and is visible to admins.
 
@@ -32,13 +32,13 @@
 **Files:**
 - Modify: `aroma-api/app/Http/Resources/CartItemResource.php`
 
-- [ ] **Step 1: Read the file**
+- [x] **Step 1: Read the file**
 
 ```bash
 cat /Users/suhaib/web_projects/aroma-full-project/aroma-api/app/Http/Resources/CartItemResource.php
 ```
 
-- [ ] **Step 2: Add `id` and `variantId` to `toArray()`**
+- [x] **Step 2: Add `id` and `variantId` to `toArray()`**
 
 In `CartItemResource.php`, add two fields at the top of the returned array (before `'product'`):
 
@@ -84,7 +84,7 @@ public function toArray(Request $request): array
 }
 ```
 
-- [ ] **Step 3: Verify with tinker**
+- [x] **Step 3: Verify with tinker**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan tinker --execute="
@@ -102,7 +102,7 @@ if (\$item) {
 
 Expected: prints `id: <number>` and `variantId: <number>` (or "no cart items in DB yet" if table is empty — that is fine).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-api/app/Http/Resources/CartItemResource.php
@@ -117,14 +117,14 @@ git commit -m "feat: expose id and variantId in CartItemResource"
 - Modify: `aroma/src/types/index.ts`
 - Modify: `aroma/src/mocks/services.ts`
 
-- [ ] **Step 1: Read both files**
+- [x] **Step 1: Read both files**
 
 ```bash
 grep -n "CartItem\|CartProduct" /Users/suhaib/web_projects/aroma-full-project/aroma/src/types/index.ts | head -20
 grep -n "getCart\|addToCart\|updateCartItem\|removeFromCart" /Users/suhaib/web_projects/aroma-full-project/aroma/src/mocks/services.ts
 ```
 
-- [ ] **Step 2: Update `CartItem` interface in `aroma/src/types/index.ts`**
+- [x] **Step 2: Update `CartItem` interface in `aroma/src/types/index.ts`**
 
 Find the existing `CartItem` interface and replace it:
 
@@ -137,7 +137,7 @@ export interface CartItem {
 }
 ```
 
-- [ ] **Step 3: Update cart service functions in `aroma/src/mocks/services.ts`**
+- [x] **Step 3: Update cart service functions in `aroma/src/mocks/services.ts`**
 
 Find and replace the four cart service functions (`getCart`, `addToCart`, `updateCartItem` / existing update, `removeFromCart` / existing remove). Replace them all with:
 
@@ -189,7 +189,7 @@ export async function removeFromCart(id: number): Promise<void> {
 
 > **Note:** `CartItem` must be imported at the top of `services.ts` if it isn't already. Check existing imports from `@/types` and add `CartItem` to the import list.
 
-- [ ] **Step 4: Check TypeScript**
+- [x] **Step 4: Check TypeScript**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "services\|CartItem" | head -20
@@ -197,7 +197,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no new errors on those files (pre-existing `data.ts` errors are unrelated).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma/src/types/index.ts aroma/src/mocks/services.ts
@@ -211,13 +211,13 @@ git commit -m "feat: update CartItem type and service fns for API cart"
 **Files:**
 - Modify: `aroma/src/lib/api/queries.ts`
 
-- [ ] **Step 1: Read the top of queries.ts to understand imports**
+- [x] **Step 1: Read the top of queries.ts to understand imports**
 
 ```bash
 head -30 /Users/suhaib/web_projects/aroma-full-project/aroma/src/lib/api/queries.ts
 ```
 
-- [ ] **Step 2: Add cart hooks**
+- [x] **Step 2: Add cart hooks**
 
 Add these four hooks to `aroma/src/lib/api/queries.ts`. Place them in the cart section (search for existing `useCart` or add after address hooks):
 
@@ -287,7 +287,7 @@ export function useRemoveFromCart() {
 > - `useAuthStore` from `@/store/auth`
 > - `useQuery, useMutation, useQueryClient` from `@tanstack/react-query`
 
-- [ ] **Step 3: Check TypeScript**
+- [x] **Step 3: Check TypeScript**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "queries" | head -20
@@ -295,7 +295,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no errors on `queries.ts`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma/src/lib/api/queries.ts
@@ -315,7 +315,7 @@ The current page uses `useCartStore` (index-based). Replace it with the API hook
 - `subtotal` computed inline
 - Loading skeleton while `isPending`
 
-- [ ] **Step 1: Replace the CartPageClient implementation**
+- [x] **Step 1: Replace the CartPageClient implementation**
 
 Replace the entire file content with:
 
@@ -501,7 +501,7 @@ export function CartPageClient() {
 }
 ```
 
-- [ ] **Step 2: TypeScript check**
+- [x] **Step 2: TypeScript check**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "CartPage" | head -20
@@ -509,7 +509,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/cart/CartPageClient.tsx
@@ -525,23 +525,23 @@ git commit -m "feat: CartPageClient uses API cart hooks"
 
 Replace `addToCart = useCartStore(s => s.addItem)` with `useAddToCart()`. The auth gate already exists (`if (!isLoggedIn) router.push('/login...')`).
 
-- [ ] **Step 1: Read the relevant section of ProductPageClient.tsx**
+- [x] **Step 1: Read the relevant section of ProductPageClient.tsx**
 
 ```bash
 grep -n "useCartStore\|addToCart\|addItem\|handleAdd\|isLoggedIn" /Users/suhaib/web_projects/aroma-full-project/aroma/src/features/product/ProductPageClient.tsx | head -20
 ```
 
-- [ ] **Step 2: Replace the import**
+- [x] **Step 2: Replace the import**
 
 Find: `import { useCartStore } from '@/store/cart'`
 Replace with: `import { useAddToCart } from '@/lib/api/queries'`
 
-- [ ] **Step 3: Replace the hook call**
+- [x] **Step 3: Replace the hook call**
 
 Find: `const addToCart = useCartStore(s => s.addItem)`
 Replace with: `const addToCartMutation = useAddToCart()`
 
-- [ ] **Step 4: Update `handleAdd`**
+- [x] **Step 4: Update `handleAdd`**
 
 Find the `handleAdd` function and replace its body:
 
@@ -572,7 +572,7 @@ const handleAdd = () => {
 
 > **Note:** `activeVariant.id` is the product variant's database id (it comes from `product.variants` which the backend returns with their ids). If the variant type doesn't yet have `id: number`, add it to the `ProductVariant` interface in `types/index.ts`.
 
-- [ ] **Step 5: TypeScript check**
+- [x] **Step 5: TypeScript check**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "ProductPage\|handleAdd\|activeVariant" | head -20
@@ -580,7 +580,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 If `activeVariant.id` errors because `ProductVariant` is missing `id`, open `aroma/src/types/index.ts`, find the `ProductVariant` interface, and add `id: number` to it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma/src/features/product/ProductPageClient.tsx aroma/src/types/index.ts
@@ -595,14 +595,14 @@ git commit -m "feat: ProductPageClient uses useAddToCart API hook"
 - Modify: `aroma/src/components/layout/Header.tsx`
 - Modify: `aroma/src/components/layout/MobileNav.tsx`
 
-- [ ] **Step 1: Read both files' cart-related lines**
+- [x] **Step 1: Read both files' cart-related lines**
 
 ```bash
 grep -n "useCartStore\|cartCount\|count()" /Users/suhaib/web_projects/aroma-full-project/aroma/src/components/layout/Header.tsx
 grep -n "useCartStore\|cartCount\|count()" /Users/suhaib/web_projects/aroma-full-project/aroma/src/components/layout/MobileNav.tsx
 ```
 
-- [ ] **Step 2: Update Header.tsx**
+- [x] **Step 2: Update Header.tsx**
 
 Replace `import { useCartStore } from '@/store/cart'` with `import { useCart } from '@/lib/api/queries'`.
 
@@ -612,7 +612,7 @@ const { data: cartItems = [] } = useCart()
 const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0)
 ```
 
-- [ ] **Step 3: Update MobileNav.tsx**
+- [x] **Step 3: Update MobileNav.tsx**
 
 Replace `import { useCartStore } from '@/store/cart'` with `import { useCart } from '@/lib/api/queries'`.
 
@@ -622,7 +622,7 @@ const { data: cartItems = [] } = useCart()
 const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0)
 ```
 
-- [ ] **Step 4: TypeScript check**
+- [x] **Step 4: TypeScript check**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "Header\|MobileNav" | head -20
@@ -630,7 +630,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma/src/components/layout/Header.tsx aroma/src/components/layout/MobileNav.tsx
@@ -646,19 +646,19 @@ git commit -m "feat: Header and MobileNav derive cart count from API"
 
 Replace Zustand cart reads with `useCart()`. Replace `clearCart()` with a loop of `removeFromCart`.
 
-- [ ] **Step 1: Read the current imports and hook usage**
+- [x] **Step 1: Read the current imports and hook usage**
 
 ```bash
 grep -n "useCartStore\|items\|subtotal\|clearCart\|clear" /Users/suhaib/web_projects/aroma-full-project/aroma/src/features/checkout/CheckoutPageClient.tsx | head -20
 ```
 
-- [ ] **Step 2: Replace the import**
+- [x] **Step 2: Replace the import**
 
 Remove: `import { useCartStore } from '@/store/cart'`
 
 Add to existing query imports: `useCart, useRemoveFromCart` from `'@/lib/api/queries'`
 
-- [ ] **Step 3: Replace hook calls**
+- [x] **Step 3: Replace hook calls**
 
 Remove:
 ```ts
@@ -674,7 +674,7 @@ const removeFromCart = useRemoveFromCart()
 const subtotal = cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
 ```
 
-- [ ] **Step 4: Update `onSubmit` to clear cart via API**
+- [x] **Step 4: Update `onSubmit` to clear cart via API**
 
 Find the `onSubmit` function. Replace any reference to `items` with `cartItems` and replace `clearCart()` with:
 
@@ -693,18 +693,18 @@ const orderItems = cartItems.map(i => ({
 
 Pass `orderItems` as `items` in `createOrder.mutateAsync({ items: orderItems, total: subtotal, ... })`.
 
-- [ ] **Step 5: Update empty-cart guard**
+- [x] **Step 5: Update empty-cart guard**
 
 Find the guard `if (items.length === 0 && !success)` and update to:
 ```ts
 if (!cartLoading && cartItems.length === 0 && !submitted) {
 ```
 
-- [ ] **Step 6: Update order summary JSX**
+- [x] **Step 6: Update order summary JSX**
 
 Find the items map in the JSX summary. Replace `items.map(item => ...)` with `cartItems.map(item => ...)`. The item fields stay the same (`item.product.name`, `item.product.price`, `item.quantity`).
 
-- [ ] **Step 7: TypeScript check**
+- [x] **Step 7: TypeScript check**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -i "CheckoutPage" | head -20
@@ -712,7 +712,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no errors.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma/src/features/checkout/CheckoutPageClient.tsx
@@ -726,7 +726,7 @@ git commit -m "feat: CheckoutPageClient reads cart from API, clears via removeFr
 **Files:**
 - Delete: `aroma/src/store/cart.ts`
 
-- [ ] **Step 1: Confirm no remaining imports**
+- [x] **Step 1: Confirm no remaining imports**
 
 ```bash
 grep -rn "from.*store/cart\|useCartStore" /Users/suhaib/web_projects/aroma-full-project/aroma/src --include="*.ts" --include="*.tsx" | grep -v node_modules | grep -v ".next"
@@ -736,13 +736,13 @@ Expected: **no output** (all usages were replaced in Tasks 4–7).
 
 If any usages remain, fix them before continuing.
 
-- [ ] **Step 2: Delete the file**
+- [x] **Step 2: Delete the file**
 
 ```bash
 rm /Users/suhaib/web_projects/aroma-full-project/aroma/src/store/cart.ts
 ```
 
-- [ ] **Step 3: Full TypeScript check**
+- [x] **Step 3: Full TypeScript check**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | grep -v "mocks/data" | head -40
@@ -750,7 +750,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: no errors (pre-existing `mocks/data.ts` errors are unrelated and can be ignored).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A

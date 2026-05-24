@@ -1,6 +1,6 @@
 # Address, Checkout & Profile Flow Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Simplify the address model (label + city + description only), wire delivery addresses into checkout, prompt for profile completion (name/phone) when missing, and skip the address step entirely when the customer chooses in-store pickup.
 
@@ -49,7 +49,7 @@
 - Modify: `aroma-api/app/Http/Requests/Address/AddressRequest.php`
 - Modify: `aroma-api/app/Http/Resources/AddressResource.php`
 
-- [ ] **Step 1: Create the migration**
+- [x] **Step 1: Create the migration**
 
 ```php
 <?php
@@ -80,7 +80,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Run the migration**
+- [x] **Step 2: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -88,7 +88,7 @@ cd aroma-api && php artisan migrate
 
 Expected: `Migrating: 2026_04_27_000001_simplify_addresses_table` then `Migrated`.
 
-- [ ] **Step 3: Update Address model**
+- [x] **Step 3: Update Address model**
 
 Replace the `fillable` array in `aroma-api/app/Models/Address.php`:
 
@@ -102,7 +102,7 @@ protected $fillable = [
 ];
 ```
 
-- [ ] **Step 4: Update AddressRequest validation**
+- [x] **Step 4: Update AddressRequest validation**
 
 Replace the `rules()` body in `aroma-api/app/Http/Requests/Address/AddressRequest.php`:
 
@@ -118,7 +118,7 @@ public function rules(): array
 }
 ```
 
-- [ ] **Step 5: Update AddressResource**
+- [x] **Step 5: Update AddressResource**
 
 Replace the `toArray()` body in `aroma-api/app/Http/Resources/AddressResource.php`:
 
@@ -135,7 +135,7 @@ public function toArray(Request $request): array
 }
 ```
 
-- [ ] **Step 6: Smoke-test via artisan tinker**
+- [x] **Step 6: Smoke-test via artisan tinker**
 
 ```bash
 cd aroma-api && php artisan tinker --execute="echo json_encode(app(\App\Http\Resources\AddressResource::class, ['resource' => \App\Models\Address::first()]))"
@@ -143,7 +143,7 @@ cd aroma-api && php artisan tinker --execute="echo json_encode(app(\App\Http\Res
 
 Expected: JSON with keys `id`, `label`, `city`, `description`, `isDefault` — no name/phone/street/country.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_04_27_000001_simplify_addresses_table.php \
@@ -164,7 +164,7 @@ git commit -m "feat: simplify addresses — label/city/description/is_default on
 - Modify: `aroma-api/app/Services/OrderService.php`
 - Modify: `aroma-api/app/Http/Resources/OrderResource.php`
 
-- [ ] **Step 1: Create the migration**
+- [x] **Step 1: Create the migration**
 
 ```php
 <?php
@@ -197,7 +197,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Run the migration**
+- [x] **Step 2: Run the migration**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -205,7 +205,7 @@ cd aroma-api && php artisan migrate
 
 Expected: `Migrated: 2026_04_27_000002_add_address_to_orders_table`.
 
-- [ ] **Step 3: Update Order model**
+- [x] **Step 3: Update Order model**
 
 Add to `fillable` in `aroma-api/app/Models/Order.php`:
 
@@ -217,7 +217,7 @@ protected $fillable = [
 ];
 ```
 
-- [ ] **Step 4: Update CreateOrderRequest**
+- [x] **Step 4: Update CreateOrderRequest**
 
 Replace `rules()` in `aroma-api/app/Http/Requests/Order/CreateOrderRequest.php`:
 
@@ -236,7 +236,7 @@ public function rules(): array
 }
 ```
 
-- [ ] **Step 5: Update OrderService to snapshot address**
+- [x] **Step 5: Update OrderService to snapshot address**
 
 In `aroma-api/app/Services/OrderService.php`, update `createOrder()`. Find the block that creates the Order and add the address snapshot:
 
@@ -275,7 +275,7 @@ public function createOrder(User $user, array $data): Order
 
 > **Note:** Preserve the existing items and timeline creation logic below this block. Only replace the `Order::create([...])` call and add the address resolution above it.
 
-- [ ] **Step 6: Update OrderResource to expose delivery address**
+- [x] **Step 6: Update OrderResource to expose delivery address**
 
 Add to `toArray()` in `aroma-api/app/Http/Resources/OrderResource.php`:
 
@@ -288,7 +288,7 @@ Add to `toArray()` in `aroma-api/app/Http/Resources/OrderResource.php`:
 
 Place this after the existing `note` / `adminNote` fields.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_04_27_000002_add_address_to_orders_table.php \
@@ -308,7 +308,7 @@ git commit -m "feat: snapshot delivery address on order creation"
 - Modify: `aroma/src/lib/schemas/index.ts`
 - Modify: `aroma/src/mocks/services.ts`
 
-- [ ] **Step 1: Update Address type in `aroma/src/types/index.ts`**
+- [x] **Step 1: Update Address type in `aroma/src/types/index.ts`**
 
 Find the existing `Address` interface (around line 159) and replace it:
 
@@ -322,7 +322,7 @@ export interface Address {
 }
 ```
 
-- [ ] **Step 2: Update CheckoutPayload type in `aroma/src/types/index.ts`**
+- [x] **Step 2: Update CheckoutPayload type in `aroma/src/types/index.ts`**
 
 Find `CheckoutPayload` (around line 186) and replace:
 
@@ -336,7 +336,7 @@ export interface CheckoutPayload {
 }
 ```
 
-- [ ] **Step 3: Add DeliveryAddress to Order type in `aroma/src/types/index.ts`**
+- [x] **Step 3: Add DeliveryAddress to Order type in `aroma/src/types/index.ts`**
 
 Find the `Order` interface and add the `deliveryAddress` field:
 
@@ -347,7 +347,7 @@ deliveryAddress?: {
 } | null
 ```
 
-- [ ] **Step 4: Update address schema in `aroma/src/lib/schemas/index.ts`**
+- [x] **Step 4: Update address schema in `aroma/src/lib/schemas/index.ts`**
 
 Find the address schema (around line 29) and replace:
 
@@ -360,7 +360,7 @@ export const addressSchema = z.object({
 })
 ```
 
-- [ ] **Step 5: Update checkout schema in `aroma/src/lib/schemas/index.ts`**
+- [x] **Step 5: Update checkout schema in `aroma/src/lib/schemas/index.ts`**
 
 Find the checkout schema (around line 64) and replace:
 
@@ -372,7 +372,7 @@ export const checkoutSchema = z.object({
 })
 ```
 
-- [ ] **Step 6: Update address service functions in `aroma/src/mocks/services.ts`**
+- [x] **Step 6: Update address service functions in `aroma/src/mocks/services.ts`**
 
 Find `addAddress` and `updateAddress` (around line 200) and update their payloads:
 
@@ -418,7 +418,7 @@ export async function updateAddress(
 }
 ```
 
-- [ ] **Step 7: Update createOrder service call in `aroma/src/mocks/services.ts`**
+- [x] **Step 7: Update createOrder service call in `aroma/src/mocks/services.ts`**
 
 Find `createOrder` and update the request body:
 
@@ -444,7 +444,7 @@ export async function createOrder(payload: CheckoutPayload): Promise<Order> {
 }
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma/src/types/index.ts \
@@ -462,7 +462,7 @@ git commit -m "feat: update types/schemas/services for simplified address"
 
 The address form currently has inputs for label, name, phone, street, city, country. We need to keep label + city + description only. The `AddressCard` display also needs to stop showing name/phone/street/country.
 
-- [ ] **Step 1: Update the `AddressForm` component inside `AddressesPageClient.tsx`**
+- [x] **Step 1: Update the `AddressForm` component inside `AddressesPageClient.tsx`**
 
 The form `defaultValues` should be:
 
@@ -558,7 +558,7 @@ Remove the `name`, `phone`, `street`, `country` field JSX blocks. The form body 
 />
 ```
 
-- [ ] **Step 2: Update the `AddressCard` component inside `AddressesPageClient.tsx`**
+- [x] **Step 2: Update the `AddressCard` component inside `AddressesPageClient.tsx`**
 
 Replace the card body to only show label, city, description, and default badge:
 
@@ -592,7 +592,7 @@ function AddressCard({ address, onEdit, onDelete }: {
 }
 ```
 
-- [ ] **Step 3: Verify the page compiles**
+- [x] **Step 3: Verify the page compiles**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -40
@@ -600,7 +600,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -40
 
 Expected: No errors related to address fields.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma/src/features/profile/AddressesPageClient.tsx
@@ -616,7 +616,7 @@ This is a reusable component used inside the Checkout page. If the user's profil
 **Files:**
 - Create: `aroma/src/features/checkout/ProfileCompletionModal.tsx`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 ```tsx
 // aroma/src/features/checkout/ProfileCompletionModal.tsx
@@ -710,7 +710,7 @@ export function ProfileCompletionModal({ open, initialName, initialPhone, onSave
 }
 ```
 
-- [ ] **Step 2: Ensure `useUpdateProfile` exists in queries**
+- [x] **Step 2: Ensure `useUpdateProfile` exists in queries**
 
 Open `aroma/src/lib/api/queries.ts` and check for a `useUpdateProfile` mutation. If it exists, skip. If not, add it:
 
@@ -734,7 +734,7 @@ export function useUpdateProfile() {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/checkout/ProfileCompletionModal.tsx \
@@ -751,7 +751,7 @@ A self-contained component used inside Checkout to let the user pick their defau
 **Files:**
 - Create: `aroma/src/features/checkout/AddressSelector.tsx`
 
-- [ ] **Step 1: Create the component**
+- [x] **Step 1: Create the component**
 
 ```tsx
 // aroma/src/features/checkout/AddressSelector.tsx
@@ -956,7 +956,7 @@ export function AddressSelector({ selectedId, onChange }: Props) {
 }
 ```
 
-- [ ] **Step 2: Ensure `useAddresses` and `useAddAddress` are exported from queries**
+- [x] **Step 2: Ensure `useAddresses` and `useAddAddress` are exported from queries**
 
 Check `aroma/src/lib/api/queries.ts`. If `useAddresses` doesn't exist, add:
 
@@ -978,7 +978,7 @@ export function useAddAddress() {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/checkout/AddressSelector.tsx \
@@ -1000,7 +1000,7 @@ This is the main checkout page. It needs to:
 4. Remove the name/phone fields from the checkout form (they now live in profile).
 5. Pass `addressId` (not name/phone) in the order payload.
 
-- [ ] **Step 1: Replace the CheckoutPageClient implementation**
+- [x] **Step 1: Replace the CheckoutPageClient implementation**
 
 ```tsx
 // aroma/src/features/checkout/CheckoutPageClient.tsx
@@ -1180,7 +1180,7 @@ export function CheckoutPageClient() {
 }
 ```
 
-- [ ] **Step 2: Verify TypeScript**
+- [x] **Step 2: Verify TypeScript**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -40
@@ -1188,7 +1188,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -40
 
 Expected: No checkout-related type errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/checkout/CheckoutPageClient.tsx
@@ -1202,7 +1202,7 @@ git commit -m "feat: rework checkout — profile modal, address selector, pickup
 **Files:**
 - Modify: `aroma/src/features/orders/OrderDetailClient.tsx`
 
-- [ ] **Step 1: Add a delivery address section**
+- [x] **Step 1: Add a delivery address section**
 
 In `OrderDetailClient.tsx`, find where the order `note` is displayed and add after it:
 
@@ -1230,7 +1230,7 @@ Import `Store` from `lucide-react` at the top if not already imported.
 
 Also ensure the `Order` type now includes `isPickup: boolean` — if not already, add it to the interface in `types/index.ts`.
 
-- [ ] **Step 2: Verify TypeScript**
+- [x] **Step 2: Verify TypeScript**
 
 ```bash
 cd aroma && npx tsc --noEmit 2>&1 | head -40
@@ -1238,7 +1238,7 @@ cd aroma && npx tsc --noEmit 2>&1 | head -40
 
 Expected: No errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/orders/OrderDetailClient.tsx \

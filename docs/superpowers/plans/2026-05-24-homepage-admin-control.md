@@ -1,6 +1,6 @@
 # Homepage Admin Control Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make the Aroma storefront homepage fully editable from the admin panel — hero text/image, section visibility, order, and per-block config — driven by DB records instead of hardcoded values.
 
@@ -54,7 +54,7 @@
 - Create: `aroma-api/app/Models/Setting.php`
 - Create: `aroma-api/app/Models/HomepageBlock.php`
 
-- [ ] **Step 1: Create the settings migration**
+- [x] **Step 1: Create the settings migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_24_000001_create_settings_table.php
@@ -82,7 +82,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Create the homepage_blocks migration**
+- [x] **Step 2: Create the homepage_blocks migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_24_000002_create_homepage_blocks_table.php
@@ -112,7 +112,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 3: Create the Setting model**
+- [x] **Step 3: Create the Setting model**
 
 ```php
 // aroma-api/app/Models/Setting.php
@@ -139,7 +139,7 @@ class Setting extends Model
 }
 ```
 
-- [ ] **Step 4: Create the HomepageBlock model**
+- [x] **Step 4: Create the HomepageBlock model**
 
 ```php
 // aroma-api/app/Models/HomepageBlock.php
@@ -156,7 +156,7 @@ class HomepageBlock extends Model
 }
 ```
 
-- [ ] **Step 5: Run migrations**
+- [x] **Step 5: Run migrations**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -164,7 +164,7 @@ cd aroma-api && php artisan migrate
 
 Expected: two new tables `settings` and `homepage_blocks` created with no errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_05_24_000001_create_settings_table.php \
@@ -183,7 +183,7 @@ git commit -m "feat: add settings and homepage_blocks migrations and models"
 - Modify: `aroma-api/app/Http/Controllers/Api/HomeController.php`
 - Create: `aroma-api/tests/Feature/HomeTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 // aroma-api/tests/Feature/HomeTest.php
@@ -274,7 +274,7 @@ class HomeTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/HomeTest.php
@@ -282,7 +282,7 @@ cd aroma-api && php artisan test tests/Feature/HomeTest.php
 
 Expected: All 3 tests FAIL — `hero` and `blocks` keys don't exist in response yet.
 
-- [ ] **Step 3: Rewrite HomeService**
+- [x] **Step 3: Rewrite HomeService**
 
 ```php
 // aroma-api/app/Services/HomeService.php
@@ -373,7 +373,7 @@ class HomeService
 }
 ```
 
-- [ ] **Step 4: Update HomeController**
+- [x] **Step 4: Update HomeController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/HomeController.php
@@ -396,7 +396,7 @@ class HomeController extends Controller
 }
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/HomeTest.php
@@ -404,7 +404,7 @@ cd aroma-api && php artisan test tests/Feature/HomeTest.php
 
 Expected: All 3 tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/app/Services/HomeService.php \
@@ -423,7 +423,7 @@ git commit -m "feat: rewrite HomeService to read hero and blocks from DB"
 - Modify: `aroma-api/routes/api.php`
 - Create: `aroma-api/tests/Feature/AdminHomepageTest.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 // aroma-api/tests/Feature/AdminHomepageTest.php
@@ -578,7 +578,7 @@ class AdminHomepageTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminHomepageTest.php
@@ -586,7 +586,7 @@ cd aroma-api && php artisan test tests/Feature/AdminHomepageTest.php
 
 Expected: All tests FAIL — routes don't exist yet.
 
-- [ ] **Step 3: Create HomepageAdminService**
+- [x] **Step 3: Create HomepageAdminService**
 
 ```php
 // aroma-api/app/Services/HomepageAdminService.php
@@ -653,7 +653,7 @@ class HomepageAdminService
 }
 ```
 
-- [ ] **Step 4: Create AdminHomepageController**
+- [x] **Step 4: Create AdminHomepageController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/Admin/AdminHomepageController.php
@@ -747,7 +747,7 @@ class AdminHomepageController extends Controller
 }
 ```
 
-- [ ] **Step 5: Add routes to api.php**
+- [x] **Step 5: Add routes to api.php**
 
 In `aroma-api/routes/api.php`, add this import at the top of the admin use statement:
 
@@ -777,7 +777,7 @@ Route::delete('/homepage/blocks/{block}',            [AdminHomepageController::c
 
 Note: `/reorder` must be declared before `/{block}` so Laravel doesn't treat "reorder" as a block ID.
 
-- [ ] **Step 6: Run tests to verify they pass**
+- [x] **Step 6: Run tests to verify they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminHomepageTest.php
@@ -785,7 +785,7 @@ cd aroma-api && php artisan test tests/Feature/AdminHomepageTest.php
 
 Expected: All 8 tests PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-api/app/Services/HomepageAdminService.php \
@@ -803,7 +803,7 @@ git commit -m "feat: add admin homepage API — hero update, block CRUD, reorder
 - Create: `aroma-api/database/seeders/HomepageBlockSeeder.php`
 - Modify: `aroma-api/database/seeders/DatabaseSeeder.php`
 
-- [ ] **Step 1: Create HomepageBlockSeeder**
+- [x] **Step 1: Create HomepageBlockSeeder**
 
 ```php
 // aroma-api/database/seeders/HomepageBlockSeeder.php
@@ -844,7 +844,7 @@ class HomepageBlockSeeder extends Seeder
 }
 ```
 
-- [ ] **Step 2: Call seeder from DatabaseSeeder**
+- [x] **Step 2: Call seeder from DatabaseSeeder**
 
 In `aroma-api/database/seeders/DatabaseSeeder.php`, add the call at the end of `run()`:
 
@@ -873,7 +873,7 @@ public function run(): void
 }
 ```
 
-- [ ] **Step 3: Run the seeder against the dev DB**
+- [x] **Step 3: Run the seeder against the dev DB**
 
 ```bash
 cd aroma-api && php artisan db:seed --class=HomepageBlockSeeder
@@ -881,7 +881,7 @@ cd aroma-api && php artisan db:seed --class=HomepageBlockSeeder
 
 Expected: No errors. Check `homepage_blocks` table has 5 rows and `settings` has 1 row with key `homepage_hero`.
 
-- [ ] **Step 4: Verify the API response**
+- [x] **Step 4: Verify the API response**
 
 ```bash
 curl -s http://localhost:8000/api/home | python3 -m json.tool | head -40
@@ -889,7 +889,7 @@ curl -s http://localhost:8000/api/home | python3 -m json.tool | head -40
 
 Expected: JSON with `hero` object containing `headline`, and `blocks` array with 5 items (assuming products with `is_bestseller`, `is_new`, `is_offer` flags exist in the DB).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/database/seeders/HomepageBlockSeeder.php \
@@ -908,7 +908,7 @@ git commit -m "feat: seed default homepage blocks and hero config"
 - Modify: `aroma/src/features/home/HomePageClient.tsx`
 - Delete: `aroma/src/features/home/TrustStrip.tsx`
 
-- [ ] **Step 1: Update HomePageData types in `aroma/src/types/index.ts`**
+- [x] **Step 1: Update HomePageData types in `aroma/src/types/index.ts`**
 
 Find the existing `HomePageData` interface and replace it with the following (keep all other types in the file untouched):
 
@@ -946,7 +946,7 @@ export interface HomePageData {
 }
 ```
 
-- [ ] **Step 2: Update HeroSection to accept props**
+- [x] **Step 2: Update HeroSection to accept props**
 
 Replace the entire contents of `aroma/src/features/home/HeroSection.tsx`:
 
@@ -1171,7 +1171,7 @@ export function HeroSection({ hero }: { hero: HeroConfig }) {
 }
 ```
 
-- [ ] **Step 3: Update HomeSections to dynamic block rendering in `aroma/src/features/home/HomeSection.tsx`**
+- [x] **Step 3: Update HomeSections to dynamic block rendering in `aroma/src/features/home/HomeSection.tsx`**
 
 Replace only the `HomeSections` function at the bottom of the file (keep all individual section components unchanged):
 
@@ -1234,7 +1234,7 @@ export function BestsellersSection({
 
 Apply the same `config` prop pattern to `NewArrivalsSection`, `OffersSection`, `CategoriesStrip`, and `FeaturedBrandBanner`.
 
-- [ ] **Step 4: Update HomePageClient to pass hero props and remove TrustStrip**
+- [x] **Step 4: Update HomePageClient to pass hero props and remove TrustStrip**
 
 Replace the entire contents of `aroma/src/features/home/HomePageClient.tsx`:
 
@@ -1274,7 +1274,7 @@ export function HomePageClient() {
 }
 ```
 
-- [ ] **Step 5: Delete TrustStrip.tsx**
+- [x] **Step 5: Delete TrustStrip.tsx**
 
 ```bash
 rm aroma/src/features/home/TrustStrip.tsx
@@ -1288,7 +1288,7 @@ grep -r "TrustStrip" aroma/src/
 
 Expected: no remaining references (it was only used in `HomePageClient.tsx` which we've already rewritten).
 
-- [ ] **Step 6: Verify the storefront builds**
+- [x] **Step 6: Verify the storefront builds**
 
 ```bash
 cd aroma && npm run build 2>&1 | tail -20
@@ -1296,7 +1296,7 @@ cd aroma && npm run build 2>&1 | tail -20
 
 Expected: Build succeeds with no TypeScript errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma/src/types/index.ts \
@@ -1315,7 +1315,7 @@ git commit -m "feat: storefront homepage reads hero+blocks from API, removes Tru
 - Modify: `aroma-admin/src/types/index.ts`
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add homepage types to `aroma-admin/src/types/index.ts`**
+- [x] **Step 1: Add homepage types to `aroma-admin/src/types/index.ts`**
 
 Append at the end of the file:
 
@@ -1369,7 +1369,7 @@ export interface ReorderItem {
 }
 ```
 
-- [ ] **Step 2: Add API functions to `aroma-admin/src/api/admin.ts`**
+- [x] **Step 2: Add API functions to `aroma-admin/src/api/admin.ts`**
 
 Append at the end of the file, after the last export:
 
@@ -1417,7 +1417,7 @@ import type {
 
 Then only the function bodies remain at the bottom (no inline import).
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npm run build 2>&1 | tail -10
@@ -1425,7 +1425,7 @@ cd aroma-admin && npm run build 2>&1 | tail -10
 
 Expected: Build succeeds with no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-admin/src/types/index.ts aroma-admin/src/api/admin.ts
@@ -1439,7 +1439,7 @@ git commit -m "feat: add admin homepage TypeScript types and API functions"
 **Files:**
 - Create: `aroma-admin/src/components/homepage/HeroEditor.vue`
 
-- [ ] **Step 1: Create the HeroEditor component**
+- [x] **Step 1: Create the HeroEditor component**
 
 ```vue
 <!-- aroma-admin/src/components/homepage/HeroEditor.vue -->
@@ -1560,7 +1560,7 @@ defineExpose({ imageFile })
 </template>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/homepage/HeroEditor.vue
@@ -1574,7 +1574,7 @@ git commit -m "feat: add HeroEditor admin component"
 **Files:**
 - Create: `aroma-admin/src/components/homepage/BlockEditor.vue`
 
-- [ ] **Step 1: Create the BlockEditor drawer component**
+- [x] **Step 1: Create the BlockEditor drawer component**
 
 ```vue
 <!-- aroma-admin/src/components/homepage/BlockEditor.vue -->
@@ -1765,7 +1765,7 @@ function submit() {
 </template>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/components/homepage/BlockEditor.vue
@@ -1780,7 +1780,7 @@ git commit -m "feat: add BlockEditor drawer component"
 - Modify: `aroma-admin/package.json` (install vuedraggable)
 - Create: `aroma-admin/src/components/homepage/BlockList.vue`
 
-- [ ] **Step 1: Install vuedraggable**
+- [x] **Step 1: Install vuedraggable**
 
 ```bash
 cd aroma-admin && npm install vuedraggable@next
@@ -1788,7 +1788,7 @@ cd aroma-admin && npm install vuedraggable@next
 
 Expected: `vuedraggable` added to `dependencies` in `package.json`.
 
-- [ ] **Step 2: Create BlockList component**
+- [x] **Step 2: Create BlockList component**
 
 ```vue
 <!-- aroma-admin/src/components/homepage/BlockList.vue -->
@@ -1927,7 +1927,7 @@ function blockMeta(block: HomepageBlock): string {
 </template>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/package.json aroma-admin/package-lock.json \
@@ -1946,7 +1946,7 @@ git commit -m "feat: add BlockList component with drag-and-drop reordering"
 - Modify: `aroma-admin/src/locales/en.ts`
 - Modify: `aroma-admin/src/locales/ar.ts`
 
-- [ ] **Step 1: Create HomepageView.vue**
+- [x] **Step 1: Create HomepageView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/HomepageView.vue -->
@@ -2131,7 +2131,7 @@ function onRemoveHeroImage() {
 </template>
 ```
 
-- [ ] **Step 2: Add route to `aroma-admin/src/router/index.ts`**
+- [x] **Step 2: Add route to `aroma-admin/src/router/index.ts`**
 
 Inside the `children` array of the layout route, add after the `notifications` route:
 
@@ -2139,7 +2139,7 @@ Inside the `children` array of the layout route, add after the `notifications` r
 { path: 'homepage', name: 'homepage', component: () => import('../views/HomepageView.vue') },
 ```
 
-- [ ] **Step 3: Add Homepage to Sidebar nav**
+- [x] **Step 3: Add Homepage to Sidebar nav**
 
 In `aroma-admin/src/components/layout/Sidebar.vue`, add the import for the `Home` icon at the top with the other lucide imports:
 
@@ -2161,7 +2161,7 @@ Then in the `groups` computed, add a new group for Storefront (between catalog a
 },
 ```
 
-- [ ] **Step 4: Add i18n strings to `aroma-admin/src/locales/en.ts`**
+- [x] **Step 4: Add i18n strings to `aroma-admin/src/locales/en.ts`**
 
 In the `nav` object, add:
 
@@ -2170,7 +2170,7 @@ storefront: 'Storefront',
 homepage: 'Homepage',
 ```
 
-- [ ] **Step 5: Add Arabic i18n strings to `aroma-admin/src/locales/ar.ts`**
+- [x] **Step 5: Add Arabic i18n strings to `aroma-admin/src/locales/ar.ts`**
 
 In the `nav` object, add:
 
@@ -2179,7 +2179,7 @@ storefront: 'الواجهة',
 homepage: 'الصفحة الرئيسية',
 ```
 
-- [ ] **Step 6: Verify the admin builds**
+- [x] **Step 6: Verify the admin builds**
 
 ```bash
 cd aroma-admin && npm run build 2>&1 | tail -10
@@ -2187,7 +2187,7 @@ cd aroma-admin && npm run build 2>&1 | tail -10
 
 Expected: Build succeeds with no TypeScript or template errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-admin/src/views/HomepageView.vue \
@@ -2202,7 +2202,7 @@ git commit -m "feat: add HomepageView, router entry, sidebar nav, and i18n strin
 
 ## Task 11: End-to-End Verification
 
-- [ ] **Step 1: Run all backend tests**
+- [x] **Step 1: Run all backend tests**
 
 ```bash
 cd aroma-api && php artisan test
@@ -2210,13 +2210,13 @@ cd aroma-api && php artisan test
 
 Expected: All tests pass including `HomeTest` and `AdminHomepageTest`.
 
-- [ ] **Step 2: Start the API server**
+- [x] **Step 2: Start the API server**
 
 ```bash
 cd aroma-api && php artisan serve
 ```
 
-- [ ] **Step 3: Start the admin**
+- [x] **Step 3: Start the admin**
 
 ```bash
 cd aroma-admin && npm run dev
@@ -2232,7 +2232,7 @@ Verify:
 - Click "+ Add Block", choose "Featured Brand", pick a brand, save — block appears in the list
 - Upload a hero image — save — preview appears
 
-- [ ] **Step 4: Start the storefront**
+- [x] **Step 4: Start the storefront**
 
 ```bash
 cd aroma && npm run dev
@@ -2245,7 +2245,7 @@ Open `http://localhost:3000`, verify:
 - Disabled sections do not appear
 - Trust Strip is gone
 
-- [ ] **Step 5: Final commit**
+- [x] **Step 5: Final commit**
 
 ```bash
 git add -A

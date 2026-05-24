@@ -1,6 +1,6 @@
 # Product & Variant UX Redesign — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the fragmented, multi-button product/variant creation flow with a guided 3-step wizard that handles both single-price and multi-variant products cleanly, and lets admins set all prices at once after variant generation.
 
@@ -30,7 +30,7 @@
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `aroma-api/tests/Feature/AdminProductVariantBulkTest.php`:
 
@@ -147,7 +147,7 @@ class AdminProductVariantBulkTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests to confirm they fail**
+- [x] **Step 2: Run tests to confirm they fail**
 
 ```bash
 cd aroma-api && php artisan test --filter AdminProductVariantBulkTest
@@ -155,7 +155,7 @@ cd aroma-api && php artisan test --filter AdminProductVariantBulkTest
 
 Expected: All 5 tests fail (route not found / method not found).
 
-- [ ] **Step 3: Register the bulk route**
+- [x] **Step 3: Register the bulk route**
 
 Open `aroma-api/routes/api.php`. Add the bulk route **before** the existing `PUT /products/{productId}/variants/{variantId}` line:
 
@@ -166,7 +166,7 @@ Route::put('/products/{productId}/variants/{variantId}',     [AdminProductVarian
 
 The bulk route must come first so Laravel doesn't capture "bulk" as `{variantId}`.
 
-- [ ] **Step 4: Add `bulkUpdate` to the controller**
+- [x] **Step 4: Add `bulkUpdate` to the controller**
 
 In `aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php`, add this method after `update()`:
 
@@ -203,7 +203,7 @@ public function bulkUpdate(Request $request, int $productId)
 }
 ```
 
-- [ ] **Step 5: Run tests to confirm they pass**
+- [x] **Step 5: Run tests to confirm they pass**
 
 ```bash
 cd aroma-api && php artisan test --filter AdminProductVariantBulkTest
@@ -211,7 +211,7 @@ cd aroma-api && php artisan test --filter AdminProductVariantBulkTest
 
 Expected: All 5 tests pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd aroma-api
@@ -226,7 +226,7 @@ git commit -m "feat: add bulk variant update endpoint"
 **Files:**
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add `apiBulkUpdateVariants` and remove `apiCreateVariant`**
+- [x] **Step 1: Add `apiBulkUpdateVariants` and remove `apiCreateVariant`**
 
 In `aroma-admin/src/api/admin.ts`:
 
@@ -252,7 +252,7 @@ export const apiBulkUpdateVariants = (
   client.put<ProductVariant[]>(`/admin/products/${productId}/variants/bulk`, { variants })
 ```
 
-- [ ] **Step 2: Verify TypeScript compiles**
+- [x] **Step 2: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit
@@ -260,7 +260,7 @@ cd aroma-admin && npx tsc --noEmit
 
 Expected: No errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd aroma-admin
@@ -275,7 +275,7 @@ git commit -m "feat: add apiBulkUpdateVariants; remove apiCreateVariant from UI 
 **Files:**
 - Modify: `aroma-admin/src/views/ProductCreateView.vue`
 
-- [ ] **Step 1: Remove the Specifications section from the template**
+- [x] **Step 1: Remove the Specifications section from the template**
 
 In `aroma-admin/src/views/ProductCreateView.vue`, delete the entire `<section>` block for Specifications (lines ~184–263 — the block starts with `<!-- Specs -->` and contains the "Assign Spec Types" and "Define Values" subsections). The section to remove looks like:
 
@@ -288,7 +288,7 @@ In `aroma-admin/src/views/ProductCreateView.vue`, delete the entire `<section>` 
 
 Delete from the opening `<!-- Specs -->` comment through the closing `</section>` tag of that block.
 
-- [ ] **Step 2: Remove spec state and logic from `<script setup>`**
+- [x] **Step 2: Remove spec state and logic from `<script setup>`**
 
 Remove the following from the script section:
 
@@ -315,7 +315,7 @@ function addValue(...) { ... }
 function removeValue(...) { ... }
 ```
 
-- [ ] **Step 3: Remove spec logic from `handleSave` and `onMounted`**
+- [x] **Step 3: Remove spec logic from `handleSave` and `onMounted`**
 
 In `handleSave`, remove:
 ```typescript
@@ -342,7 +342,7 @@ brands.value = b.data
 cats.value   = c.data
 ```
 
-- [ ] **Step 4: Verify TypeScript compiles**
+- [x] **Step 4: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit
@@ -350,7 +350,7 @@ cd aroma-admin && npx tsc --noEmit
 
 Expected: No errors.
 
-- [ ] **Step 5: Start dev server and verify the create page has no Specifications section**
+- [x] **Step 5: Start dev server and verify the create page has no Specifications section**
 
 ```bash
 cd aroma-admin && npm run dev
@@ -358,7 +358,7 @@ cd aroma-admin && npm run dev
 
 Navigate to `/products/new`. Confirm the page shows: Product Name, Description, Images, and the right sidebar (Organize, Status, Card Color). No Specifications section should be visible.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd aroma-admin
@@ -377,7 +377,7 @@ This task replaces the entire file. The new view implements:
 - Wizard mode (no variants exist): steps 1 → 2 → 3
 - Editing mode (variants exist): collapsed summary cards + price grid directly
 
-- [ ] **Step 1: Replace the entire file**
+- [x] **Step 1: Replace the entire file**
 
 Write the following as the complete new content of `aroma-admin/src/views/ProductVariantsView.vue`:
 
@@ -1208,7 +1208,7 @@ watch(() => props.id, () => { loadImages(); loadSpecs(); loadVariants() })
 </script>
 ```
 
-- [ ] **Step 2: Verify TypeScript compiles**
+- [x] **Step 2: Verify TypeScript compiles**
 
 ```bash
 cd aroma-admin && npx tsc --noEmit
@@ -1216,7 +1216,7 @@ cd aroma-admin && npx tsc --noEmit
 
 Expected: No errors.
 
-- [ ] **Step 3: Start the dev server and test the wizard flow**
+- [x] **Step 3: Start the dev server and test the wizard flow**
 
 ```bash
 cd aroma-admin && npm run dev
@@ -1245,7 +1245,7 @@ cd aroma-admin && npm run dev
 2. Confirm "Switch to multiple variants" link is present below
 3. Click it → confirm wizard resets to Step 1 with "Multiple variants" pre-selected
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd aroma-admin

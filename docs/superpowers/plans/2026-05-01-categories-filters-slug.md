@@ -1,6 +1,6 @@
 # Categories Admin — Filters & Auto-slug Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add label + min/max-products filters to the admin categories list, and auto-generate the slug from the label on creation instead of asking the user to type it.
 
@@ -27,7 +27,7 @@
 **Files:**
 - Create: `aroma-api/database/factories/CategoryFactory.php`
 
-- [ ] **Step 1: Create the factory**
+- [x] **Step 1: Create the factory**
 
 ```php
 <?php
@@ -55,7 +55,7 @@ class CategoryFactory extends Factory
 }
 ```
 
-- [ ] **Step 2: Add `HasFactory` to Category model**
+- [x] **Step 2: Add `HasFactory` to Category model**
 
 Open `aroma-api/app/Models/Category.php` and add the trait:
 
@@ -79,7 +79,7 @@ class Category extends Model
 }
 ```
 
-- [ ] **Step 3: Verify factory works**
+- [x] **Step 3: Verify factory works**
 
 ```bash
 cd aroma-api && php artisan tinker --execute="use App\Models\Category; Category::factory()->make()->toArray();"
@@ -87,7 +87,7 @@ cd aroma-api && php artisan tinker --execute="use App\Models\Category; Category:
 
 Expected: prints an array with `slug`, `label`, `bg` keys.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-api/database/factories/CategoryFactory.php aroma-api/app/Models/Category.php
@@ -101,7 +101,7 @@ git commit -m "feat: add CategoryFactory and HasFactory to Category model"
 **Files:**
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminCategoryController.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `aroma-api/tests/Feature/AdminCategoryTest.php`:
 
@@ -217,7 +217,7 @@ class AdminCategoryTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminCategoryTest.php
@@ -225,7 +225,7 @@ cd aroma-api && php artisan test tests/Feature/AdminCategoryTest.php
 
 Expected: multiple FAIL — `index` may pass (no filtering yet), store tests fail because current `store()` requires `slug`.
 
-- [ ] **Step 3: Update `AdminCategoryController`**
+- [x] **Step 3: Update `AdminCategoryController`**
 
 Replace the full file content:
 
@@ -312,7 +312,7 @@ class AdminCategoryController extends Controller
 }
 ```
 
-- [ ] **Step 4: Run tests — all must pass**
+- [x] **Step 4: Run tests — all must pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminCategoryTest.php
@@ -320,7 +320,7 @@ cd aroma-api && php artisan test tests/Feature/AdminCategoryTest.php
 
 Expected: all tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminCategoryController.php \
@@ -335,7 +335,7 @@ git commit -m "feat: add category filters and auto-generate slug from label"
 **Files:**
 - Modify: `aroma-admin/src/api/admin.ts` (around line 96)
 
-- [ ] **Step 1: Update `apiGetCategories` to accept filter params**
+- [x] **Step 1: Update `apiGetCategories` to accept filter params**
 
 Replace the existing `apiGetCategories` definition:
 
@@ -348,7 +348,7 @@ export const apiGetCategories = (params?: {
   client.get<AdminCategory[]>('/admin/categories', { params })
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/api/admin.ts
@@ -362,7 +362,7 @@ git commit -m "feat: pass filter params to apiGetCategories"
 **Files:**
 - Modify: `aroma-admin/src/views/CategoriesView.vue`
 
-- [ ] **Step 1: Replace `CategoriesView.vue` with the updated version**
+- [x] **Step 1: Replace `CategoriesView.vue` with the updated version**
 
 ```vue
 <!-- aroma-admin/src/views/CategoriesView.vue -->
@@ -530,7 +530,7 @@ onMounted(loadCats)
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/CategoriesView.vue
@@ -541,13 +541,13 @@ git commit -m "feat: add filters and remove manual slug input from categories vi
 
 ## Task 5: Manual smoke test
 
-- [ ] **Step 1: Start the dev server if not running**
+- [x] **Step 1: Start the dev server if not running**
 
 ```bash
 cd aroma-admin && npm run dev
 ```
 
-- [ ] **Step 2: Open the Categories page**
+- [x] **Step 2: Open the Categories page**
 
 Navigate to the Categories page in the browser. Verify:
 - Filter bar shows "Label", "Min Products", "Max Products" inputs
@@ -556,7 +556,7 @@ Navigate to the Categories page in the browser. Verify:
 - Filtering by label text narrows the list
 - Min/max product filters work correctly
 
-- [ ] **Step 3: Run the full backend test suite**
+- [x] **Step 3: Run the full backend test suite**
 
 ```bash
 cd aroma-api && php artisan test

@@ -1,6 +1,6 @@
 # Logo Management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Let the admin upload/remove a store logo that appears in the storefront navbar and footer, replacing the hardcoded "AROMA" text.
 
@@ -43,7 +43,7 @@
 - Modify: `aroma-api/routes/api.php`
 - Test: `aroma-api/tests/Feature/HomeTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add this test to `aroma-api/tests/Feature/HomeTest.php` inside the class, after the existing tests:
 
@@ -59,7 +59,7 @@ public function test_home_includes_logo_url_null_when_not_set(): void
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test tests/Feature/HomeTest.php --filter=test_home_includes_logo_url_null_when_not_set
@@ -67,7 +67,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test t
 
 Expected: FAIL — `logo_url` key is missing from response.
 
-- [ ] **Step 3: Add `getLogoUrl()` to HomeService**
+- [x] **Step 3: Add `getLogoUrl()` to HomeService**
 
 In `aroma-api/app/Services/HomeService.php`, add this private method after `getHero()`:
 
@@ -79,7 +79,7 @@ public function getLogoUrl(): ?string
 }
 ```
 
-- [ ] **Step 4: Add `logo_url` to HomeController response**
+- [x] **Step 4: Add `logo_url` to HomeController response**
 
 Replace the `index()` method in `aroma-api/app/Http/Controllers/Api/HomeController.php`:
 
@@ -94,7 +94,7 @@ public function index(HomeService $homeService)
 }
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test tests/Feature/HomeTest.php --filter=test_home_includes_logo_url_null_when_not_set
@@ -102,7 +102,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test t
 
 Expected: PASS.
 
-- [ ] **Step 6: Add `updateLogo()` and `deleteLogo()` to HomepageAdminService**
+- [x] **Step 6: Add `updateLogo()` and `deleteLogo()` to HomepageAdminService**
 
 In `aroma-api/app/Services/HomepageAdminService.php`, add these two methods after `updateHero()`, and update `getConfig()`:
 
@@ -134,7 +134,7 @@ public function deleteLogo(): void
 }
 ```
 
-- [ ] **Step 7: Add `uploadLogo()` and `destroyLogo()` to AdminHomepageController**
+- [x] **Step 7: Add `uploadLogo()` and `destroyLogo()` to AdminHomepageController**
 
 In `aroma-api/app/Http/Controllers/Api/Admin/AdminHomepageController.php`, add these two methods after `updateHero()`:
 
@@ -153,7 +153,7 @@ public function destroyLogo(): \Illuminate\Http\JsonResponse
 }
 ```
 
-- [ ] **Step 8: Register routes**
+- [x] **Step 8: Register routes**
 
 In `aroma-api/routes/api.php`, add these two lines alongside the other `/homepage` routes (in the admin auth middleware group):
 
@@ -162,7 +162,7 @@ Route::post('/homepage/logo',   [AdminHomepageController::class, 'uploadLogo']);
 Route::delete('/homepage/logo', [AdminHomepageController::class, 'destroyLogo']);
 ```
 
-- [ ] **Step 9: Run all homepage tests**
+- [x] **Step 9: Run all homepage tests**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test tests/Feature/HomeTest.php tests/Feature/AdminHomepageTest.php
@@ -170,7 +170,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test t
 
 Expected: All 14 tests pass (13 existing + 1 new).
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project && git add \
@@ -191,7 +191,7 @@ git commit -m "feat: add logo_url to GET /api/home and logo upload/delete admin 
 - Modify: `aroma-admin/src/types/index.ts`
 - Modify: `aroma-admin/src/api/admin.ts`
 
-- [ ] **Step 1: Add `logo_url` to `HomepageConfig`**
+- [x] **Step 1: Add `logo_url` to `HomepageConfig`**
 
 In `aroma-admin/src/types/index.ts`, find:
 
@@ -212,7 +212,7 @@ export interface HomepageConfig {
 }
 ```
 
-- [ ] **Step 2: Add `apiUploadLogo` and `apiDeleteLogo`**
+- [x] **Step 2: Add `apiUploadLogo` and `apiDeleteLogo`**
 
 In `aroma-admin/src/api/admin.ts`, add these two functions after `apiReorderBlocks`:
 
@@ -229,7 +229,7 @@ export const apiDeleteLogo = () =>
   client.delete<{ message: string }>('/admin/homepage/logo')
 ```
 
-- [ ] **Step 3: Verify TypeScript**
+- [x] **Step 3: Verify TypeScript**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npx vue-tsc --noEmit 2>&1 | grep -E "types/index|api/admin" | head -10
@@ -237,7 +237,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npx vue-tsc --no
 
 Expected: No errors on those files.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project && git add aroma-admin/src/types/index.ts aroma-admin/src/api/admin.ts
@@ -251,7 +251,7 @@ git commit -m "feat: add HomepageConfig logo_url and logo API functions to admin
 **Files:**
 - Modify: `aroma-admin/src/views/HomepageView.vue`
 
-- [ ] **Step 1: Add logo state and handlers to script**
+- [x] **Step 1: Add logo state and handlers to script**
 
 In `aroma-admin/src/views/HomepageView.vue`, add the new imports and state.
 
@@ -324,7 +324,7 @@ async function onDeleteLogo() {
 }
 ```
 
-- [ ] **Step 2: Add logo card to template**
+- [x] **Step 2: Add logo card to template**
 
 In the template, insert the logo card **above the `<!-- Hero editor -->` div** (before `<div class="space-y-2">`):
 
@@ -380,7 +380,7 @@ In the template, insert the logo card **above the `<!-- Hero editor -->` div** (
 </div>
 ```
 
-- [ ] **Step 3: Verify admin builds without errors on this file**
+- [x] **Step 3: Verify admin builds without errors on this file**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npm run build 2>&1 | grep "HomepageView" | head -10
@@ -388,7 +388,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npm run build 2>
 
 Expected: No errors on `HomepageView`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project && git add aroma-admin/src/views/HomepageView.vue
@@ -405,7 +405,7 @@ git commit -m "feat: add logo upload card to homepage admin"
 - Modify: `aroma/src/components/layout/Header.tsx`
 - Modify: `aroma/src/components/layout/Footer.tsx`
 
-- [ ] **Step 1: Add `logo_url` to `HomePageData`**
+- [x] **Step 1: Add `logo_url` to `HomePageData`**
 
 In `aroma/src/types/index.ts`, find:
 
@@ -426,7 +426,7 @@ export interface HomePageData {
 }
 ```
 
-- [ ] **Step 2: Make layout async, fetch `logo_url`**
+- [x] **Step 2: Make layout async, fetch `logo_url`**
 
 Replace the entire content of `aroma/src/app/(storefront)/layout.tsx`:
 
@@ -460,7 +460,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
 
 `revalidate: 60` means Next.js will re-fetch the logo at most once per minute (ISR). Logo changes in admin appear in the storefront within 60 seconds without a deploy.
 
-- [ ] **Step 3: Update Header to accept and render `logoUrl`**
+- [x] **Step 3: Update Header to accept and render `logoUrl`**
 
 Replace the entire content of `aroma/src/components/layout/Header.tsx`:
 
@@ -595,7 +595,7 @@ export function Header({ logoUrl }: { logoUrl?: string | null }) {
 }
 ```
 
-- [ ] **Step 4: Update Footer to accept and render `logoUrl`**
+- [x] **Step 4: Update Footer to accept and render `logoUrl`**
 
 Replace the entire content of `aroma/src/components/layout/Footer.tsx`:
 
@@ -727,7 +727,7 @@ export function Footer({ logoUrl }: { logoUrl?: string | null }) {
 }
 ```
 
-- [ ] **Step 5: Verify storefront TypeScript**
+- [x] **Step 5: Verify storefront TypeScript**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | head -10
@@ -735,7 +735,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 
 
 Expected: No errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project && git add \
@@ -750,7 +750,7 @@ git commit -m "feat: render logo from API in storefront header and footer"
 
 ## Task 5: End-to-End Verification
 
-- [ ] **Step 1: Run all homepage backend tests**
+- [x] **Step 1: Run all homepage backend tests**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test tests/Feature/HomeTest.php tests/Feature/AdminHomepageTest.php
@@ -758,7 +758,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-api && php artisan test t
 
 Expected: All 14 tests pass.
 
-- [ ] **Step 2: Verify admin builds clean**
+- [x] **Step 2: Verify admin builds clean**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npm run build 2>&1 | grep -i "error" | grep -v "deprecated" | head -10
@@ -766,7 +766,7 @@ cd /Users/suhaib/web_projects/aroma-full-project/aroma-admin && npm run build 2>
 
 Expected: No new errors in homepage-related files.
 
-- [ ] **Step 3: Verify storefront TypeScript**
+- [x] **Step 3: Verify storefront TypeScript**
 
 ```bash
 cd /Users/suhaib/web_projects/aroma-full-project/aroma && npx tsc --noEmit 2>&1 | head -10

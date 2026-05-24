@@ -1,6 +1,6 @@
 # Flexible Product Specifications & Variants — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the hardcoded `size` column on product variants with a normalized spec system: global spec types, per-product spec assignments + values, auto-generated variant combinations stored in a `variant_spec_values` pivot table.
 
@@ -60,7 +60,7 @@
 - Create: `aroma-api/database/migrations/2026_05_02_000004_create_variant_spec_values_table.php`
 - Create: `aroma-api/database/migrations/2026_05_02_000005_drop_size_from_product_variants.php`
 
-- [ ] **Step 1: Create the spec_types migration**
+- [x] **Step 1: Create the spec_types migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_02_000001_create_spec_types_table.php
@@ -84,7 +84,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Create the product_spec_assignments migration**
+- [x] **Step 2: Create the product_spec_assignments migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_02_000002_create_product_spec_assignments_table.php
@@ -112,7 +112,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 3: Create the product_spec_values migration**
+- [x] **Step 3: Create the product_spec_values migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_02_000003_create_product_spec_values_table.php
@@ -140,7 +140,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 4: Create the variant_spec_values migration**
+- [x] **Step 4: Create the variant_spec_values migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_02_000004_create_variant_spec_values_table.php
@@ -168,7 +168,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 5: Create the drop_size migration**
+- [x] **Step 5: Create the drop_size migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_02_000005_drop_size_from_product_variants.php
@@ -191,7 +191,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 6: Run migrations and verify**
+- [x] **Step 6: Run migrations and verify**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -199,7 +199,7 @@ cd aroma-api && php artisan migrate
 
 Expected: 5 new migrations run successfully, no errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_05_02_*
@@ -218,7 +218,7 @@ git commit -m "feat: add spec_types, product_spec_assignments, product_spec_valu
 - Modify: `aroma-api/app/Models/Product.php`
 - Modify: `aroma-api/app/Models/ProductVariant.php`
 
-- [ ] **Step 1: Create SpecType model**
+- [x] **Step 1: Create SpecType model**
 
 ```php
 // aroma-api/app/Models/SpecType.php
@@ -239,7 +239,7 @@ class SpecType extends Model
 }
 ```
 
-- [ ] **Step 2: Create ProductSpecAssignment model**
+- [x] **Step 2: Create ProductSpecAssignment model**
 
 ```php
 // aroma-api/app/Models/ProductSpecAssignment.php
@@ -265,7 +265,7 @@ class ProductSpecAssignment extends Model
 }
 ```
 
-- [ ] **Step 3: Create ProductSpecValue model**
+- [x] **Step 3: Create ProductSpecValue model**
 
 ```php
 // aroma-api/app/Models/ProductSpecValue.php
@@ -286,7 +286,7 @@ class ProductSpecValue extends Model
 }
 ```
 
-- [ ] **Step 4: Create VariantSpecValue model**
+- [x] **Step 4: Create VariantSpecValue model**
 
 ```php
 // aroma-api/app/Models/VariantSpecValue.php
@@ -312,7 +312,7 @@ class VariantSpecValue extends Model
 }
 ```
 
-- [ ] **Step 5: Update Product model — add spec relations**
+- [x] **Step 5: Update Product model — add spec relations**
 
 In `aroma-api/app/Models/Product.php`, add the following imports and methods. Add `use` statements at the top alongside existing ones:
 
@@ -335,7 +335,7 @@ public function specValues(): HasMany
 }
 ```
 
-- [ ] **Step 6: Update ProductVariant model — add specValues relation, remove `size`**
+- [x] **Step 6: Update ProductVariant model — add specValues relation, remove `size`**
 
 Replace the entire `aroma-api/app/Models/ProductVariant.php` with:
 
@@ -399,7 +399,7 @@ class ProductVariant extends Model
 }
 ```
 
-- [ ] **Step 7: Verify PHP syntax**
+- [x] **Step 7: Verify PHP syntax**
 
 ```bash
 cd aroma-api && php artisan about 2>&1 | head -5
@@ -407,7 +407,7 @@ cd aroma-api && php artisan about 2>&1 | head -5
 
 Expected: No parse errors, app boots.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma-api/app/Models/SpecType.php aroma-api/app/Models/ProductSpecAssignment.php \
@@ -426,7 +426,7 @@ git commit -m "feat: add SpecType, ProductSpecAssignment, ProductSpecValue, Vari
 - Create: `aroma-api/database/factories/ProductVariantFactory.php`
 - Create: `aroma-api/database/factories/SpecTypeFactory.php`
 
-- [ ] **Step 1: Create VariantGeneratorService**
+- [x] **Step 1: Create VariantGeneratorService**
 
 ```php
 // aroma-api/app/Services/VariantGeneratorService.php
@@ -515,7 +515,7 @@ class VariantGeneratorService
 }
 ```
 
-- [ ] **Step 2: Create ProductFactory**
+- [x] **Step 2: Create ProductFactory**
 
 ```php
 // aroma-api/database/factories/ProductFactory.php
@@ -550,7 +550,7 @@ class ProductFactory extends Factory
 }
 ```
 
-- [ ] **Step 3: Create ProductVariantFactory**
+- [x] **Step 3: Create ProductVariantFactory**
 
 ```php
 // aroma-api/database/factories/ProductVariantFactory.php
@@ -579,7 +579,7 @@ class ProductVariantFactory extends Factory
 }
 ```
 
-- [ ] **Step 4: Create SpecTypeFactory**
+- [x] **Step 4: Create SpecTypeFactory**
 
 ```php
 // aroma-api/database/factories/SpecTypeFactory.php
@@ -604,7 +604,7 @@ class SpecTypeFactory extends Factory
 }
 ```
 
-- [ ] **Step 5: Add `HasFactory` to Product and SpecType models**
+- [x] **Step 5: Add `HasFactory` to Product and SpecType models**
 
 In `aroma-api/app/Models/Product.php`, add to imports:
 ```php
@@ -624,7 +624,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 ```
 Add `use HasFactory;` inside the `ProductVariant` class body.
 
-- [ ] **Step 6: Check CategoryFactory exists; if not, create it**
+- [x] **Step 6: Check CategoryFactory exists; if not, create it**
 
 ```bash
 cat aroma-api/database/factories/CategoryFactory.php
@@ -660,7 +660,7 @@ class CategoryFactory extends Factory
 
 Also add `use HasFactory;` to `aroma-api/app/Models/Category.php` if it's not already there.
 
-- [ ] **Step 7: Verify VariantGeneratorService cartesian logic with artisan tinker**
+- [x] **Step 7: Verify VariantGeneratorService cartesian logic with artisan tinker**
 
 ```bash
 cd aroma-api && php artisan tinker --execute="
@@ -682,7 +682,7 @@ Expected output:
 empty OK
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma-api/app/Services/VariantGeneratorService.php \
@@ -705,7 +705,7 @@ git commit -m "feat: add VariantGeneratorService, ProductFactory, ProductVariant
 - Create: `aroma-api/tests/Feature/AdminSpecTypeTest.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 // aroma-api/tests/Feature/AdminSpecTypeTest.php
@@ -810,7 +810,7 @@ class AdminSpecTypeTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run test to confirm it fails**
+- [x] **Step 2: Run test to confirm it fails**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminSpecTypeTest.php 2>&1 | tail -20
@@ -818,7 +818,7 @@ cd aroma-api && php artisan test tests/Feature/AdminSpecTypeTest.php 2>&1 | tail
 
 Expected: Multiple FAILED errors — route not found (404).
 
-- [ ] **Step 3: Create AdminSpecTypeController**
+- [x] **Step 3: Create AdminSpecTypeController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/Admin/AdminSpecTypeController.php
@@ -888,7 +888,7 @@ class AdminSpecTypeController extends Controller
 }
 ```
 
-- [ ] **Step 4: Register routes in api.php**
+- [x] **Step 4: Register routes in api.php**
 
 In `aroma-api/routes/api.php`, inside the `Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')` group, add after the coupon routes and update the `use` import:
 
@@ -911,7 +911,7 @@ Route::put('/spec-types/{id}',   [AdminSpecTypeController::class, 'update']);
 Route::delete('/spec-types/{id}',[AdminSpecTypeController::class, 'destroy']);
 ```
 
-- [ ] **Step 5: Run tests to confirm they pass**
+- [x] **Step 5: Run tests to confirm they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminSpecTypeTest.php 2>&1 | tail -20
@@ -919,7 +919,7 @@ cd aroma-api && php artisan test tests/Feature/AdminSpecTypeTest.php 2>&1 | tail
 
 Expected: All 6 tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminSpecTypeController.php \
@@ -939,7 +939,7 @@ git commit -m "feat: add AdminSpecTypeController with CRUD and in-use delete gua
 - Create: `aroma-api/tests/Feature/AdminVariantGenerateTest.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing product spec test**
+- [x] **Step 1: Write the failing product spec test**
 
 ```php
 // aroma-api/tests/Feature/AdminProductSpecTest.php
@@ -1037,7 +1037,7 @@ class AdminProductSpecTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Write the failing variant generate test**
+- [x] **Step 2: Write the failing variant generate test**
 
 ```php
 // aroma-api/tests/Feature/AdminVariantGenerateTest.php
@@ -1164,7 +1164,7 @@ class AdminVariantGenerateTest extends TestCase
 }
 ```
 
-- [ ] **Step 3: Run tests to confirm they fail**
+- [x] **Step 3: Run tests to confirm they fail**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminProductSpecTest.php tests/Feature/AdminVariantGenerateTest.php 2>&1 | tail -20
@@ -1172,7 +1172,7 @@ cd aroma-api && php artisan test tests/Feature/AdminProductSpecTest.php tests/Fe
 
 Expected: All FAILED (routes not found).
 
-- [ ] **Step 4: Create AdminProductSpecController**
+- [x] **Step 4: Create AdminProductSpecController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/Admin/AdminProductSpecController.php
@@ -1252,7 +1252,7 @@ class AdminProductSpecController extends Controller
 }
 ```
 
-- [ ] **Step 5: Create AdminProductVariantGenerateController**
+- [x] **Step 5: Create AdminProductVariantGenerateController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantGenerateController.php
@@ -1321,7 +1321,7 @@ class AdminProductVariantGenerateController extends Controller
 }
 ```
 
-- [ ] **Step 6: Register routes in api.php**
+- [x] **Step 6: Register routes in api.php**
 
 Add `AdminProductSpecController` and `AdminProductVariantGenerateController` to the `use` import block at the bottom of `aroma-api/routes/api.php`:
 
@@ -1343,7 +1343,7 @@ Route::put('/products/{productId}/specs',    [AdminProductSpecController::class,
 Route::post('/products/{productId}/variants/generate', AdminProductVariantGenerateController::class);
 ```
 
-- [ ] **Step 7: Run tests to confirm they pass**
+- [x] **Step 7: Run tests to confirm they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminProductSpecTest.php tests/Feature/AdminVariantGenerateTest.php 2>&1 | tail -20
@@ -1351,7 +1351,7 @@ cd aroma-api && php artisan test tests/Feature/AdminProductSpecTest.php tests/Fe
 
 Expected: All 9 tests PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminProductSpecController.php \
@@ -1370,7 +1370,7 @@ git commit -m "feat: add AdminProductSpecController, AdminProductVariantGenerate
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php`
 - Modify: `aroma-api/routes/api.php` — remove the `store` route
 
-- [ ] **Step 1: Replace AdminProductVariantController**
+- [x] **Step 1: Replace AdminProductVariantController**
 
 Replace the entire file `aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php` with:
 
@@ -1480,14 +1480,14 @@ class AdminProductVariantController extends Controller
 }
 ```
 
-- [ ] **Step 2: Remove the variant store route**
+- [x] **Step 2: Remove the variant store route**
 
 In `aroma-api/routes/api.php`, remove this line from the admin group:
 ```php
 Route::post('/products/{productId}/variants',               [AdminProductVariantController::class, 'store']);
 ```
 
-- [ ] **Step 3: Run the full test suite to verify nothing broken**
+- [x] **Step 3: Run the full test suite to verify nothing broken**
 
 ```bash
 cd aroma-api && php artisan test 2>&1 | tail -20
@@ -1495,7 +1495,7 @@ cd aroma-api && php artisan test 2>&1 | tail -20
 
 Expected: All tests PASS. If AdminCouponTest or AdminBrandTest fail, investigate — they should be unaffected by this change.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminProductVariantController.php \
@@ -1514,7 +1514,7 @@ git commit -m "feat: update AdminProductVariantController — remove size, add s
 - Modify: `aroma-admin/src/router/index.ts`
 - Modify: `aroma-admin/src/components/layout/Sidebar.vue`
 
-- [ ] **Step 1: Update types/index.ts — add SpecType, ProductSpec, VariantSpec; update ProductVariant**
+- [x] **Step 1: Update types/index.ts — add SpecType, ProductSpec, VariantSpec; update ProductVariant**
 
 In `aroma-admin/src/types/index.ts`:
 
@@ -1563,7 +1563,7 @@ export interface ProductSpec {
 }
 ```
 
-- [ ] **Step 2: Update api/admin.ts — add spec type and product spec API calls**
+- [x] **Step 2: Update api/admin.ts — add spec type and product spec API calls**
 
 Add these functions at the end of `aroma-admin/src/api/admin.ts` (also update the import at the top to include `SpecType` and `ProductSpec`):
 
@@ -1608,7 +1608,7 @@ export const apiGenerateVariants = (productId: number, force = false) =>
   )
 ```
 
-- [ ] **Step 3: Create SpecTypesView.vue**
+- [x] **Step 3: Create SpecTypesView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/SpecTypesView.vue -->
@@ -1812,14 +1812,14 @@ async function handleSave() {
 
 Use this corrected version in the file above.
 
-- [ ] **Step 4: Add route to router/index.ts**
+- [x] **Step 4: Add route to router/index.ts**
 
 In `aroma-admin/src/router/index.ts`, add inside the `children` array:
 ```typescript
 { path: 'spec-types', name: 'spec-types', component: () => import('../views/SpecTypesView.vue') },
 ```
 
-- [ ] **Step 5: Add Spec Types to Sidebar.vue**
+- [x] **Step 5: Add Spec Types to Sidebar.vue**
 
 In `aroma-admin/src/components/layout/Sidebar.vue`, add `SlidersHorizontal` to the import:
 ```typescript
@@ -1837,7 +1837,7 @@ const catalogItems = [
 ]
 ```
 
-- [ ] **Step 6: Start the dev server and verify SpecTypesView in browser**
+- [x] **Step 6: Start the dev server and verify SpecTypesView in browser**
 
 ```bash
 cd aroma-admin && npm run dev
@@ -1851,7 +1851,7 @@ Open `http://localhost:5173/spec-types` (or whatever port is shown). Verify:
 - Delete with productCount > 0 shows disabled button
 - Sidebar shows "Spec Types" link
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-admin/src/types/index.ts \
@@ -1871,7 +1871,7 @@ git commit -m "feat: add SpecTypesView, update types and API for spec types and 
 
 This task fully replaces the variants section logic. Read the current file before editing.
 
-- [ ] **Step 1: Replace ProductVariantsView.vue**
+- [x] **Step 1: Replace ProductVariantsView.vue**
 
 Replace the entire `aroma-admin/src/views/ProductVariantsView.vue` with:
 
@@ -2450,7 +2450,7 @@ watch(() => props.id, () => { loadImages(); loadSpecs(); loadVariants() })
 </script>
 ```
 
-- [ ] **Step 2: Verify the page in browser**
+- [x] **Step 2: Verify the page in browser**
 
 With the dev server running, navigate to a product's variants page (e.g., `http://localhost:5173/products/1/variants`). Verify:
 
@@ -2467,7 +2467,7 @@ With the dev server running, navigate to a product's variants page (e.g., `http:
 11. Saving price/stock updates the row in the table
 12. Delete variant removes the row
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma-admin/src/views/ProductVariantsView.vue

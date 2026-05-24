@@ -1,7 +1,7 @@
 # Homepage Admin Control — Design Spec
 
 **Date:** 2026-05-23
-**Status:** Approved
+**Status:** Implemented
 
 ## Overview
 
@@ -121,7 +121,7 @@ Returns hero config and all enabled blocks ordered by position, each hydrated wi
 ### New files
 
 - `database/migrations/..._create_homepage_blocks_table.php`
-- `database/migrations/..._create_settings_table.php` (if not already present)
+- `database/migrations/..._create_settings_table.php` (does not exist yet — must be created)
 - `app/Models/HomepageBlock.php`
 - `app/Models/Setting.php` (key/value JSON store)
 - `app/Services/HomepageAdminService.php` — CRUD for blocks and hero
@@ -159,7 +159,7 @@ Added to the sidebar nav between Orders and Coupons.
   - Featured brand: Brand selector (dropdown of all brands), Product limit (1–4)
   - Categories: no extra fields
 
-**Drag-and-drop:** Uses `vuedraggable` (already available in ecosystem). On drop, calls `/api/admin/homepage/blocks/reorder` with updated positions.
+**Drag-and-drop:** Uses `vuedraggable` (install: `npm install vuedraggable@next`). On drop, calls `/api/admin/homepage/blocks/reorder` with updated positions.
 
 **Save behaviour:** Hero fields auto-save on "Save Changes" click. Block enable/disable toggles save immediately (single `PUT` call). Block config saves on "Save" within the editor drawer.
 

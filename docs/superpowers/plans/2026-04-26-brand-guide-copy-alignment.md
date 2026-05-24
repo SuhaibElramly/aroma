@@ -1,6 +1,6 @@
 # Brand Guide Copy Alignment — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Align all UI text in the Next.js storefront with the Aroma Shop brand guide (BRAND_GUIDE.md).
 
@@ -30,7 +30,7 @@
 **Files:**
 - Modify: `aroma/src/app/layout.tsx`
 
-- [ ] **Step 1: Edit metadata**
+- [x] **Step 1: Edit metadata**
 
 Replace the current `metadata` object:
 
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/app/layout.tsx
@@ -69,7 +69,7 @@ The current hero has two issues:
 1. `مجموعة الربيع · ٢٠٢٦` — a dated seasonal label that will become stale. Replace with the brand tagline.
 2. The tagline "SMELL GOOD, FEEL GOOD" is absent from the hero entirely.
 
-- [ ] **Step 1: Replace the seasonal label with the brand tagline**
+- [x] **Step 1: Replace the seasonal label with the brand tagline**
 
 Find line 42:
 ```tsx
@@ -85,7 +85,7 @@ Replace with:
 </motion.p>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/home/HeroSection.tsx
@@ -101,7 +101,7 @@ git commit -m "copy: replace seasonal hero label with brand tagline"
 
 The `NewArrivalsSection` uses label `وصل حديثًا` (matches brand guide) but title `الوافدون الجدد` — the brand guide's exact phrase is `كل ماهو جديد`.
 
-- [ ] **Step 1: Update the New Arrivals section header**
+- [x] **Step 1: Update the New Arrivals section header**
 
 Find in `NewArrivalsSection` (~line 78):
 ```tsx
@@ -123,7 +123,7 @@ Replace with:
 />
 ```
 
-- [ ] **Step 2: Remove the hardcoded brand description suffix in FeaturedBrandBanner**
+- [x] **Step 2: Remove the hardcoded brand description suffix in FeaturedBrandBanner**
 
 Find (~line 113):
 ```tsx
@@ -139,7 +139,7 @@ Replace with:
 </p>
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add aroma/src/features/home/HomeSection.tsx
@@ -155,7 +155,7 @@ git commit -m "copy: use brand phrase for new arrivals; remove hardcoded brand d
 
 The brand guide specifies location, phone, and hours as core brand identity. These are completely absent from the footer. Add a contact column.
 
-- [ ] **Step 1: Replace the Info column with a Contact column**
+- [x] **Step 1: Replace the Info column with a Contact column**
 
 Find the existing "معلومات" column (~lines 65–81):
 ```tsx
@@ -217,7 +217,7 @@ Replace with:
 </div>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/components/layout/Footer.tsx
@@ -231,7 +231,7 @@ git commit -m "copy: add contact info (location, phone, hours) to footer"
 **Files:**
 - Modify: `aroma/src/features/cart/CartPageClient.tsx`
 
-- [ ] **Step 1: Update empty state copy**
+- [x] **Step 1: Update empty state copy**
 
 Find (~lines 47–51):
 ```tsx
@@ -255,7 +255,7 @@ Replace with:
 />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/cart/CartPageClient.tsx
@@ -269,7 +269,7 @@ git commit -m "copy: warm up cart empty state with brand welcome phrase"
 **Files:**
 - Modify: `aroma/src/features/wishlist/WishlistPageClient.tsx`
 
-- [ ] **Step 1: Update empty state copy**
+- [x] **Step 1: Update empty state copy**
 
 Find (~lines 35–39):
 ```tsx
@@ -293,7 +293,7 @@ Replace with:
 />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/wishlist/WishlistPageClient.tsx
@@ -307,7 +307,7 @@ git commit -m "copy: update wishlist empty state to use brand phrases"
 **Files:**
 - Modify: `aroma/src/features/orders/OrdersPageClient.tsx`
 
-- [ ] **Step 1: Update empty state copy**
+- [x] **Step 1: Update empty state copy**
 
 Find (~lines 33–37):
 ```tsx
@@ -331,7 +331,7 @@ Replace with:
 />
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/orders/OrdersPageClient.tsx
@@ -347,7 +347,7 @@ git commit -m "copy: update orders empty state with brand CTA phrase"
 
 The registration success toast uses `✦` (a non-brand symbol). Brand guide uses `🌟` for welcome lines.
 
-- [ ] **Step 1: Update the toast message**
+- [x] **Step 1: Update the toast message**
 
 Find (~line 58):
 ```ts
@@ -359,7 +359,7 @@ Replace with:
 showToast('مرحباً في أرومـا 🌟 — تم إنشاء حسابك بنجاح')
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/auth/RegisterPageClient.tsx

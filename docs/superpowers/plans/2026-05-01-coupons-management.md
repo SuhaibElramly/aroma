@@ -1,6 +1,6 @@
 # Coupons Management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add full coupon management (admin CRUD + storefront apply/display) with percentage and fixed discounts, expiry, per-user limits, usage caps, and minimum order enforcement.
 
@@ -52,7 +52,7 @@
 - Create: `aroma-api/database/migrations/2026_05_01_000003_create_coupon_usages_table.php`
 - Create: `aroma-api/database/migrations/2026_05_01_000004_add_coupon_to_orders_table.php`
 
-- [ ] **Step 1: Create the coupons migration**
+- [x] **Step 1: Create the coupons migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_01_000002_create_coupons_table.php
@@ -84,7 +84,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 2: Create the coupon_usages migration**
+- [x] **Step 2: Create the coupon_usages migration**
 
 ```php
 // aroma-api/database/migrations/2026_05_01_000003_create_coupon_usages_table.php
@@ -115,7 +115,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 3: Create the migration adding coupon columns to orders**
+- [x] **Step 3: Create the migration adding coupon columns to orders**
 
 ```php
 // aroma-api/database/migrations/2026_05_01_000004_add_coupon_to_orders_table.php
@@ -141,7 +141,7 @@ return new class extends Migration {
 };
 ```
 
-- [ ] **Step 4: Run migrations**
+- [x] **Step 4: Run migrations**
 
 ```bash
 cd aroma-api && php artisan migrate
@@ -149,7 +149,7 @@ cd aroma-api && php artisan migrate
 
 Expected: `Migrating: 2026_05_01_000002_create_coupons_table` ... `Migrated` (three migrations run successfully)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/database/migrations/2026_05_01_000002_create_coupons_table.php \
@@ -168,7 +168,7 @@ git commit -m "feat: add coupons, coupon_usages migrations and coupon columns to
 - Create: `aroma-api/database/factories/CouponFactory.php`
 - Modify: `aroma-api/app/Models/Order.php`
 
-- [ ] **Step 1: Create the Coupon model**
+- [x] **Step 1: Create the Coupon model**
 
 ```php
 // aroma-api/app/Models/Coupon.php
@@ -210,7 +210,7 @@ class Coupon extends Model
 }
 ```
 
-- [ ] **Step 2: Create the CouponUsage model**
+- [x] **Step 2: Create the CouponUsage model**
 
 ```php
 // aroma-api/app/Models/CouponUsage.php
@@ -231,7 +231,7 @@ class CouponUsage extends Model
 }
 ```
 
-- [ ] **Step 3: Create the CouponFactory**
+- [x] **Step 3: Create the CouponFactory**
 
 ```php
 // aroma-api/database/factories/CouponFactory.php
@@ -292,7 +292,7 @@ class CouponFactory extends Factory
 }
 ```
 
-- [ ] **Step 4: Update Order model with coupon fields**
+- [x] **Step 4: Update Order model with coupon fields**
 
 Open `aroma-api/app/Models/Order.php`. Add `coupon_code` and `discount_amount` to `$fillable` and add `discount_amount` to `$casts`:
 
@@ -312,7 +312,7 @@ protected $casts = [
 ];
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-api/app/Models/Coupon.php \
@@ -331,7 +331,7 @@ git commit -m "feat: add Coupon and CouponUsage models, factory, update Order fi
 - Create: `aroma-api/tests/Feature/CouponValidateTest.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 // aroma-api/tests/Feature/CouponValidateTest.php
@@ -459,7 +459,7 @@ class CouponValidateTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/CouponValidateTest.php
@@ -467,7 +467,7 @@ cd aroma-api && php artisan test tests/Feature/CouponValidateTest.php
 
 Expected: FAIL — "Route [POST /api/coupons/validate] not found" or similar
 
-- [ ] **Step 3: Create the CouponController**
+- [x] **Step 3: Create the CouponController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/CouponController.php
@@ -529,7 +529,7 @@ class CouponController extends Controller
 }
 ```
 
-- [ ] **Step 4: Register the route in `routes/api.php`**
+- [x] **Step 4: Register the route in `routes/api.php`**
 
 In `aroma-api/routes/api.php`, add the import and the route inside the `auth:sanctum` group. Find the existing imports block and add:
 
@@ -543,7 +543,7 @@ Then inside `Route::middleware('auth:sanctum')->group(...)`, add after the wishl
 Route::post('/coupons/validate', [CouponController::class, 'validate']);
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/CouponValidateTest.php
@@ -551,7 +551,7 @@ cd aroma-api && php artisan test tests/Feature/CouponValidateTest.php
 
 Expected: All 8 tests PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/CouponController.php \
@@ -569,7 +569,7 @@ git commit -m "feat: add POST /coupons/validate endpoint with all validation rul
 - Create: `aroma-api/tests/Feature/AdminCouponTest.php`
 - Modify: `aroma-api/routes/api.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 // aroma-api/tests/Feature/AdminCouponTest.php
@@ -711,7 +711,7 @@ class AdminCouponTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminCouponTest.php
@@ -719,7 +719,7 @@ cd aroma-api && php artisan test tests/Feature/AdminCouponTest.php
 
 Expected: FAIL — routes not found
 
-- [ ] **Step 3: Create AdminCouponController**
+- [x] **Step 3: Create AdminCouponController**
 
 ```php
 // aroma-api/app/Http/Controllers/Api/Admin/AdminCouponController.php
@@ -840,7 +840,7 @@ class AdminCouponController extends Controller
 }
 ```
 
-- [ ] **Step 4: Register admin coupon routes**
+- [x] **Step 4: Register admin coupon routes**
 
 In `aroma-api/routes/api.php`, add the import:
 
@@ -858,7 +858,7 @@ Route::delete('/coupons/{id}',        [AdminCouponController::class, 'destroy'])
 Route::patch('/coupons/{id}/toggle',  [AdminCouponController::class, 'toggle']);
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 cd aroma-api && php artisan test tests/Feature/AdminCouponTest.php
@@ -866,7 +866,7 @@ cd aroma-api && php artisan test tests/Feature/AdminCouponTest.php
 
 Expected: All 10 tests PASS
 
-- [ ] **Step 6: Run all tests to check for regressions**
+- [x] **Step 6: Run all tests to check for regressions**
 
 ```bash
 cd aroma-api && php artisan test
@@ -874,7 +874,7 @@ cd aroma-api && php artisan test
 
 Expected: All existing tests still pass
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add aroma-api/app/Http/Controllers/Api/Admin/AdminCouponController.php \
@@ -893,7 +893,7 @@ git commit -m "feat: add admin coupon CRUD + toggle endpoints with tests"
 - Modify: `aroma-api/app/Http/Resources/OrderResource.php`
 - Modify: `aroma-api/app/Http/Controllers/Api/Admin/AdminOrderController.php`
 
-- [ ] **Step 1: Add `coupon_code` to CreateOrderRequest**
+- [x] **Step 1: Add `coupon_code` to CreateOrderRequest**
 
 Open `aroma-api/app/Http/Requests/Order/CreateOrderRequest.php`. Add to the `rules()` array:
 
@@ -901,7 +901,7 @@ Open `aroma-api/app/Http/Requests/Order/CreateOrderRequest.php`. Add to the `rul
 'coupon_code' => ['nullable', 'string'],
 ```
 
-- [ ] **Step 2: Update OrderService to apply the coupon**
+- [x] **Step 2: Update OrderService to apply the coupon**
 
 Open `aroma-api/app/Services/OrderService.php`. Add the import at the top:
 
@@ -1015,7 +1015,7 @@ public function createOrder(User $user, array $data): Order
 }
 ```
 
-- [ ] **Step 3: Update OrderResource to expose coupon fields**
+- [x] **Step 3: Update OrderResource to expose coupon fields**
 
 Open `aroma-api/app/Http/Resources/OrderResource.php`. Add these two fields inside the `toArray` return array:
 
@@ -1024,7 +1024,7 @@ Open `aroma-api/app/Http/Resources/OrderResource.php`. Add these two fields insi
 'discountAmount' => $this->discount_amount ? (float) $this->discount_amount : null,
 ```
 
-- [ ] **Step 4: Update AdminOrderController formatOrder to include coupon fields**
+- [x] **Step 4: Update AdminOrderController formatOrder to include coupon fields**
 
 Open `aroma-api/app/Http/Controllers/Api/Admin/AdminOrderController.php`. In the `formatOrder` method, add to the `$base` array:
 
@@ -1033,7 +1033,7 @@ Open `aroma-api/app/Http/Controllers/Api/Admin/AdminOrderController.php`. In the
 'discountAmount' => $order->discount_amount ? (float) $order->discount_amount : null,
 ```
 
-- [ ] **Step 5: Run all tests**
+- [x] **Step 5: Run all tests**
 
 ```bash
 cd aroma-api && php artisan test
@@ -1041,7 +1041,7 @@ cd aroma-api && php artisan test
 
 Expected: All tests PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add aroma-api/app/Http/Requests/Order/CreateOrderRequest.php \
@@ -1061,7 +1061,7 @@ git commit -m "feat: apply coupon in OrderService, expose coupon fields in order
 - Modify: `aroma-admin/src/router/index.ts`
 - Modify: `aroma-admin/src/components/layout/Sidebar.vue`
 
-- [ ] **Step 1: Add AdminCoupon type and extend AdminOrder**
+- [x] **Step 1: Add AdminCoupon type and extend AdminOrder**
 
 Open `aroma-admin/src/types/index.ts`. Add after the existing `AdminOrder` interface:
 
@@ -1088,7 +1088,7 @@ couponCode?: string | null
 discountAmount?: number | null
 ```
 
-- [ ] **Step 2: Add coupon API functions**
+- [x] **Step 2: Add coupon API functions**
 
 Open `aroma-admin/src/api/admin.ts`. Add the import to the top `import type { ... }` line — add `AdminCoupon` to the existing type import. Then append at the bottom of the file:
 
@@ -1126,7 +1126,7 @@ export const apiToggleCoupon = (id: number) =>
   client.patch<AdminCoupon>(`/admin/coupons/${id}/toggle`)
 ```
 
-- [ ] **Step 3: Add the /coupons route to router**
+- [x] **Step 3: Add the /coupons route to router**
 
 Open `aroma-admin/src/router/index.ts`. Inside the `children` array (alongside `brands`, `categories`), add:
 
@@ -1134,7 +1134,7 @@ Open `aroma-admin/src/router/index.ts`. Inside the `children` array (alongside `
 { path: 'coupons', name: 'coupons', component: () => import('../views/CouponsView.vue') },
 ```
 
-- [ ] **Step 4: Add Coupons to the sidebar**
+- [x] **Step 4: Add Coupons to the sidebar**
 
 Open `aroma-admin/src/components/layout/Sidebar.vue`. In the `<script setup>` block, add `Ticket` to the import:
 
@@ -1153,7 +1153,7 @@ const catalogItems = [
 ]
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add aroma-admin/src/types/index.ts \
@@ -1170,7 +1170,7 @@ git commit -m "feat: add AdminCoupon type, coupon API functions, router route an
 **Files:**
 - Create: `aroma-admin/src/views/CouponsView.vue`
 
-- [ ] **Step 1: Create CouponsView.vue**
+- [x] **Step 1: Create CouponsView.vue**
 
 ```vue
 <!-- aroma-admin/src/views/CouponsView.vue -->
@@ -1473,7 +1473,7 @@ onUnmounted(() => clearTimeout(debounceTimer))
 </script>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/CouponsView.vue
@@ -1487,7 +1487,7 @@ git commit -m "feat: add CouponsView admin page with list, create, edit, toggle,
 **Files:**
 - Modify: `aroma-admin/src/views/OrderDetailView.vue`
 
-- [ ] **Step 1: Find the price/total section in OrderDetailView.vue**
+- [x] **Step 1: Find the price/total section in OrderDetailView.vue**
 
 Open `aroma-admin/src/views/OrderDetailView.vue`. Find where the order `total` is displayed (search for `total`). It will be in the right sidebar panel. Add the coupon discount row just before the total line:
 
@@ -1512,7 +1512,7 @@ Also add a subtotal row above the discount (if a coupon is applied), so the brea
 </div>
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma-admin/src/views/OrderDetailView.vue
@@ -1528,7 +1528,7 @@ git commit -m "feat: show coupon discount breakdown in admin order detail"
 - Modify: `aroma/src/mocks/services.ts`
 - Modify: `aroma/src/lib/api/queries.ts`
 
-- [ ] **Step 1: Update Order type and CheckoutPayload**
+- [x] **Step 1: Update Order type and CheckoutPayload**
 
 Open `aroma/src/types/index.ts`. In the `Order` interface, add:
 
@@ -1543,7 +1543,7 @@ In the `CheckoutPayload` interface, add:
 couponCode?: string
 ```
 
-- [ ] **Step 2: Add validateCoupon service and update createOrder**
+- [x] **Step 2: Add validateCoupon service and update createOrder**
 
 Open `aroma/src/mocks/services.ts`. Add the `validateCoupon` function:
 
@@ -1588,7 +1588,7 @@ export async function createOrder(payload: CheckoutPayload): Promise<Order> {
 }
 ```
 
-- [ ] **Step 3: Add useValidateCoupon mutation to queries.ts**
+- [x] **Step 3: Add useValidateCoupon mutation to queries.ts**
 
 Open `aroma/src/lib/api/queries.ts`. Add the import at the top (alongside the existing `import * as services`):
 
@@ -1607,7 +1607,7 @@ export function useValidateCoupon() {
 }
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma/src/types/index.ts \
@@ -1623,7 +1623,7 @@ git commit -m "feat: add coupon fields to Order type, validateCoupon service, us
 **Files:**
 - Modify: `aroma/src/features/checkout/CheckoutPageClient.tsx`
 
-- [ ] **Step 1: Add coupon state and logic to CheckoutPageClient**
+- [x] **Step 1: Add coupon state and logic to CheckoutPageClient**
 
 Open `aroma/src/features/checkout/CheckoutPageClient.tsx`.
 
@@ -1694,7 +1694,7 @@ await createOrder.mutateAsync({
 })
 ```
 
-- [ ] **Step 2: Add coupon UI to the checkout summary**
+- [x] **Step 2: Add coupon UI to the checkout summary**
 
 In the JSX of `CheckoutPageClient.tsx`, find where `subtotal` and the total/confirm button are displayed. Add the coupon row between them:
 
@@ -1752,7 +1752,7 @@ In the JSX of `CheckoutPageClient.tsx`, find where `subtotal` and the total/conf
 
 Also update any existing total display line to use `finalTotal` instead of `subtotal`.
 
-- [ ] **Step 3: Handle coupon errors on order submit**
+- [x] **Step 3: Handle coupon errors on order submit**
 
 In the existing `onSubmit` catch block inside `CheckoutPageClient.tsx`, add coupon-specific error handling:
 
@@ -1774,7 +1774,7 @@ In the existing `onSubmit` catch block inside `CheckoutPageClient.tsx`, add coup
 }
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add aroma/src/features/checkout/CheckoutPageClient.tsx
@@ -1788,7 +1788,7 @@ git commit -m "feat: add coupon input and discount summary to checkout page"
 **Files:**
 - Modify: `aroma/src/features/orders/OrderDetailClient.tsx`
 
-- [ ] **Step 1: Add coupon discount breakdown to OrderDetailClient**
+- [x] **Step 1: Add coupon discount breakdown to OrderDetailClient**
 
 Open `aroma/src/features/orders/OrderDetailClient.tsx`. Find where the `order.total` is displayed (the price summary section). Add the discount rows above the total:
 
@@ -1808,7 +1808,7 @@ Open `aroma/src/features/orders/OrderDetailClient.tsx`. Find where the `order.to
 )}
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add aroma/src/features/orders/OrderDetailClient.tsx
@@ -1819,7 +1819,7 @@ git commit -m "feat: show coupon discount breakdown in storefront order detail"
 
 ## Task 12: Smoke test end-to-end
 
-- [ ] **Step 1: Start all three servers**
+- [x] **Step 1: Start all three servers**
 
 ```bash
 # Terminal 1
@@ -1832,7 +1832,7 @@ cd aroma-admin && npm run dev
 cd aroma && npm run dev
 ```
 
-- [ ] **Step 2: Create a test coupon in the admin**
+- [x] **Step 2: Create a test coupon in the admin**
 
 Navigate to `http://localhost:5173/coupons` (admin). Click "New Coupon", create:
 - Code: `TEST20`
@@ -1843,26 +1843,26 @@ Navigate to `http://localhost:5173/coupons` (admin). Click "New Coupon", create:
 
 Verify it appears in the list with "Active" badge and "20%" value.
 
-- [ ] **Step 3: Test the storefront apply flow**
+- [x] **Step 3: Test the storefront apply flow**
 
 Log in to the storefront, add items to the cart, go to checkout. Enter `TEST20` in the coupon field and click تطبيق. Verify:
 - Green confirmation row appears with discount amount
 - Total updates to show 20% off
 - Subtotal + coupon breakdown rows visible
 
-- [ ] **Step 4: Place the order and verify coupon is recorded**
+- [x] **Step 4: Place the order and verify coupon is recorded**
 
 Complete checkout. Go to the order detail page. Verify the discount breakdown shows subtotal, coupon line, and final total.
 
-- [ ] **Step 5: Check admin order detail**
+- [x] **Step 5: Check admin order detail**
 
 In the admin, open the order. Verify the coupon code and discount amount appear in the order summary.
 
-- [ ] **Step 6: Verify coupon usage tracking**
+- [x] **Step 6: Verify coupon usage tracking**
 
 Back in admin Coupons list, verify `TEST20` now shows `1 / ∞` uses. Try applying `TEST20` again on the same user account — verify the error "لقد استخدمت هذا الكوبون من قبل" appears.
 
-- [ ] **Step 7: Run full test suite**
+- [x] **Step 7: Run full test suite**
 
 ```bash
 cd aroma-api && php artisan test
@@ -1870,7 +1870,7 @@ cd aroma-api && php artisan test
 
 Expected: All tests PASS
 
-- [ ] **Step 8: Final commit**
+- [x] **Step 8: Final commit**
 
 ```bash
 git add -A
