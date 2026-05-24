@@ -31,7 +31,7 @@ class HomepageAdminService
 
         if ($image) {
             if ($bgPath) Storage::disk(config('filesystems.default'))->delete($bgPath);
-            $bgPath = $image->store('homepage', 'public');
+            $bgPath = $image->store('homepage', config('filesystems.default'));
         }
 
         Setting::set('homepage_hero', array_merge($fields, ['bg_image_path' => $bgPath]));
@@ -41,7 +41,7 @@ class HomepageAdminService
     {
         $existing = Setting::get('site_logo_path');
         if ($existing) Storage::disk(config('filesystems.default'))->delete($existing);
-        $path = $image->store('logos', 'public');
+        $path = $image->store('logos', config('filesystems.default'));
         Setting::set('site_logo_path', $path);
         return asset('storage/' . $path);
     }

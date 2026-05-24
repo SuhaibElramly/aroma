@@ -31,7 +31,7 @@ class AdminProductImageController extends Controller
 
         foreach ($request->file('images') as $index => $file) {
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-            $path     = $file->storeAs("products/{$productId}", $filename, 'public');
+            $path     = $file->storeAs("products/{$productId}", $filename, config('filesystems.default'));
 
             $created[] = ProductImage::create([
                 'product_id'    => $productId,
