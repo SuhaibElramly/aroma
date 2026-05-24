@@ -1,6 +1,6 @@
 <!-- aroma-admin/src/components/homepage/ProductPicker.vue -->
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import draggable from 'vuedraggable'
 import { apiGetProducts } from '../../api/admin'
 import { GripVertical, X } from 'lucide-vue-next'
@@ -74,6 +74,10 @@ function remove(id: number) {
 function onDragEnd() {
   emit('update:modelValue', selected.value.map(p => p.id))
 }
+
+function onBlur() {
+  setTimeout(() => { showResults.value = false }, 150)
+}
 </script>
 
 <template>
@@ -89,7 +93,7 @@ function onDragEnd() {
         type="text"
         placeholder="Search products…"
         @input="onInput"
-        @blur="setTimeout(() => { showResults = false }, 150)"
+        @blur="onBlur"
         @focus="showResults = results.length > 0"
         class="w-full rounded border border-dash-border bg-dash-paper-2 px-3 py-2 text-[13px]
                text-dash-text placeholder:text-dash-faint focus:outline-none focus:border-dash-primary"
