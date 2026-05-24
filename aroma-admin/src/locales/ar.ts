@@ -53,8 +53,6 @@ const ar = {
     orders: 'الطلبات',
     orderDetail: 'تفاصيل الطلب',
     products: 'المنتجات',
-    productVariants: 'متغيرات المنتج',
-    productCreate: 'إنشاء منتج',
     brands: 'العلامات التجارية',
     brandDetail: 'تفاصيل العلامة التجارية',
     categories: 'التصنيفات',

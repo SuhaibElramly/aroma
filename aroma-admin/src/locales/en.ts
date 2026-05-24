@@ -51,8 +51,6 @@ const en = {
     orders: 'Orders',
     orderDetail: 'Order Detail',
     products: 'Products',
-    productVariants: 'Product Variants',
-    productCreate: 'Create Product',
     brands: 'Brands',
     brandDetail: 'Brand Detail',
     categories: 'Categories',
