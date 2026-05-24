@@ -112,7 +112,6 @@ class AdminProductController extends Controller
             'slug'           => $product->slug,
             'name'           => $product->name,
             'nameEn'         => $product->name_en,
-            'name_en'        => $product->name_en,
             'brand'          => $product->brand?->name,
             'brandId'        => $product->brand_id,
             'category'       => $product->category?->label,
