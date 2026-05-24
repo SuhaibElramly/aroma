@@ -126,10 +126,10 @@ export const apiGetCategories = (params?: {
 export const apiCreateCategory = (data: Record<string, unknown>) =>
   client.post<{ id: string }>('/admin/categories', data)
 
-export const apiUpdateCategory = (id: string, data: Record<string, unknown>) =>
-  client.put<{ id: string }>(`/admin/categories/${id}`, data)
+export const apiUpdateCategory = (id: number, data: Record<string, unknown>) =>
+  client.put<{ id: number }>(`/admin/categories/${id}`, data)
 
-export const apiDeleteCategory = (id: string) =>
+export const apiDeleteCategory = (id: number) =>
   client.delete(`/admin/categories/${id}`)
 
 // ── Product Images ────────────────────────────────────────────────────

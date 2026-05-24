@@ -17,6 +17,7 @@ import {
   Search,
   LogOut,
   Home,
+  type LucideIcon,
 } from 'lucide-vue-next'
 
 const { t, locale } = useI18n()
@@ -25,42 +26,57 @@ const router = useRouter()
 const auth   = useAuthStore()
 const { openPalette } = useCommandPalette()
 
+interface NavItem {
+  key:   string
+  label: string
+  icon:  LucideIcon
+  path:  string
+  badge: string | null
+}
+
+interface NavGroup {
+  label: string
+  items: NavItem[]
+}
+
 const isActive = (path: string) => route.path.startsWith('/' + path)
 
-const groups = computed(() => {
+const groups = computed<NavGroup[]>(() => {
   const c = (resource: string) => auth.can(resource, 'view')
-  return [
+  const filterItems = (arr: (NavItem | false)[]): NavItem[] =>
+    arr.filter((x): x is NavItem => Boolean(x))
+  return ([
     {
       label: t('nav.workspace'),
-      items: [
+      items: filterItems([
         { key: 'dashboard',  label: t('nav.dashboard'),  icon: LayoutDashboard, path: 'dashboard',  badge: null },
         c('orders')    && { key: 'orders',     label: t('nav.orders'),    icon: ShoppingBag, path: 'orders',     badge: null },
         c('customers') && { key: 'users',      label: t('nav.customers'), icon: Users,       path: 'users',      badge: null },
-      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: null } => Boolean(x)),
+      ]),
     },
     {
       label: t('nav.catalog'),
-      items: [
+      items: filterItems([
         c('products') && { key: 'products',   label: t('nav.products'),  icon: Package,           path: 'products',   badge: null },
         c('specs')    && { key: 'spec-types', label: t('nav.specTypes'), icon: SlidersHorizontal, path: 'spec-types', badge: null },
         c('brands')   && { key: 'brands',     label: t('nav.brands'),    icon: Tag,               path: 'brands',     badge: null },
         c('brands')   && { key: 'categories', label: t('nav.categories'),icon: Grid3X3,           path: 'categories', badge: null }, // shares brands permission — no separate ROLE_PERMS key
         c('coupons')  && { key: 'coupons',    label: t('nav.coupons'),   icon: Ticket,            path: 'coupons',    badge: null },
-      ].filter((x): x is { key: string; label: string; icon: any; path: string; badge: null } => Boolean(x)),
+      ]),
     },
     {
       label: t('nav.storefront'),
-      items: [
+      items: filterItems([
         { key: 'homepage', label: t('nav.homepage'), icon: Home, path: 'homepage', badge: null },
-      ],
+      ]),
     },
     auth.can('admins', 'view') ? {
       label: t('nav.settings'),
-      items: [
+      items: filterItems([
         { key: 'admins', label: t('nav.admins'), icon: ShieldCheck, path: 'admins', badge: null },
-      ],
+      ]),
     } : null,
-  ].filter((g): g is { label: string; items: { key: string; label: string; icon: any; path: string; badge: null }[] } => Boolean(g))
+  ] as (NavGroup | null)[]).filter((g): g is NavGroup => Boolean(g))
 })
 
 const userInitials = computed(() => {

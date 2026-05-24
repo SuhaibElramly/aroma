@@ -202,7 +202,7 @@ async function handleSave() {
   saving.value = true
   try {
     editing.value
-      ? await apiUpdateCategory(String(editing.value.id), form.value)
+      ? await apiUpdateCategory(editing.value.id, form.value)
       : await apiCreateCategory(form.value)
     modalOpen.value = false; loadCats()
   } catch (e: unknown) {
@@ -217,7 +217,7 @@ async function handleDelete() {
   deleteError.value = null
   deleting.value = true
   try {
-    await apiDeleteCategory(String(deletingCat.value.id))
+    await apiDeleteCategory(deletingCat.value.id)
     deletingCat.value = null
     loadCats()
   } catch (e: unknown) {

@@ -23,6 +23,7 @@ import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement,
   Title, Tooltip, Legend,
 } from 'chart.js'
+import type { TooltipItem } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -60,7 +61,7 @@ const chartOptions = {
       cornerRadius: 8,
       displayColors: false,
       callbacks: {
-        label: (ctx: { parsed: { y: number | null } }) => ` ${ctx.parsed.y ?? 0} orders`,
+        label: (ctx: TooltipItem<'bar'>) => ` ${ctx.parsed.y ?? 0} orders`,
       },
     },
   },

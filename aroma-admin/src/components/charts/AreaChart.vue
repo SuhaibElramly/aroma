@@ -24,6 +24,7 @@ import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
   LineElement, Title, Tooltip, Filler, Legend,
 } from 'chart.js'
+import type { TooltipItem } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend)
 
@@ -73,7 +74,7 @@ const chartOptions = {
       cornerRadius: 8,
       displayColors: false,
       callbacks: {
-        label: (ctx: { parsed: { y: number | null } }) => ` ${(ctx.parsed.y ?? 0).toLocaleString()} LYD`,
+        label: (ctx: TooltipItem<'line'>) => ` ${(ctx.parsed.y ?? 0).toLocaleString()} LYD`,
       },
     },
   },
