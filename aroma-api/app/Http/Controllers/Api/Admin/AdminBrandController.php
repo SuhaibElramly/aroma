@@ -52,7 +52,7 @@ class AdminBrandController extends Controller
             'origin'       => $b->origin,
             'tagline'      => $b->tagline,
             'bg'           => $b->bg,
-            'logoUrl'      => $b->logo ? Storage::disk('public')->url($b->logo) : null,
+            'logoUrl'      => $b->logo ? Storage::disk(config('filesystems.default'))->url($b->logo) : null,
             'productCount' => $b->products_count,
         ]));
     }
@@ -68,7 +68,7 @@ class AdminBrandController extends Controller
             'origin'       => $brand->origin,
             'tagline'      => $brand->tagline,
             'bg'           => $brand->bg,
-            'logoUrl'      => $brand->logo ? Storage::disk('public')->url($brand->logo) : null,
+            'logoUrl'      => $brand->logo ? Storage::disk(config('filesystems.default'))->url($brand->logo) : null,
             'productCount' => $brand->products_count,
         ]);
     }
@@ -112,7 +112,7 @@ class AdminBrandController extends Controller
         }
 
         if ($brand->logo) {
-            Storage::disk('public')->delete($brand->logo);
+            Storage::disk(config('filesystems.default'))->delete($brand->logo);
         }
 
         $brand->delete();
@@ -129,7 +129,7 @@ class AdminBrandController extends Controller
 
         // Delete previous logo file if one exists
         if ($brand->logo) {
-            Storage::disk('public')->delete($brand->logo);
+            Storage::disk(config('filesystems.default'))->delete($brand->logo);
         }
 
         $file     = $request->file('logo');
@@ -143,7 +143,7 @@ class AdminBrandController extends Controller
         $brand->update(['logo' => $path]);
 
         return response()->json([
-            'logoUrl' => Storage::disk('public')->url($path),
+            'logoUrl' => Storage::disk(config('filesystems.default'))->url($path),
         ]);
     }
 
@@ -152,7 +152,7 @@ class AdminBrandController extends Controller
         $brand = Brand::findOrFail($id);
 
         if ($brand->logo) {
-            Storage::disk('public')->delete($brand->logo);
+            Storage::disk(config('filesystems.default'))->delete($brand->logo);
             $brand->update(['logo' => null]);
         }
 

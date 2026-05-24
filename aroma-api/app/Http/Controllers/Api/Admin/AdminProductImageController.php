@@ -61,7 +61,7 @@ class AdminProductImageController extends Controller
     public function destroy(int $productId, int $imageId)
     {
         $image = ProductImage::where('product_id', $productId)->findOrFail($imageId);
-        Storage::disk('public')->delete($image->path);
+        Storage::disk(config('filesystems.default'))->delete($image->path);
 
         $wasThumbnail = $image->is_thumbnail;
         $image->delete();
@@ -79,7 +79,7 @@ class AdminProductImageController extends Controller
     {
         return [
             'id'           => $img->id,
-            'url'          => Storage::disk('public')->url($img->path),
+            'url'          => Storage::disk(config('filesystems.default'))->url($img->path),
             'originalName' => $img->original_name,
             'isThumbnail'  => $img->is_thumbnail,
             'sortOrder'    => $img->sort_order,
