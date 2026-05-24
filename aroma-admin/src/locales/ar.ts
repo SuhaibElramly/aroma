@@ -729,6 +729,7 @@ const ar = {
     noImages: 'لا توجد صور بعد',
     noImagesHint: 'ارفع الصور باستخدام الزر أعلاه',
   },
+  // Used via dynamic key lookup in ABadge.vue (t(`statuses.${props.status}`)) — static audits will not detect these references.
   statuses: {
     paid: 'مدفوع',
     confirmed: 'مؤكد',

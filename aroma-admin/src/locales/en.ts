@@ -727,6 +727,7 @@ const en = {
     noImages: 'No images yet',
     noImagesHint: 'Upload images using the button above',
   },
+  // Used via dynamic key lookup in ABadge.vue (t(`statuses.${props.status}`)) — static audits will not detect these references.
   statuses: {
     paid: 'Paid',
     confirmed: 'Confirmed',
