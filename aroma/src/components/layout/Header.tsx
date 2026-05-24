@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Search, Heart, ShoppingBag, User } from 'lucide-react'
 import { useCart } from '@/lib/api/queries'
@@ -23,7 +24,7 @@ const ICON_LINKS = [
   { icon: User,        href: '/profile',  label: 'حسابي' },
 ]
 
-export function Header() {
+export function Header({ logoUrl }: { logoUrl?: string | null }) {
   const [hydrated, setHydrated] = useState(false)
   const pathname    = usePathname()
   const isLoggedIn  = useAuthStore(s => s.isLoggedIn)
@@ -57,11 +58,21 @@ export function Header() {
         }}
       >
         {/* Logo */}
-        <Link
-          href="/"
-          className="shrink-0 font-display text-[20px] font-semibold tracking-[0.18em] text-[#F4EFE8] pr-6"
-        >
-          AROMA
+        <Link href="/" className="shrink-0 pr-6">
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt="Aroma"
+              height={32}
+              width={120}
+              className="object-contain object-left"
+              style={{ height: 32, width: 'auto' }}
+            />
+          ) : (
+            <span className="font-display text-[20px] font-semibold tracking-[0.18em] text-[#F4EFE8]">
+              AROMA
+            </span>
+          )}
         </Link>
 
         {/* Nav links — hidden on small screens */}

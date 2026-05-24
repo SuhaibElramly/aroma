@@ -251,4 +251,5 @@ export interface HomeBlock {
 export interface HomePageData {
   hero: HeroConfig
   blocks: HomeBlock[]
+  logo_url?: string | null
 }

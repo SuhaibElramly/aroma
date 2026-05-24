@@ -1,14 +1,26 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
-export function Footer() {
+export function Footer({ logoUrl }: { logoUrl?: string | null }) {
   return (
     <footer className="border-t border-aroma-border bg-aroma-surface mt-20">
       <div className="max-w-[1200px] mx-auto px-12 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
-          <p className="font-display text-2xl font-semibold tracking-[0.18em] text-aroma-text mb-3">
-            AROMA
-          </p>
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt="Aroma"
+              height={28}
+              width={100}
+              className="object-contain object-left mb-3"
+              style={{ height: 28, width: 'auto' }}
+            />
+          ) : (
+            <p className="font-display text-2xl font-semibold tracking-[0.18em] text-aroma-text mb-3">
+              AROMA
+            </p>
+          )}
           <p className="font-sans text-[13px] text-aroma-muted leading-relaxed max-w-[220px]">
             عطور مختارة من أرقى دور العطور حول العالم.
           </p>
@@ -21,9 +33,9 @@ export function Footer() {
           </p>
           <ul className="space-y-2.5">
             {[
-              { label: 'وصل حديثًا',  href: '/search?filter=new' },
+              { label: 'وصل حديثًا',    href: '/search?filter=new' },
               { label: 'الأكثر مبيعًا', href: '/search?filter=bestseller' },
-              { label: 'العروض',        href: '/search?filter=offer' },
+              { label: 'العروض',         href: '/search?filter=offer' },
               { label: 'جميع الماركات', href: '/brands' },
             ].map(l => (
               <li key={l.href}>
