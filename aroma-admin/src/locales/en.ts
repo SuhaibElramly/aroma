@@ -38,11 +38,9 @@ const en = {
   },
   topbar: {
     signOut: 'Sign Out',
-    adminConsole: 'Admin Console',
     newProduct: 'New product',
     notifications: 'Notifications',
     markAllRead: 'Mark all read',
-    noNotifications: 'No new notifications',
     unreadLabel: 'unread',
     viewAll: 'View all',
   },
