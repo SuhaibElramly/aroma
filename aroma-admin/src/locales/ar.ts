@@ -21,7 +21,6 @@ const ar = {
     fieldRequired: 'مطلوب',
   },
   nav: {
-    main: 'الرئيسية',
     catalog: 'الكتالوج',
     dashboard: 'لوحة التحكم',
     orders: 'الطلبات',

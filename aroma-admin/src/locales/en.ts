@@ -19,7 +19,6 @@ const en = {
     fieldRequired: 'Required',
   },
   nav: {
-    main: 'Main',
     catalog: 'Catalog',
     dashboard: 'Dashboard',
     orders: 'Orders',
