@@ -165,6 +165,21 @@ export function OffersSection({ products, config }: { products: Product[]; confi
   )
 }
 
+// ── Curated ───────────────────────────────────────────────────────────
+export function CuratedSection({ products, config }: { products: Product[]; config?: { label?: string; title?: string } }) {
+  return (
+    <RevealSection className="px-6 md:px-12 py-16 md:py-[72px]">
+      <SectionHeader
+        label={config?.label ?? 'مختارات خاصة'}
+        title={config?.title ?? 'مختارات المحرر'}
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-7">
+        {products.map(p => <ProductCard key={p.id} product={p} />)}
+      </div>
+    </RevealSection>
+  )
+}
+
 // ── Home Page Client root ─────────────────────────────────────────────
 export function HomeSections({ blocks }: { blocks: HomeBlock[] }) {
   return (
@@ -183,6 +198,8 @@ export function HomeSections({ blocks }: { blocks: HomeBlock[] }) {
             return block.data.brand
               ? <FeaturedBrandBanner key={block.id} brand={block.data.brand} products={block.data.products ?? []} config={block.config} />
               : null
+          case 'curated':
+            return <CuratedSection key={block.id} products={block.data.products ?? []} config={block.config} />
           default:
             return null
         }

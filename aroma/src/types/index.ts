@@ -232,13 +232,14 @@ export interface HeroConfig {
 
 export interface HomeBlock {
   id: number
-  type: 'bestsellers' | 'new_arrivals' | 'offers' | 'categories' | 'featured_brand'
+  type: 'bestsellers' | 'new_arrivals' | 'offers' | 'categories' | 'featured_brand' | 'curated'
   config: {
     label?: string
     title?: string
     limit?: number
     product_limit?: number
     brand_id?: string
+    product_ids?: number[]
   }
   data: {
     products?: Product[]
