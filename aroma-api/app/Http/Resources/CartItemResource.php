@@ -46,6 +46,10 @@ class CartItemResource extends JsonResource
                     'bg' => $product->placeholder_bg,
                     'dot' => $product->placeholder_dot,
                 ],
+                'thumbnailUrl' => $product->relationLoaded('images')
+                    ? ($product->images->firstWhere('is_thumbnail', true)?->url
+                        ?? $product->images->first()?->url)
+                    : null,
             ],
             'quantity' => $this->quantity,
         ];
