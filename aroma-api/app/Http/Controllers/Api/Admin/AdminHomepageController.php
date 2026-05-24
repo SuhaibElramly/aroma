@@ -40,7 +40,11 @@ class AdminHomepageController extends Controller
     public function uploadLogo(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate(['logo' => 'required|image|max:2048']);
-        $url = $this->service->updateLogo($request->file('logo'));
+        $file = $request->file('logo');
+        if (!$file) {
+            return response()->json(['error' => 'No file uploaded'], 422);
+        }
+        $url = $this->service->updateLogo($file);
         return response()->json(['logo_url' => $url]);
     }
 

@@ -11,12 +11,17 @@ class HomepageAdminService
 {
     public function getConfig(): array
     {
-        $logoPath = Setting::get('site_logo_path');
         return [
             'hero'     => Setting::get('homepage_hero', []),
             'blocks'   => HomepageBlock::orderBy('position')->get()->toArray(),
-            'logo_url' => $logoPath ? asset('storage/' . $logoPath) : null,
+            'logo_url' => $this->getLogoUrl(),
         ];
+    }
+
+    private function getLogoUrl(): ?string
+    {
+        $path = Setting::get('site_logo_path');
+        return $path ? asset('storage/' . $path) : null;
     }
 
     public function updateHero(array $fields, ?UploadedFile $image): void
