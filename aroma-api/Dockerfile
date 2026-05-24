@@ -1,12 +1,17 @@
 FROM php:8.3-cli-alpine
 
-# System libs + PHP extensions Laravel needs against Neon/Postgres
+# System libs + PHP extensions Laravel needs against Neon/Postgres.
+# bcmath/intl are required by laravel/framework; pdo_pgsql for Neon.
 RUN apk add --no-cache \
         postgresql-dev \
         libzip-dev \
+        icu-dev \
+        oniguruma-dev \
     && docker-php-ext-install \
         pdo_pgsql \
         zip \
+        bcmath \
+        intl \
         opcache
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -16,9 +21,13 @@ WORKDIR /app
 # Copy source. .dockerignore keeps node_modules / vendor / .env out.
 COPY . .
 
-# Production install: no dev deps, optimized autoloader
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
-    && php artisan storage:link || true
+# Install dependencies. NO `|| true` — a composer install failure must
+# fail the build loudly, not produce an image without vendor/.
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# storage:link is idempotent-ish; tolerate the "already exists" case but
+# keep it in a separate RUN so its failure can't mask the composer step.
+RUN php artisan storage:link || true
 
 # Render injects $PORT; expose for documentation only.
 EXPOSE 10000
