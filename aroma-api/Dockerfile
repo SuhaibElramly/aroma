@@ -1,4 +1,4 @@
-FROM php:8.3-cli-alpine
+FROM php:8.4-cli-alpine
 
 # System libs + PHP extensions Laravel needs against Neon/Postgres.
 # bcmath/intl are required by laravel/framework; pdo_pgsql for Neon.
