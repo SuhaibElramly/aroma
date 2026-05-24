@@ -499,7 +499,6 @@ const ar = {
     },
   },
   userDetail: {
-    title: 'تفاصيل العميل',
     back: 'العودة إلى العملاء',
     orders: 'الطلبات',
     ordersLabel: 'الطلبات',

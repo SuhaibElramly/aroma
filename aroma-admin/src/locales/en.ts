@@ -497,7 +497,6 @@ const en = {
     },
   },
   userDetail: {
-    title: 'Customer Detail',
     back: 'Back to Customers',
     orders: 'Orders',
     ordersLabel: 'Orders',
