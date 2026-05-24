@@ -698,14 +698,11 @@ const ar = {
     },
   },
   pagination: {
-    showing: 'عرض',
-    to: 'إلى',
     of: 'من',
     results: 'نتائج',
     prev: 'السابق',
     next: 'التالي',
     page: 'صفحة',
-    perPage: 'في الصفحة',
   },
   admins: {
     title: 'المشرفون',

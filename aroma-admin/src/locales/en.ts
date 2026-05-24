@@ -696,14 +696,11 @@ const en = {
     },
   },
   pagination: {
-    showing: 'Showing',
-    to: 'to',
     of: 'of',
     results: 'results',
     prev: 'Previous',
     next: 'Next',
     page: 'Page',
-    perPage: 'Per page',
   },
   admins: {
     title: 'Admins',
