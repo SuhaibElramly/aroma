@@ -36,6 +36,18 @@ const en = {
     storefront: 'Storefront',
     homepage: 'Homepage',
   },
+  commandPalette: {
+    placeholder:     'Search pages, products, customers, orders…',
+    sectionNavigate: 'Navigate',
+    sectionProducts: 'Products',
+    sectionUsers:    'Customers',
+    sectionOrders:   'Orders',
+    sectionBrands:   'Brands',
+    sectionCoupons:  'Coupons',
+    emptyHint:       'Type to search across the admin',
+    noResults:       'No matches',
+    escHint:         'Esc',
+  },
   topbar: {
     signOut: 'Sign Out',
     newProduct: 'New product',

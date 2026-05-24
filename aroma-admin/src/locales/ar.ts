@@ -38,6 +38,18 @@ const ar = {
     storefront: 'الواجهة',
     homepage: 'الصفحة الرئيسية',
   },
+  commandPalette: {
+    placeholder:     'بحث في الصفحات، المنتجات، العملاء، الطلبات…',
+    sectionNavigate: 'تصفح',
+    sectionProducts: 'المنتجات',
+    sectionUsers:    'العملاء',
+    sectionOrders:   'الطلبات',
+    sectionBrands:   'العلامات',
+    sectionCoupons:  'الكوبونات',
+    emptyHint:       'اكتب للبحث في لوحة التحكم',
+    noResults:       'لا توجد نتائج',
+    escHint:         'Esc',
+  },
   topbar: {
     signOut: 'تسجيل الخروج',
     newProduct: 'منتج جديد',
