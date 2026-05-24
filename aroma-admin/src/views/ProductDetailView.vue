@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import type { ProductVariant, ProductDiscount } from '../types'
 import AModal from '../components/ui/AModal.vue'
 import { useI18n } from 'vue-i18n'
+import { getApiUrl } from '../lib/api-url'
 
 const props  = defineProps<{ id: string }>()
 const router = useRouter()
@@ -41,7 +42,7 @@ const form = ref({
 })
 
 // ── API helpers ────────────────────────────────────────────────────────────
-const BASE    = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
+const BASE    = getApiUrl()
 const token   = () => localStorage.getItem('admin_token') ?? ''
 const headers = () => ({
   'Authorization': `Bearer ${token()}`,
